@@ -5,178 +5,251 @@
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue)
 ![Supabase](https://img.shields.io/badge/Backend-Supabase-green)
 ![TailwindCSS](https://img.shields.io/badge/Styling-TailwindCSS-06B6D4)
+![License](https://img.shields.io/badge/License-MIT-gray)
 
-**CryptoAgent** is a comprehensive multi-asset algorithmic trading software designed to track, analyze, and manage real-time market data across various asset classes, including Cryptocurrencies, Forex, Stocks, and Commodities. Built with React and Supabase, it provides role-based access, automated alerting systems, and an AI strategy builder.
+**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading and monitoring software. It allows users to track, analyze, and manage real-time market data across various asset classes (Cryptocurrencies, Forex, Stocks, and Commodities).
+
+The application features a sophisticated Role-Based Access Control (RBAC) system, real-time push and Telegram notifications via a custom alert engine, an AI Strategy Builder for backtesting, and a centralized manual trading signal broadcast system.
 
 ---
 
 ## 📑 Table of Contents
 
-- [Key Features](#-key-features)
-- [Tech Stack](#-tech-stack)
+- [Deep-Dive Features](#-deep-dive-features)
+  - [User Capabilities](#user-capabilities)
+  - [Administrator Capabilities](#administrator-capabilities)
+- [Detailed Tech Stack](#-detailed-tech-stack)
 - [System Architecture](#-system-architecture)
-- [Database Schema](#-database-schema)
-- [Application Flow](#-application-flow)
-- [Setup & Installation](#-setup--installation)
-- [Project Structure](#-project-structure)
+- [Database Schema & RLS](#-database-schema--rls)
+- [Component Architecture & Flow](#-component-architecture--flow)
+- [External API Integrations](#-external-api-integrations)
+- [Setup & Configuration](#-setup--configuration)
+- [Project Directory Structure](#-project-directory-structure)
+- [Future Roadmap](#-future-roadmap)
 - [License](#-license)
 
 ---
 
-## 🚀 Key Features
+## 🚀 Deep-Dive Features
 
-*   **Multi-Asset Support**: Track and trade Cryptocurrencies, Forex, Stocks, and Commodities from a single interface.
-*   **Real-time Market Data Feeds**: Integration with Binance and CoinGecko for up-to-the-minute price and volume data.
-*   **Role-Based Access Control (RBAC)**: Distinct views and capabilities for regular users (trading feed) and administrators (AI Strategy Builder, Manual Trades, and Alerts Manager).
-*   **Advanced Price Alerts**: Set dynamic conditional alerts (`price_above`, `price_below`, `price_cross`) with real-time push and Telegram notifications.
-*   **Interactive Trading Charts**: High-performance, interactive candlestick charts using Lightweight Charts and Recharts.
-*   **AI Strategy Builder**: Define custom algorithmic trading strategies using multiple technical indicators (EMA, RSI, MACD).
+### User Capabilities
+*   **Trading Feed & Dashboard**: View real-time market overviews, top gainers/losers, and trending assets globally.
+*   **Interactive Trading Charts**: High-performance candlestick charts powered by `lightweight-charts`, integrated directly with Binance and CoinGecko WebSocket/REST feeds.
+*   **Personalized Settings**: Securely manage user profiles and configure Telegram Webhook IDs for external notifications.
+
+### Administrator Capabilities
+Administrators (identified by `crypto@crypto.com`) gain access to an exclusive suite of tools:
+*   **AI Strategy Builder**: A powerful backtesting engine to evaluate algorithmic strategies (EMA Crossover, RSI Oversold/Overbought, MACD, Bollinger Bands) against historical data. Includes equity curves and radar charts for performance metrics (Accuracy, Win Rate, Profit Ratio, Drawdown).
+*   **Price Alerts Manager**: Set dynamic conditional alerts (`price_above`, `price_below`, `price_cross`). The background `alertMonitor.ts` continuously checks these parameters against live market data and dispatches instant Telegram messages when triggered.
+*   **Manual Trade Broadcasting**: Directly dispatch manual trading signals (Entry, Target, Stop Loss) to the platform feed for all users to see, mimicking a VIP signal group.
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Detailed Tech Stack
 
-*   **Frontend**: React 18, Vite, TypeScript
-*   **Styling**: TailwindCSS, Lucide React (Icons)
-*   **Charting**: Lightweight Charts (TradingView), Recharts
-*   **Backend / Database**: Supabase (PostgreSQL, Row Level Security)
-*   **APIs**: Binance API, CoinGecko API, Telegram Bot API
+*   **Frontend Framework**: React 18 initialized via Vite for lightning-fast HMR and optimized production builds.
+*   **Type Safety**: 100% strictly-typed TypeScript across components, hooks, and services.
+*   **State & Data Fetching**: React Hooks (`useState`, `useEffect`) coupled with Supabase Realtime subscriptions.
+*   **Styling Engine**: TailwindCSS for utility-first styling, paired with Lucide React for consistent, crisp SVG iconography.
+*   **Data Visualization**: 
+    *   `lightweight-charts` by TradingView for financial candlestick rendering.
+    *   `recharts` for backtesting equity curves and strategy radar charts.
+*   **Backend & Auth**: Supabase (PostgreSQL). Handles user authentication (JWT), database interactions, and Row Level Security (RLS).
 
 ---
 
 ## 🏗 System Architecture
 
-The application adopts a modern serverless backend architecture connected to a reactive frontend.
+The platform architecture is designed for low latency and high availability. The frontend subscribes to Supabase via WebSockets for real-time state updates, while polling external APIs for high-frequency pricing data.
 
 ```mermaid
 graph TD
-    %% Define styles
     classDef frontend fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
     classDef backend fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
     classDef external fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#fff
 
-    subgraph Frontend [React Frontend Client]
-        UI[User Interface]
-        Charts[Interactive Charts]
-        Services[Background Services / Polishers]
+    subgraph "Frontend Client (React/Vite)"
+        UI[User Interface & Routing]
+        Charts[Lightweight Charts Engine]
+        AlertWorker[Alert Polling Service]
+        SimWorker[Market Simulator Service]
     end
 
-    subgraph Backend [Supabase Backend]
+    subgraph "Supabase Backend Core"
         DB[(PostgreSQL Database)]
-        Auth[Auth / RLS]
-        Cache[Market Data Cache]
+        Realtime[Realtime WebSocket Engine]
+        Auth[GoTrue Auth Service]
     end
 
-    subgraph External [External Services]
-        Binance(Binance API)
-        CoinGecko(CoinGecko API)
-        Telegram(Telegram Bot API)
+    subgraph "External Ecosystem"
+        Binance[Binance REST API]
+        CoinGecko[CoinGecko API]
+        Telegram[Telegram Bot API]
     end
 
-    %% Connections
-    UI --> Auth
-    UI --> Charts
-    UI --> Services
-    Services --> |Fetch Prices| Binance
-    Services --> |Fetch Market Data| CoinGecko
-    Services <--> |Cache / Retrieve| Cache
-    Services --> |Check Alerts| DB
-    Services --> |Send Notification| Telegram
-    Auth --> DB
+    UI <--> |JWT Authentication| Auth
+    UI <--> |CRUD Operations| DB
+    UI <--> |Live Subscriptions| Realtime
+    
+    Charts --> |Fetch OHLCV Candles| Binance
+    SimWorker --> |Fetch Global Market Data| CoinGecko
+    
+    AlertWorker --> |Poll Active Alerts| DB
+    AlertWorker --> |Trigger Condition Met| Telegram
+    AlertWorker --> |Fetch Latest Price| Binance
 
-    class UI,Charts,Services frontend;
-    class DB,Auth,Cache backend;
+    class UI,Charts,AlertWorker,SimWorker frontend;
+    class DB,Realtime,Auth backend;
     class Binance,CoinGecko,Telegram external;
 ```
 
 ---
 
-## 🗄 Database Schema
+## 🗄 Database Schema & RLS
 
-The core backend relies on a PostgreSQL database managed by Supabase. Here is the Entity-Relationship (ER) diagram for the main operational tables.
+The PostgreSQL database leverages Supabase Row Level Security (RLS) to ensure users can only access and mutate their own data, while Admins have broader privileges.
 
 ```mermaid
 erDiagram
-    USERS ||--o{ PRICE_ALERTS : creates
-    USERS ||--o{ MARKET_DATA_CACHE : queries
-
-    USERS {
+    auth_users ||--o{ price_alerts : creates
+    auth_users ||--o{ market_data_cache : accesses
+    
+    auth_users {
         uuid id PK
         string email
         timestamptz created_at
     }
 
-    PRICE_ALERTS {
+    price_alerts {
         uuid id PK
-        uuid user_id FK
-        string symbol "e.g., BTC/USDT"
-        string asset_type "crypto, forex, stock, commodity"
-        string exchange
-        string alert_type "price_above, price_below, price_cross, manual"
+        uuid user_id FK "References auth.users"
+        text symbol "e.g., BTC/USDT"
+        text asset_type "CHECK (crypto, forex, stock, commodity)"
+        text exchange
+        text alert_type "CHECK (price_above, price_below, price_cross, manual)"
         numeric target_price
         numeric condition_value
-        string message
-        string status "active, triggered, cancelled"
+        text message
+        text status "CHECK (active, triggered, cancelled)"
         boolean telegram_enabled
-        string telegram_chat_id
+        text telegram_chat_id
         timestamptz triggered_at
         timestamptz created_at
     }
 
-    MARKET_DATA_CACHE {
+    manual_trades {
         uuid id PK
-        string symbol
-        string asset_type
-        string exchange
+        text coin_name
+        numeric entry_price
+        numeric stop_loss
+        numeric target_price
+        text message
+        timestamptz created_at
+    }
+
+    ai_strategies {
+        uuid id PK
+        text strategy_name "UNIQUE"
+        numeric accuracy
+        numeric drawdown
+        numeric profit_ratio
+        integer trades_count
+        numeric win_rate
+        timestamptz updated_at
+    }
+
+    market_data_cache {
+        uuid id PK
+        text symbol
+        text asset_type
+        text exchange
         jsonb data
         timestamptz expires_at
     }
 ```
 
+### Security Policies (Row Level Security)
+- **`price_alerts`**: Users can `SELECT`, `INSERT`, `UPDATE`, and `DELETE` only where `auth.uid() = user_id`.
+- **`manual_trades`**: Public read access (`anon`), but only authorized administrators should be inserting via the UI.
+- **`ai_strategies`**: Public read access to display backtest metrics globally.
+
 ---
 
-## 🔄 Application Flow
+## 🔄 Component Architecture & Flow
 
-The system continuously monitors market data and checks active user alerts. When a condition is met, notifications are dispatched.
+### Alert Trigger Lifecycle
+This sequence diagram illustrates the lifecycle of a price alert, from user creation to the background service triggering a Telegram push notification.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as User
-    participant F as Frontend App
-    participant DB as Supabase DB
-    participant API as Binance/CoinGecko
-    participant TG as Telegram Service
+    participant AM as AlertsManager (UI)
+    participant DB as Supabase (price_alerts)
+    participant Srv as alertMonitor.ts
+    participant Bin as Binance API
+    participant TG as Telegram API
 
-    U->>F: Create Price Alert (e.g. BTC > 100k)
-    F->>DB: Insert Alert into `price_alerts` table
-    DB-->>F: Success
+    U->>AM: Enters Symbol, Target Price, checks "Telegram"
+    AM->>DB: INSERT INTO price_alerts
+    DB-->>AM: Return created record
+    AM-->>U: Show Success UI
     
-    loop Every 30 seconds (Alert Monitor)
-        F->>DB: Fetch Active Alerts
-        DB-->>F: Return Alerts List
-        F->>API: Fetch Latest Candles / Realtime Price
-        API-->>F: Return Latest Price Data
+    loop Every 30s Polling Cycle
+        Srv->>DB: SELECT * FROM price_alerts WHERE status = 'active'
+        DB-->>Srv: Return List of Alerts
         
-        opt If Price Meets Condition
-            F->>DB: Update Alert Status to 'triggered'
-            F->>TG: Dispatch message to `telegram_chat_id`
-            TG-->>U: Push Notification Received
+        Srv->>Bin: fetchLatestCandle() for symbols
+        Bin-->>Srv: Return Current Price
+        
+        opt Current Price >= Target Price
+            Srv->>DB: UPDATE status = 'triggered'
+            Srv->>TG: POST https://api.telegram.org/bot{TOKEN}/sendMessage
+            TG-->>U: Push Notification to Mobile
         end
     end
 ```
 
+### AI Strategy Backtesting Flow
+```mermaid
+flowchart LR
+    A[Select Strategy in UI] --> B{Fetch historical OHLCV}
+    B --> C[Calculate Indicators]
+    C --> D[Simulate Trades]
+    D --> E[Calculate Metrics]
+    
+    E --> F[Accuracy %]
+    E --> G[Max Drawdown]
+    E --> H[Profit Factor]
+    
+    F --> I[Render Recharts Radar & Equity Curve]
+    G --> I
+    H --> I
+```
+
 ---
 
-## ⚙️ Setup & Installation
+## 🌐 External API Integrations
+
+1. **Binance REST API** (`api.binance.com`)
+   - Used for fetching historical candlestick data (`/api/v3/klines`) and real-time ticker prices (`/api/v3/ticker/price`).
+   - Powers the `TradingViewChart.tsx` component.
+2. **CoinGecko API** (`api.coingecko.com`)
+   - Used within `marketSimulation.ts` to fetch 24-hour global volume, price changes, and metadata for a predefined list of top 50 cryptocurrencies.
+3. **Telegram Bot API** (`api.telegram.org`)
+   - Used in `telegramService.ts` to push JSON payloads containing triggered alert details to specific `chat_id`s.
+
+---
+
+## ⚙️ Setup & Configuration
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v18+)
 - npm or yarn
-- Supabase Account and Project
-- (Optional) Telegram Bot Token
+- Supabase Account
+- Telegram Bot Token (obtained from `@BotFather`)
 
-### 1. Clone the repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/yourusername/multi-asset-algorithmic-trading-software.git
 cd multi-asset-algorithmic-trading-software
@@ -187,57 +260,75 @@ cd multi-asset-algorithmic-trading-software
 npm install
 ```
 
-### 3. Environment Variables
-Create a `.env` file in the root directory and add your Supabase credentials:
+### 3. Environment Configuration
+Create a `.env` file in the root directory:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-### 4. Database Setup
-Execute the SQL migrations found in the `supabase/migrations/` and the root `.sql` files directly in your Supabase SQL Editor to set up the necessary tables (e.g., `price_alerts`) and Row Level Security (RLS) policies.
-- Run `create_price_alerts_table.sql`
-- Run `fix_rls_issues.sql`
+### 4. Database Migrations
+Navigate to the Supabase SQL Editor in your dashboard and execute the SQL files in the following order:
+1. `create_price_alerts_table.sql`
+2. `supabase/migrations/20251027051145_create_crypto_trading_tables.sql`
+3. `fix_rls_issues.sql`
 
-### 5. Start the Development Server
+### 5. Start Development Server
 ```bash
 npm run dev
 ```
-The application will be running at `http://localhost:5173`.
+The application will launch on `http://localhost:5173`. 
+*Note: To access admin features, create an account with the email `crypto@crypto.com`.*
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Directory Structure
 
 ```text
 multi-asset-algorithmic-trading-software/
 ├── src/
-│   ├── components/       # Reusable React components & Views
-│   │   ├── Auth/         # Login & Signup flows
-│   │   ├── AIStrategyBuilder.tsx
-│   │   ├── AlertsManager.tsx
-│   │   ├── TradingViewChart.tsx
-│   │   └── ...
-│   ├── lib/              # Library configurations (e.g., Supabase client)
-│   ├── services/         # Core business logic
-│   │   ├── alertMonitor.ts       # Polling and processing alerts
-│   │   ├── dataFeed.ts           # Interacting with Binance/CoinGecko APIs
-│   │   ├── marketSimulation.ts   # Market simulation utilities
-│   │   └── telegramService.ts    # Telegram bot integration
-│   ├── utils/            # Helper functions
-│   ├── App.tsx           # Main application routing and RBAC handling
-│   ├── index.css         # Tailwind directives
-│   └── main.tsx          # Application entry point
+│   ├── components/                 # React UI Views
+│   │   ├── Auth/                   # Login/Signup Forms
+│   │   ├── AIStrategyBuilder.tsx   # Recharts backtesting UI
+│   │   ├── AlertsManager.tsx       # Alert creation & list
+│   │   ├── Dashboard.tsx           # Main analytics view
+│   │   ├── ManualTrades.tsx        # Admin signal broadcasting
+│   │   ├── MarketDashboard.tsx     # Trading terminal view
+│   │   ├── StrategyAlerts.tsx      # System alert feed
+│   │   ├── TradingViewChart.tsx    # Lightweight-charts wrapper
+│   │   └── UserDashboard.tsx       # Standard user feed
+│   ├── lib/
+│   │   └── supabase.ts             # Supabase client instantiation
+│   ├── services/                   # Business Logic & APIs
+│   │   ├── alertMonitor.ts         # Background alert polling
+│   │   ├── dataFeed.ts             # Binance/External data fetchers
+│   │   ├── marketSimulation.ts     # CoinGecko volume simulator
+│   │   └── telegramService.ts      # Push notification dispatcher
+│   ├── utils/                      # Mocks and helpers
+│   ├── App.tsx                     # Routing & RBAC Gatekeeper
+│   ├── main.tsx                    # React DOM entry
+│   └── index.css                   # Tailwind base imports
 ├── supabase/
-│   └── migrations/       # Database migration scripts
-├── package.json          # Project dependencies and scripts
-├── tailwind.config.js    # Tailwind configuration
-├── vite.config.ts        # Vite configuration
-└── README.md             # This documentation
+│   └── migrations/                 # DB schemas and initial seed data
+├── .env                            # Local environment variables
+├── package.json                    # Dependencies & Scripts
+├── tailwind.config.js              # Theme customization
+├── vite.config.ts                  # Bundler configuration
+└── README.md                       # Documentation
 ```
 
 ---
 
+## 🔮 Future Roadmap
+
+- **Self-Learning AI Integration**: Implementing reinforcement learning for real-time strategy optimization.
+- **Automated Hyperparameter Tuning**: Neural architecture search for indicator optimization.
+- **Sentiment Analysis**: Ingesting Twitter/X and News APIs to gauge market fear/greed indices.
+- **Broker Integration**: Execution of trades directly via CCXT (Crypto) and MetaTrader API (Forex).
+
+---
+
 ## 📄 License
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
