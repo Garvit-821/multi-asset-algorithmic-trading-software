@@ -51,8 +51,8 @@ async function fetchBinanceCandles(
       timeout: 10000,
     });
 
-    const candles: CandleData[] = response.data.map((kline: any[]) => ({
-      time: Math.floor(kline[0] / 1000) as Time,
+    const candles: CandleData[] = (response.data as (string | number)[][]).map((kline) => ({
+      time: Math.floor(Number(kline[0]) / 1000) as Time,
       open: Number(kline[1]),
       high: Number(kline[2]),
       low: Number(kline[3]),
@@ -69,9 +69,9 @@ async function fetchBinanceCandles(
 
 // Fetch real candlestick data from alternative sources for non-crypto assets
 async function fetchAlternativeCandles(
-  symbol: string,
-  assetType: AssetType,
-  count: number
+  _symbol: string,
+  _assetType: AssetType,
+  _count: number
 ): Promise<CandleData[]> {
   // For now, return empty array for non-crypto
   // These would require specific APIs (e.g., forex.com for forex, etc.)
@@ -211,7 +211,7 @@ export async function fetchChartData(
 export async function fetchLatestCandle(
   symbol: string,
   assetType: AssetType,
-  exchange?: string
+  _exchange?: string
 ): Promise<CandleData | null> {
   try {
     if (assetType === 'crypto') {

@@ -22,6 +22,7 @@ interface FeedItem {
   coin_name?: string;
   symbol?: string;
   asset_type?: AssetType;
+  exchange?: string;
   condition_type?: string;
   condition_message?: string;
   entry_price?: number;
@@ -196,7 +197,7 @@ export function UserDashboard() {
           try {
             const price = await fetchRealtimePrice(symbol, 'crypto');
             return { ...item, currentPrice: price || undefined };
-          } catch (error) {
+          } catch {
             return item;
           }
         }

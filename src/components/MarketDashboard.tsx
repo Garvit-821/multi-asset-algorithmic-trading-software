@@ -53,7 +53,7 @@ export function MarketDashboard() {
       .eq('asset_type', activeMarket);
 
     if (data) {
-      setWatchlist(data.map((item) => item.symbol));
+      setWatchlist((data as any[]).map((item: any) => item.symbol));
     }
   };
 

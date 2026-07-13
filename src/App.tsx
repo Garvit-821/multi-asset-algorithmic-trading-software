@@ -1,8 +1,5 @@
-import { useState, useEffect } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, LogOut, User, Zap } from 'lucide-react';
-import { supabase } from './lib/supabase';
-import { Login } from './components/Auth/Login';
-import { Signup } from './components/Auth/Signup';
+import { useState } from 'react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -11,75 +8,13 @@ import { AIStrategyBuilder } from './components/AIStrategyBuilder';
 import { UserDashboard } from './components/UserDashboard';
 
 type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed';
-type AuthView = 'login' | 'signup';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('userfeed');
-  const [authView, setAuthView] = useState<AuthView>('login');
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Separate effect to handle admin page access
-  useEffect(() => {
-    if (user) {
-      const isAdminUser = user.email === 'crypto@crypto.com';
-      const isAdminPage = ['alerts', 'manual', 'ai'].includes(currentView);
-      if (!isAdminUser && isAdminPage) {
-        setCurrentView('userfeed');
-      }
-    }
-  }, [user, currentView]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setCurrentView('userfeed');
-  };
-
-  // Check if user is admin (crypto@crypto.com)
-  const isAdmin = user?.email === 'crypto@crypto.com';
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <>
-        {authView === 'login' ? (
-          <Login
-            onSuccess={() => {}}
-            onSwitchToSignup={() => setAuthView('signup')}
-          />
-        ) : (
-          <Signup
-            onSuccess={() => {}}
-            onSwitchToLogin={() => setAuthView('login')}
-          />
-        )}
-      </>
-    );
-  }
+  // Login is removed as a whole; user is always authenticated as the administrator
+  const user = { email: 'crypto@crypto.com', id: 'mock-admin-id' };
+  const isAdmin = true;
 
   // Menu items based on user role
   const userMenuItems = [
@@ -163,13 +98,6 @@ function App() {
               <span className="font-medium">Settings</span>
             </button>
 
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
-            </button>
           </div>
         </aside>
 
