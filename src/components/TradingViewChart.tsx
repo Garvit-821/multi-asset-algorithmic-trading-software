@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createChart, IChartApi, ISeriesApi, ColorType } from 'lightweight-charts';
+import { createChart, IChartApi, ISeriesApi, ColorType, Time } from 'lightweight-charts';
 import { Loader2 } from 'lucide-react';
 
 export type AssetType = 'crypto' | 'forex' | 'stock' | 'commodity';
@@ -76,14 +76,57 @@ export function TradingViewChart({
 
     window.addEventListener('resize', handleResize);
 
-    // Real-time updates (simulated - replace with actual WebSocket/API)
-    const updateInterval = setInterval(() => {
-      updateChartData();
-    }, 5000);
+    // Real-time updates: Use WebSocket for crypto (Binance), fallback to API polling for others
+    let ws: WebSocket | null = null;
+    let updateInterval: NodeJS.Timeout | null = null;
+
+    if (assetType === 'crypto') {
+      const cleanSymbol = symbol.replace('/', '').toLowerCase();
+      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cleanSymbol}@kline_1m`);
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.e === 'kline' && message.k) {
+            const k = message.k;
+            const latestCandle = {
+              time: Math.floor(k.t / 1000) as Time,
+              open: parseFloat(k.o),
+              high: parseFloat(k.h),
+              low: parseFloat(k.l),
+              close: parseFloat(k.c),
+              volume: parseFloat(k.v),
+            };
+
+            if (seriesRef.current) {
+              seriesRef.current.update(latestCandle);
+              if (onPriceUpdate) {
+                onPriceUpdate(latestCandle.close);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing WebSocket message:', err);
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error('Binance WebSocket error:', err);
+      };
+    } else {
+      updateInterval = setInterval(() => {
+        updateChartData();
+      }, 5000);
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      clearInterval(updateInterval);
+      if (ws) {
+        ws.close();
+      }
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
       chart.remove();
     };
   }, [symbol, assetType, exchange]);

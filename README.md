@@ -7,9 +7,9 @@
 ![TailwindCSS](https://img.shields.io/badge/Styling-TailwindCSS-06B6D4)
 ![License](https://img.shields.io/badge/License-MIT-gray)
 
-**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading and monitoring software. It allows users to track, analyze, and manage real-time market data across various asset classes (Cryptocurrencies, Forex, Stocks, and Commodities).
+**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, and monitoring software. It allows users to track, analyze, and trade real-time market data across various asset classes (Cryptocurrencies, Forex, Stocks, and Commodities).
 
-The application features a sophisticated Role-Based Access Control (RBAC) system, real-time push and Telegram notifications via a custom alert engine, an AI Strategy Builder for backtesting, and a centralized manual trading signal broadcast system.
+The application features a sophisticated Role-Based Access Control (RBAC) system, real-time push and Telegram notifications via a custom alert engine, a fully functional dynamic AI Strategy Builder & Backtester, a sandbox Paper Trading portfolio environment, and a centralized manual trading signal broadcast system.
 
 ---
 
@@ -34,12 +34,13 @@ The application features a sophisticated Role-Based Access Control (RBAC) system
 
 ### User Capabilities
 *   **Trading Feed & Dashboard**: View real-time market overviews, top gainers/losers, and trending assets globally.
-*   **Interactive Trading Charts**: High-performance candlestick charts powered by `lightweight-charts`, integrated directly with Binance and CoinGecko WebSocket/REST feeds.
+*   **Interactive Trading Charts**: High-performance candlestick charts powered by `lightweight-charts`, integrated directly with a **live Binance WebSocket stream** (`wss://stream.binance.com:9443/ws/`) for sub-second crypto kline updates, falling back to REST APIs for traditional assets.
+*   **Paper Trading Sandbox**: Practice trading with zero financial risk using a persistent $100,000 USD virtual portfolio. Features include placing BUY/SELL orders directly on the trading interface, an allocations pie chart, real-time unrealized P&L calculations, and a complete order logs history ledger.
 *   **Personalized Settings**: Securely manage user profiles and configure Telegram Webhook IDs for external notifications.
 
 ### Administrator Capabilities
 Administrators (identified by `crypto@crypto.com`) gain access to an exclusive suite of tools:
-*   **AI Strategy Builder**: A powerful backtesting engine to evaluate algorithmic strategies (EMA Crossover, RSI Oversold/Overbought, MACD, Bollinger Bands) against historical data. Includes equity curves and radar charts for performance metrics (Accuracy, Win Rate, Profit Ratio, Drawdown).
+*   **AI Strategy Builder & Backtester**: A powerful, operational client-side backtesting engine. It fetches actual historical candlestick data from Binance, computes technical indicators (EMA, RSI, MACD, Bollinger Bands) in TypeScript, executes trade simulations, and displays real Win Rates, Drawdowns, Profit Ratios, and portfolio equity curves. Includes an "Optimize Hyperparameters" feature to simulate training neural networks for localized rule updates.
 *   **Price Alerts Manager**: Set dynamic conditional alerts (`price_above`, `price_below`, `price_cross`). The background `alertMonitor.ts` continuously checks these parameters against live market data and dispatches instant Telegram messages when triggered.
 *   **Manual Trade Broadcasting**: Directly dispatch manual trading signals (Entry, Target, Stop Loss) to the platform feed for all users to see, mimicking a VIP signal group.
 
@@ -49,18 +50,19 @@ Administrators (identified by `crypto@crypto.com`) gain access to an exclusive s
 
 *   **Frontend Framework**: React 18 initialized via Vite for lightning-fast HMR and optimized production builds.
 *   **Type Safety**: 100% strictly-typed TypeScript across components, hooks, and services.
-*   **State & Data Fetching**: React Hooks (`useState`, `useEffect`) coupled with Supabase Realtime subscriptions.
+*   **State & Data Fetching**: React Hooks (`useState`, `useEffect`) coupled with Supabase Realtime subscriptions and live WebSockets.
+*   **Persistence**: Browser `localStorage` for secure, offline paper portfolio tracking.
 *   **Styling Engine**: TailwindCSS for utility-first styling, paired with Lucide React for consistent, crisp SVG iconography.
 *   **Data Visualization**: 
     *   `lightweight-charts` by TradingView for financial candlestick rendering.
-    *   `recharts` for backtesting equity curves and strategy radar charts.
+    *   `recharts` for backtesting equity curves, strategy radar charts, and paper asset allocation pie charts.
 *   **Backend & Auth**: Supabase (PostgreSQL). Handles user authentication (JWT), database interactions, and Row Level Security (RLS).
 
 ---
 
 ## 🏗 System Architecture
 
-The platform architecture is designed for low latency and high availability. The frontend subscribes to Supabase via WebSockets for real-time state updates, while polling external APIs for high-frequency pricing data.
+The platform architecture is designed for low latency and high availability. The frontend client establishes a direct WebSocket link to Binance streams for market charts, connects to Supabase for authentication and alert data, and utilizes a local persistence layer for the paper trading accounts.
 
 ```mermaid
 graph TD
@@ -73,6 +75,9 @@ graph TD
         Charts[Lightweight Charts Engine]
         AlertWorker[Alert Polling Service]
         SimWorker[Market Simulator Service]
+        PaperService[Paper Trading Service]
+        Backtester[Backtesting & Indicators Engine]
+        LocalDB[(Browser LocalStorage)]
     end
 
     subgraph "Supabase Backend Core"
@@ -82,7 +87,8 @@ graph TD
     end
 
     subgraph "External Ecosystem"
-        Binance[Binance REST API]
+        BinanceWS[Binance WebSocket Stream]
+        BinanceREST[Binance REST API]
         CoinGecko[CoinGecko API]
         Telegram[Telegram Bot API]
     end
@@ -90,17 +96,22 @@ graph TD
     UI <--> |JWT Authentication| Auth
     UI <--> |CRUD Operations| DB
     UI <--> |Live Subscriptions| Realtime
+    PaperService <--> |Persist Portfolio| LocalDB
+    UI <--> PaperService
+    UI <--> Backtester
     
-    Charts --> |Fetch OHLCV Candles| Binance
+    Charts <--> |Stream Sub-second Price| BinanceWS
+    Charts -.-> |Fetch Historical Candles| BinanceREST
+    Backtester --> |Load Historical Data| BinanceREST
     SimWorker --> |Fetch Global Market Data| CoinGecko
     
     AlertWorker --> |Poll Active Alerts| DB
     AlertWorker --> |Trigger Condition Met| Telegram
-    AlertWorker --> |Fetch Latest Price| Binance
+    AlertWorker --> |Fetch Latest Price| BinanceREST
 
-    class UI,Charts,AlertWorker,SimWorker frontend;
+    class UI,Charts,AlertWorker,SimWorker,PaperService,Backtester,LocalDB frontend;
     class DB,Realtime,Auth backend;
-    class Binance,CoinGecko,Telegram external;
+    class BinanceWS,BinanceREST,CoinGecko,Telegram external;
 ```
 
 ---
@@ -210,17 +221,17 @@ sequenceDiagram
     end
 ```
 
-### AI Strategy Backtesting Flow
+### AI Strategy Backtesting & Indicators Flow
 ```mermaid
 flowchart LR
-    A[Select Strategy in UI] --> B{Fetch historical OHLCV}
-    B --> C[Calculate Indicators]
-    C --> D[Simulate Trades]
-    D --> E[Calculate Metrics]
+    A[Select Strategy & Asset in UI] --> B{Fetch historical OHLCV}
+    B --> C[Calculate Technical Indicators<br/>EMA, RSI, MACD, BB]
+    C --> D[Simulate Historical Trades<br/>Long Entry, SL/TP Exit Rules]
+    D --> E[Calculate Performance Metrics]
     
-    E --> F[Accuracy %]
-    E --> G[Max Drawdown]
-    E --> H[Profit Factor]
+    E --> F[Accuracy % / Win Rate]
+    E --> G[Max Drawdown %]
+    E --> H[Profit Factor / Ratio]
     
     F --> I[Render Recharts Radar & Equity Curve]
     G --> I
@@ -231,12 +242,13 @@ flowchart LR
 
 ## 🌐 External API Integrations
 
-1. **Binance REST API** (`api.binance.com`)
-   - Used for fetching historical candlestick data (`/api/v3/klines`) and real-time ticker prices (`/api/v3/ticker/price`).
-   - Powers the `TradingViewChart.tsx` component.
-2. **CoinGecko API** (`api.coingecko.com`)
-   - Used within `marketSimulation.ts` to fetch 24-hour global volume, price changes, and metadata for a predefined list of top 50 cryptocurrencies.
-3. **Telegram Bot API** (`api.telegram.org`)
+1. **Binance WebSocket Stream** (`wss://stream.binance.com:9443`)
+   - Used for sub-second, low-latency candlestick updates (`/ws/<symbol>@kline_1m`) on the charting view.
+2. **Binance REST API** (`api.binance.com`)
+   - Used for fetching historical candlestick data (`/api/v3/klines`) and real-time ticker prices (`/api/v3/ticker/price`) during backtests and manual trade assessments.
+3. **CoinGecko API** (`api.coingecko.com`)
+   - Used within `marketSimulation.ts` to fetch 24-hour global volume, price changes, and metadata for a predefined list of top cryptocurrencies.
+4. **Telegram Bot API** (`api.telegram.org`)
    - Used in `telegramService.ts` to push JSON payloads containing triggered alert details to specific `chat_id`s.
 
 ---
@@ -295,9 +307,10 @@ multi-asset-algorithmic-trading-software/
 │   │   ├── AlertsManager.tsx       # Alert creation & list
 │   │   ├── Dashboard.tsx           # Main analytics view
 │   │   ├── ManualTrades.tsx        # Admin signal broadcasting
-│   │   ├── MarketDashboard.tsx     # Trading terminal view
+│   │   ├── MarketDashboard.tsx     # Trading terminal & paper order widget
+│   │   ├── PaperTrading.tsx        # Paper trading portfolio UI
 │   │   ├── StrategyAlerts.tsx      # System alert feed
-│   │   ├── TradingViewChart.tsx    # Lightweight-charts wrapper
+│   │   ├── TradingViewChart.tsx    # Live WebSocket lightweight-charts wrapper
 │   │   └── UserDashboard.tsx       # Standard user feed
 │   ├── lib/
 │   │   └── supabase.ts             # Supabase client instantiation
@@ -305,6 +318,7 @@ multi-asset-algorithmic-trading-software/
 │   │   ├── alertMonitor.ts         # Background alert polling
 │   │   ├── dataFeed.ts             # Binance/External data fetchers
 │   │   ├── marketSimulation.ts     # CoinGecko volume simulator
+│   │   ├── paperTradingService.ts  # Virtual trade ledger & balance store
 │   │   └── telegramService.ts      # Push notification dispatcher
 │   ├── utils/                      # Mocks and helpers
 │   ├── App.tsx                     # Routing & RBAC Gatekeeper

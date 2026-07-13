@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
 import { ManualTrades } from './components/ManualTrades';
 import { AIStrategyBuilder } from './components/AIStrategyBuilder';
 import { UserDashboard } from './components/UserDashboard';
+import { PaperTrading } from './components/PaperTrading';
 
-type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed';
+type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed' | 'paper';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('userfeed');
@@ -20,6 +21,7 @@ function App() {
   const userMenuItems = [
     { id: 'userfeed' as View, label: 'Trading Feed', icon: Zap },
     { id: 'trading' as View, label: 'Trading', icon: TrendingUp },
+    { id: 'paper' as View, label: 'Paper Trading', icon: Wallet },
     { id: 'dashboard' as View, label: 'Dashboard', icon: LayoutDashboard },
   ];
 
@@ -109,6 +111,13 @@ function App() {
             </div>
           )}
           {currentView === 'trading' && <MarketDashboard />}
+          {currentView === 'paper' && (
+            <div className="h-full overflow-y-auto">
+              <div className="p-8">
+                <PaperTrading />
+              </div>
+            </div>
+          )}
           {currentView === 'dashboard' && (
             <div className="h-full overflow-y-auto">
               <div className="p-8">
