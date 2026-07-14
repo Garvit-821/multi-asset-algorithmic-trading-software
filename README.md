@@ -1,79 +1,162 @@
 # CryptoAgent - Multi-Asset Algorithmic Trading Platform
 
-![CryptoAgent Overview](https://img.shields.io/badge/Status-Active-brightgreen)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue)
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue)
 ![Supabase](https://img.shields.io/badge/Backend-Supabase-green)
-![TailwindCSS](https://img.shields.io/badge/Styling-TailwindCSS-06B6D4)
+![TailwindCSS](https://img.shields.io/badge/Theme-Coinbase%20Design%20System-0052ff)
 ![License](https://img.shields.io/badge/License-MIT-gray)
 
-**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, and monitoring software. It allows users to track, analyze, and trade real-time market data across various asset classes (Cryptocurrencies, Forex, Stocks, and Commodities).
-
-The application features a sophisticated Role-Based Access Control (RBAC) system, real-time push and Telegram notifications via a custom alert engine, a fully functional dynamic AI Strategy Builder & Backtester, a sandbox Paper Trading portfolio environment, and a centralized manual trading signal broadcast system.
+**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, and risk analysis platform. It allows quantitative traders to backtest indicator-based models, simulate portfolio exposures under extreme drawdowns, track live digital assets via sub-second WebSocket feeds, and dispatch real-time status notifications to Telegram.
 
 ---
 
 ## 📑 Table of Contents
 
-- [Deep-Dive Features](#-deep-dive-features)
-  - [User Capabilities](#user-capabilities)
-  - [Administrator Capabilities](#administrator-capabilities)
-- [Detailed Tech Stack](#-detailed-tech-stack)
-- [System Architecture](#-system-architecture)
-- [Database Schema & RLS](#-database-schema--rls)
-- [Component Architecture & Flow](#-component-architecture--flow)
-- [External API Integrations](#-external-api-integrations)
-- [Setup & Configuration](#-setup--configuration)
-- [Project Directory Structure](#-project-directory-structure)
-- [Future Roadmap](#-future-roadmap)
-- [License](#-license)
+1. [Deep-Dive Features](#-deep-dive-features)
+   - [User Workspace Capabilities](#user-workspace-capabilities)
+   - [Administrator Workspace Capabilities](#administrator-workspace-capabilities)
+2. [Coinbase-Inspired Design System](#-coinbase-inspired-design-system)
+   - [Visual Tokens & Color Palette](#visual-tokens--color-palette)
+   - [Typography & Geometry Rules](#typography--geometry-rules)
+3. [Core Algorithms & Mathematical Frameworks](#-core-algorithms--mathematical-frameworks)
+   - [Geometric Brownian Motion (Monte Carlo)](#1-geometric-brownian-motion-monte-carlo)
+   - [Risk of Ruin Computation](#2-risk-of-ruin-computation)
+   - [Sharpe and Sortino Risk-Adjusted Ratios](#3-sharpe-and-sortino-risk-adjusted-ratios)
+   - [Parametric Value at Risk (VaR)](#4-parametric-value-at-risk-var)
+   - [Pearson Correlation Matrix](#5-pearson-correlation-matrix)
+4. [System Architecture](#-system-architecture)
+5. [Database Schema & RLS Security](#-database-schema--rls-security)
+6. [External API Integrations](#-external-api-integrations)
+7. [Developer Setup & Configuration](#-developer-setup--configuration)
+8. [Directory Layout](#-directory-layout)
 
 ---
 
 ## 🚀 Deep-Dive Features
 
-### User Capabilities
-*   **Trading Feed & Dashboard**: View real-time market overviews, top gainers/losers, and trending assets globally.
-*   **Interactive Trading Charts**: High-performance candlestick charts powered by `lightweight-charts`, integrated directly with a **live Binance WebSocket stream** (`wss://stream.binance.com:9443/ws/`) for sub-second crypto kline updates, falling back to REST APIs for traditional assets.
-*   **Paper Trading Sandbox**: Practice trading with zero financial risk using a persistent $100,000 USD virtual portfolio. Features include:
-    *   **Live Positions & Orders**: Place BUY/SELL orders directly on the trading interface, with real-time updates and manual close buttons.
-    *   **Asset Allocation Visualization**: A dynamic Recharts donut chart representing cash vs. open position ratios.
-    *   **High-Water Mark & Drawdown Visualizer**: A Composed Recharts chart mapping portfolio equity, tracking peak portfolio value (HWM), and dynamically shading the area under it to highlight drawdown depth and durations.
-    *   **Monte Carlo Ruin Probability Simulator**: Simulates 1,000+ geometric Brownian motion paths over customizable horizons (15-60 days) and thresholds to predict the probability of reaching a drawdown limit (Risk of Ruin).
-    *   **Institutional Statistics Matrix**: Real-time calculations of Sharpe Ratio, Sortino Ratio, 95% Confidence Value at Risk (VaR), and Pearson correlation coefficients against key asset classes (Bitcoin, S&P 500, Gold, EUR/USD).
-*   **CryptoAgent Landing Page**: A high-impact entry showcase exhibiting core capabilities, including real-time WebSocket speeds, Monte Carlo simulator previews, Sharpe/Sortino indicators, and direct terminal workspace entry points.
-*   **Mobile-Responsive UI & Sidebar Drawer**: Fluid styling for all screen sizes, incorporating mobile hamburger triggers, auto-collapsing sidebar navigation drawers, backdrop overlays, and scrollable data/chart containers.
-*   **Personalized Settings**: Securely manage user profiles and configure Telegram Webhook IDs for external notifications.
+### User Workspace Capabilities
 
-### Administrator Capabilities
-Administrators (identified by `crypto@crypto.com`) gain access to an exclusive suite of tools:
-*   **AI Strategy Builder & Backtester**: A powerful, operational client-side backtesting engine. It fetches actual historical candlestick data from Binance, computes technical indicators (EMA, RSI, MACD, Bollinger Bands) in TypeScript, executes trade simulations, and displays real Win Rates, Drawdowns, Profit Ratios, and portfolio equity curves. Includes an "Optimize Hyperparameters" feature to simulate training neural networks for localized rule updates.
-*   **Price Alerts Manager**: Set dynamic conditional alerts (`price_above`, `price_below`, `price_cross`). The background `alertMonitor.ts` continuously checks these parameters against live market data and dispatches instant Telegram messages when triggered.
-*   **Manual Trade Broadcasting**: Directly dispatch manual trading signals (Entry, Target, Stop Loss) to the platform feed for all users to see, mimicking a VIP signal group.
+*   **CryptoAgent Landing Page**: A premium, full-width showcase introducing users to the terminal features. Features include:
+    *   **Live Market Rates Bar**: A light-gray elevation band mapping real-time pricing indicators.
+    *   **Portfolio Snapshot Previews**: Multi-layered product mockup cards displaying cash value growth, 24h performance ratios, and active risk stats.
+    *   **Interactive Anchors**: Direct links to explorer listings, backtest specs, and the main workspace entrance.
+*   **Trading Feed & Dashboard**: A real-time, central activity feed showing active AI strategies, triggered price alerts, and manual admin trading broadcasts (Entry, Target, Stop Loss).
+*   **Interactive Trading Charts**: High-performance charting powered by TradingView's `lightweight-charts`. 
+    *   **Crypto Feeds**: Direct connection to the **live Binance WebSocket stream** (`wss://stream.binance.com:9443/ws/`) for sub-second, sub-150ms kline updates.
+    *   **Traditional Assets**: REST-based polling fallbacks for global indexes, commodities, and Forex rates.
+*   **Paper Trading Sandbox**: A risk-free, client-side trading workspace.
+    *   **Balance Ledger**: Persistent virtual portfolio initialized at $100,000 USD.
+    *   **Order Book Execution**: Execute market buy/sell trades with instant slippage estimates, active position tracking, and manual liquidation controls.
+    *   **Asset Allocation Charting**: A Recharts pie representation rendering current cash vs. holdings ratios.
+    *   **HWM & Drawdown Visualizer**: A Composed Recharts chart displaying portfolio equity, tracking peak valuations (High-Water Mark), and dynamically shading the area under it during drawdown states.
+    *   **Stochastic Ruin Predictor**: Computes 1,000+ geometric Brownian motion paths to calculate the probability of strategy bankruptcy.
+    *   **Institutional Statistics Matrix**: Calculates and displays risk-adjusted metrics (Sharpe, Sortino, VaR, Correlations) in real-time.
+*   **Personalized Configurations**: Set user names, save interface rules, and save Telegram Chat IDs to enable background notification routing.
+
+### Administrator Workspace Capabilities
+
+Administrators (automatically logged in under the credentials `crypto@crypto.com`) access additional tooling:
+*   **AI Strategy Builder & Backtester**: A client-side backtesting engine.
+    *   **Historical Candle Loader**: Fetches actual historical OHLCV klines from Binance REST endpoints.
+    *   **Technical Indicator Pipeline**: Computes indicators (EMA, RSI, MACD, Bollinger Bands) in native TypeScript.
+    *   **Backtest Simulator**: Executes logic rules to calculate Win Rates, Profit Factors, maximum drawdowns, and renders an equity curve overlay.
+    *   **Hyperparameter Optimizer**: Runs iterative loops over variable indicator ranges to automatically identify maximum profitability levels.
+*   **Price Alerts Manager**: Set conditional alerts (`price_above`, `price_below`, `price_cross`). The background alert polling thread (`alertMonitor.ts`) validates these parameters against live REST tickers, updating state tables and executing API triggers.
+*   **Manual Signal Broadcast**: Set custom entry points, profit targets, and stop-loss levels, then publish them directly to the main user feed.
 
 ---
 
-## 🛠 Detailed Tech Stack
+## 🎨 Coinbase-Inspired Design System
 
-*   **Frontend Framework**: React 18 initialized via Vite for lightning-fast HMR and optimized production builds.
-*   **Type Safety**: 100% strictly-typed TypeScript across components, hooks, and services.
-*   **State & Data Fetching**: React Hooks (`useState`, `useEffect`) coupled with Supabase Realtime subscriptions and live WebSockets.
-*   **Persistence**: Browser `localStorage` for secure, offline paper portfolio tracking.
-*   **Styling Engine**: TailwindCSS for utility-first styling, paired with Lucide React for consistent, crisp SVG iconography.
-*   **Data Visualization**: 
-    *   `lightweight-charts` by TradingView for financial candlestick rendering.
-    *   `recharts` for backtesting equity curves, strategy radar charts, and paper asset allocation pie charts.
-*   **Backend & Auth**: Supabase (PostgreSQL). Handles user authentication (JWT), database interactions, and Row Level Security (RLS).
+The frontend layout strictly inherits the quietly-confident Coinbase brand voice defined in `DESIGN.md`.
+
+### Visual Tokens & Color Palette
+
+| Token | Hex / Value | Application |
+|---|---|---|
+| **Canvas** | `#ffffff` | Primary bright background page floor |
+| **Surface Soft** | `#f7f7f7` | Soft gray elevation bands, list backgrounds, main container floor |
+| **Surface Dark** | `#0a0b0d` | Deep near-black background for landing page heroes, pre-footers, and headers |
+| **Surface Dark Elevated** | `#16181c` | One step lighter, used for mockup cards, sidebar admin panels |
+| **Primary (Coinbase Blue)** | `#0052ff` | Used scarcely. The single brand voltage for active buttons, key links, and icons |
+| **Primary Active** | `#003ecc` | Pressed/Hover state darken for blue buttons |
+| **Hairline** | `#dee1e6` | Subtle 1px dividers on white canvases |
+| **Hairline Soft** | `#eef0f3` | Subtle 1px dividers on gray surfaces |
+| **Semantic Up** | `#05b169` | Text-only coloring for positive asset gains and returns |
+| **Semantic Down** | `#cf202f` | Text-only coloring for negative asset losses and drawdowns |
+
+### Typography & Geometry Rules
+
+1. **Display Weights**: Headlines use `Inter` at weight 400 (never bold 700+), mapping to the quiet editorial style. Negative tracking (`tracking-tight` at -1.5% to -2%) is applied to displays only.
+2. **Numeric Rendering**: Every numerical value (prices, balance sums, percentages, stats matrix) is rendered in the monospace font `JetBrains Mono`.
+3. **Pill & Shape Geometries**:
+   - Interactive buttons, search bars, and tags use `{rounded.pill}` (100px / `rounded-full`).
+   - Cards, chart containers, and modular panels use `{rounded.xl}` (24px / `rounded-3xl`).
+   - Avatars and asset icons use circular geometry (diameter 32px / `rounded-full`).
+4. **Mobile Responsive Strategy**:
+   - Navigation collapses to an overlay drawer sliding out from the left.
+   - Display headlines step down dynamically (80px → 64px → 40px).
+   - Stacking layouts collapse from 3-up to 1-up grids.
+   - Overlapping card mockups collapse to a single card to fit small screens.
+
+---
+
+## 🧮 Core Algorithms & Mathematical Frameworks
+
+### 1. Geometric Brownian Motion (Monte Carlo)
+
+To simulate future price paths, we assume prices follow a stochastic process under Geometric Brownian Motion (GBM):
+$$dS_t = \mu S_t dt + \sigma S_t dW_t$$
+
+We discretize this process over the daily step horizon $\Delta t = 1$:
+$$S_t = S_{t-1} \exp\left(\left(\mu - \frac{1}{2}\sigma^2\right)\Delta t + \sigma Z \sqrt{\Delta t}\right)$$
+
+Where:
+*   $S_t$: Simulated portfolio value on day $t$.
+*   $\mu$: Daily return drift coefficient, calculated from historical performance:
+    $$\mu = \text{mean}(R)$$
+*   $\sigma$: Daily standard deviation of historical portfolio returns:
+    $$\sigma = \sqrt{\frac{1}{N-1}\sum_{i=1}^{N}(R_i - \bar{R})^2}$$
+*   $Z$: Random variable generated using the **Box-Muller Transform** to map uniform coordinates to a standard normal distribution:
+    $$Z = \sqrt{-2\ln U_1} \cos(2\pi U_2) \quad \text{where } U_1, U_2 \sim \text{Uniform}(0,1)$$
+
+### 2. Risk of Ruin Computation
+
+The risk of ruin predicts the probability that the portfolio value will hit or fall below a specified drawdown liquidation threshold (e.g., $75,000) at any point during the $N$-day horizon (simulated over $M = 1000$ paths):
+$$\text{Risk of Ruin} = \frac{1}{M}\sum_{m=1}^{M} \mathbb{I}\left( \min_{0 \le t \le N} S_{t,m} < \text{Threshold} \right) \times 100\%$$
+
+Where $\mathbb{I}$ is the indicator function, returning $1$ if the condition is met and $0$ otherwise.
+
+### 3. Sharpe and Sortino Risk-Adjusted Ratios
+
+*   **Sharpe Ratio**: Measures the portfolio return relative to total volatility:
+    $$\text{Sharpe} = \frac{R_p - R_f}{\sigma_p} \times \sqrt{252}$$
+    Where $R_p$ is average daily return, $R_f$ is risk-free rate, and $\sigma_p$ is standard deviation.
+*   **Sortino Ratio**: Focuses on downside risk by replacing total volatility with downside deviation ($\sigma_d$):
+    $$\text{Sortino} = \frac{R_p - R_f}{\sigma_d} \times \sqrt{252}$$
+    $$\text{where } \sigma_d = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left[\min\left(0, R_{i} - R_f\right)\right]^2}$$
+
+### 4. Parametric Value at Risk (VaR)
+
+Represents the maximum expected dollar loss over a 1-day horizon at a given confidence level ($1-\alpha$):
+$$\text{VaR}_{1-\alpha} = \text{Portfolio Value} \times \left( Z_{\alpha} \times \sigma_p \right)$$
+Where $Z_{\alpha}$ is the normal distribution critical value ($1.645$ for $95\%$ confidence, $2.326$ for $99\%$ confidence).
+
+### 5. Pearson Correlation Matrix
+
+Correlates simulated portfolio returns against global asset classes (Bitcoin, S&P 500, Gold, EUR/USD):
+$$\rho_{X,Y} = \frac{\sum_{i=1}^{N}(X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^{N}(X_i - \bar{X})^2 \sum_{i=1}^{N}(Y_i - \bar{Y})^2}}$$
 
 ---
 
 ## 🏗 System Architecture
 
-The platform architecture is designed for low latency and high availability. The frontend client establishes a direct WebSocket link to Binance streams for market charts, connects to Supabase for authentication and alert data, and utilizes a local persistence layer for the paper trading accounts.
+The platform architecture is designed for low latency. A client-side WebSockets interface streams real-time data from Binance, while Supabase handles configurations and alerts.
 
 ```mermaid
 graph TD
-    classDef frontend fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+    classDef frontend fill:#0052ff,stroke:#003ecc,stroke-width:2px,color:#fff
     classDef backend fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
     classDef external fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#fff
 
@@ -123,9 +206,9 @@ graph TD
 
 ---
 
-## 🗄 Database Schema & RLS
+## 🗄 Database Schema & RLS Security
 
-The PostgreSQL database leverages Supabase Row Level Security (RLS) to ensure users can only access and mutate their own data, while Admins have broader privileges.
+The database runs PostgreSQL with Supabase Row Level Security (RLS) policies enabled.
 
 ```mermaid
 erDiagram
@@ -186,116 +269,40 @@ erDiagram
     }
 ```
 
-### Security Policies (Row Level Security)
-- **`price_alerts`**: Users can `SELECT`, `INSERT`, `UPDATE`, and `DELETE` only where `auth.uid() = user_id`.
-- **`manual_trades`**: Public read access (`anon`), but only authorized administrators should be inserting via the UI.
-- **`ai_strategies`**: Public read access to display backtest metrics globally.
+### Row Level Security (RLS) Policy Implementations
 
----
+1. **Price Alerts Ownership**:
+   ```sql
+   ALTER TABLE price_alerts ENABLE ROW LEVEL SECURITY;
 
-## 🔄 Component Architecture & Flow
+   CREATE POLICY "Users can manage their own alerts" ON price_alerts
+     FOR ALL TO authenticated
+     USING (auth.uid() = user_id)
+     WITH CHECK (auth.uid() = user_id);
+   ```
 
-### Alert Trigger Lifecycle
-This sequence diagram illustrates the lifecycle of a price alert, from user creation to the background service triggering a Telegram push notification.
+2. **Signals & Backtests Global Read**:
+   ```sql
+   ALTER TABLE manual_trades ENABLE ROW LEVEL SECURITY;
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant U as User
-    participant AM as AlertsManager (UI)
-    participant DB as Supabase (price_alerts)
-    participant Srv as alertMonitor.ts
-    participant Bin as Binance API
-    participant TG as Telegram API
-
-    U->>AM: Enters Symbol, Target Price, checks "Telegram"
-    AM->>DB: INSERT INTO price_alerts
-    DB-->>AM: Return created record
-    AM-->>U: Show Success UI
-    
-    loop Every 30s Polling Cycle
-        Srv->>DB: SELECT * FROM price_alerts WHERE status = 'active'
-        DB-->>Srv: Return List of Alerts
-        
-        Srv->>Bin: fetchLatestCandle() for symbols
-        Bin-->>Srv: Return Current Price
-        
-        opt Current Price >= Target Price
-            Srv->>DB: UPDATE status = 'triggered'
-            Srv->>TG: POST https://api.telegram.org/bot{TOKEN}/sendMessage
-            TG-->>U: Push Notification to Mobile
-        end
-    end
-```
-
-### AI Strategy Backtesting & Indicators Flow
-```mermaid
-flowchart LR
-    A[Select Strategy & Asset in UI] --> B{Fetch historical OHLCV}
-    B --> C[Calculate Technical Indicators<br/>EMA, RSI, MACD, BB]
-    C --> D[Simulate Historical Trades<br/>Long Entry, SL/TP Exit Rules]
-    D --> E[Calculate Performance Metrics]
-    
-    E --> F[Accuracy % / Win Rate]
-    E --> G[Max Drawdown %]
-    E --> H[Profit Factor / Ratio]
-    
-    F --> I[Render Recharts Radar & Equity Curve]
-    G --> I
-    H --> I
-```
-
-### 📈 Quantitative Risk Analytics Architecture & Math
-
-To support institutional-grade portfolio risk profiling, the platform computes quantitative metrics on client portfolios and simulated strategy returns:
-
-#### 1. Stochastic Price Pathing (Monte Carlo Simulation)
-We model asset and portfolio value fluctuations over forward horizons (15–60 days) using **Geometric Brownian Motion (GBM)**. The continuous stochastic process:
-$$dS_t = \mu S_t dt + \sigma S_t dW_t$$
-
-is discretized and simulated daily over 1,000 distinct paths:
-$$S_{t} = S_{t-1} \exp\left(\left(\mu - \frac{1}{2}\sigma^2\right)\Delta t + \sigma Z \sqrt{\Delta t}\right)$$
-
-Where:
-*   $S_t$ is the simulated portfolio value on day $t$.
-*   $\mu$ is the expected growth rate (drift) estimated from historical daily portfolio returns.
-*   $\sigma$ is the daily historical standard deviation (volatility).
-*   $Z$ is a standard normal random variable generated client-side via the **Box-Muller Transform**:
-    $$Z = \sqrt{-2\ln U_1} \cos(2\pi U_2) \quad \text{where } U_1, U_2 \sim \text{Uniform}(0, 1)$$
-
-The **Risk of Ruin** represents the probability ($P$) that the portfolio value drops below the user-specified liquidation threshold (e.g., $75,000 or a 25% drawdown) at any point during the path horizon:
-$$\text{Risk of Ruin} = \frac{1}{M}\sum_{m=1}^{M} \mathbb{I}\left( \min_{0 \le t \le N} S_{t,m} < \text{Threshold} \right) \times 100\%$$
-
-#### 2. Risk-Adjusted Performance Ratios
-*   **Sharpe Ratio**: Measures the portfolio excess return per unit of total risk (standard deviation):
-    $$\text{Sharpe} = \frac{R_p - R_f}{\sigma_p} \times \sqrt{252}$$
-    where $R_p$ is average daily return, $R_f$ is risk-free return rate, and $\sigma_p$ is standard deviation.
-*   **Sortino Ratio**: Refines the Sharpe ratio by penalizing only downside deviation (negative volatility), ignoring positive returns that would otherwise inflate standard deviation:
-    $$\text{Sortino} = \frac{R_p - R_f}{\sigma_d} \times \sqrt{252}$$
-    where $\sigma_d$ is the downside standard deviation:
-    $$\sigma_d = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left[\min\left(0, R_{p,i} - R_f\right)\right]^2}$$
-
-#### 3. Parametric Value at Risk (VaR)
-Estimates the maximum dollar loss expected over a 1-day holding period at a given confidence interval ($1-\alpha$):
-$$\text{VaR}_{1-\alpha} = \text{Portfolio Value} \times \left( Z_{\alpha} \times \sigma_p \sqrt{t} \right)$$
-Where $Z_{\alpha}$ is the normal distribution critical value ($1.645$ for $95\%$ confidence, $2.326$ for $99\%$ confidence), $\sigma_p$ is the portfolio standard deviation, and $t = 1$ day.
-
-#### 4. Pearson Correlation Matrix
-Correlates simulated portfolio returns against global asset classes (Bitcoin, S&P 500, Gold, EUR/USD):
-$$\rho_{X,Y} = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^{n} (X_i - \bar{X})^2 \sum_{i=1}^{n} (Y_i - \bar{Y})^2}}$$
+   CREATE POLICY "Anyone can view published signals" ON manual_trades
+     FOR SELECT TO anon, authenticated
+     USING (true);
+   ```
 
 ---
 
 ## 🌐 External API Integrations
 
 1. **Binance WebSocket Stream** (`wss://stream.binance.com:9443`)
-   - Used for sub-second, low-latency candlestick updates (`/ws/<symbol>@kline_1m`) on the charting view.
+   - `/ws/<symbol>@kline_1m`: Feeds sub-second candlestick values to charts.
 2. **Binance REST API** (`api.binance.com`)
-   - Used for fetching historical candlestick data (`/api/v3/klines`) and real-time ticker prices (`/api/v3/ticker/price`) during backtests and manual trade assessments.
+   - `/api/v3/klines`: Fetches historical OHLCV data for backtesting.
+   - `/api/v3/ticker/price`: Fetches current ticker prices.
 3. **CoinGecko API** (`api.coingecko.com`)
-   - Used within `marketSimulation.ts` to fetch 24-hour global volume, price changes, and metadata for a predefined list of top cryptocurrencies.
+   - `/api/v3/coins/markets`: Fetches global market caps, 24h volumes, and gainers.
 4. **Telegram Bot API** (`api.telegram.org`)
-   - Used in `telegramService.ts` to push JSON payloads containing triggered alert details to specific `chat_id`s.
+   - `/bot<token>/sendMessage`: Dispatches real-time alerts to Telegram.
 
 ---
 
@@ -303,93 +310,62 @@ $$\rho_{X,Y} = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{
 
 ### Prerequisites
 - Node.js (v18+)
-- npm or yarn
-- Supabase Account
-- Telegram Bot Token (obtained from `@BotFather`)
+- Supabase project
+- Telegram bot token (from `@BotFather`)
 
-### 1. Clone the Repository
+### 1. Installation
 ```bash
 git clone https://github.com/yourusername/multi-asset-algorithmic-trading-software.git
 cd multi-asset-algorithmic-trading-software
-```
-
-### 2. Install Dependencies
-```bash
 npm install
 ```
 
-### 3. Environment Configuration
+### 2. Configure Environment Variables
 Create a `.env` file in the root directory:
-
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-### 4. Database Migrations
-Navigate to the Supabase SQL Editor in your dashboard and execute the SQL files in the following order:
+### 3. Deploy Database Schemes
+Execute the following SQL migration scripts in your Supabase SQL Editor:
 1. `create_price_alerts_table.sql`
 2. `supabase/migrations/20251027051145_create_crypto_trading_tables.sql`
 3. `fix_rls_issues.sql`
 
-### 5. Start Development Server
+### 4. Launch Development Server
 ```bash
 npm run dev
 ```
-The application will launch on `http://localhost:5173`. 
-*Note: To access admin features, create an account with the email `crypto@crypto.com`.*
+The workspace will load at `http://localhost:5173`. Sign in as `crypto@crypto.com` to access administrator capabilities.
 
 ---
 
-## 📁 Project Directory Structure
+## 📁 Directory Layout
 
 ```text
 multi-asset-algorithmic-trading-software/
 ├── src/
 │   ├── components/                 # React UI Views
-│   │   ├── Auth/                   # Login/Signup Forms
-│   │   ├── AIStrategyBuilder.tsx   # Recharts backtesting UI
-│   │   ├── AlertsManager.tsx       # Alert creation & list
-│   │   ├── Dashboard.tsx           # Main analytics view
-│   │   ├── ManualTrades.tsx        # Admin signal broadcasting
-│   │   ├── MarketDashboard.tsx     # Trading terminal & paper order widget
-│   │   ├── PaperTrading.tsx        # Paper trading portfolio UI
-│   │   ├── StrategyAlerts.tsx      # System alert feed
-│   │   ├── TradingViewChart.tsx    # Live WebSocket lightweight-charts wrapper
-│   │   └── UserDashboard.tsx       # Standard user feed
-│   ├── lib/
-│   │   └── supabase.ts             # Supabase client instantiation
-│   ├── services/                   # Business Logic & APIs
-│   │   ├── alertMonitor.ts         # Background alert polling
-│   │   ├── dataFeed.ts             # Binance/External data fetchers
-│   │   ├── marketSimulation.ts     # CoinGecko volume simulator
-│   │   ├── paperTradingService.ts  # Virtual trade ledger & balance store
-│   │   └── telegramService.ts      # Push notification dispatcher
-│   ├── utils/                      # Mocks and helpers
-│   │   └── riskCalculators.ts      # Sharpe, Sortino, VaR, & Monte Carlo calculations
-│   ├── App.tsx                     # Routing & RBAC Gatekeeper
-│   ├── main.tsx                    # React DOM entry
-│   └── index.css                   # Tailwind base imports
-├── supabase/
-│   └── migrations/                 # DB schemas and initial seed data
-├── .env                            # Local environment variables
-├── package.json                    # Dependencies & Scripts
-├── tailwind.config.js              # Theme customization
-├── vite.config.ts                  # Bundler configuration
+│   │   ├── LandingPage.tsx         # Responsive landing page (Coinbase Display style)
+│   │   ├── MarketDashboard.tsx     # Trading terminal & chart
+│   │   ├── PaperTrading.tsx        # Portfolio simulator & ledger
+│   │   ├── Dashboard.tsx           # Global statistics & visualizer
+│   │   ├── AlertsManager.tsx       # Set active alerts
+│   │   ├── AIStrategyBuilder.tsx   # Strategy backtester & optimizer
+│   │   └── UserDashboard.tsx       # Live feed workspace
+│   ├── services/                   # APIs & Workers
+│   │   ├── alertMonitor.ts         # Polling worker for active alerts
+│   │   ├── telegramService.ts      # Sends alert messages
+│   │   ├── paperTradingService.ts  # Virtual ledger & balance tracker
+│   │   └── dataFeed.ts             # Binance WebSocket & REST services
+│   ├── utils/                      # Calculations
+│   │   └── riskCalculators.ts      # Sharpe, Sortino, VaR, & Monte Carlo pathing
+│   ├── App.tsx                     # Routing & Sidebar Navigation Drawer
+│   ├── index.css                   # Global styles & font overrides
+│   └── main.tsx                    # React DOM bootstrapper
+├── tailwind.config.js              # Coinbase branding configuration
+├── tsconfig.json                   # TypeScript configuration
 └── README.md                       # Documentation
 ```
-
----
-
-## 🔮 Future Roadmap
-
-- **Self-Learning AI Integration**: Implementing reinforcement learning for real-time strategy optimization.
-- **Automated Hyperparameter Tuning**: Neural architecture search for indicator optimization.
-- **Sentiment Analysis**: Ingesting Twitter/X and News APIs to gauge market fear/greed indices.
-- **Broker Integration**: Execution of trades directly via CCXT (Crypto) and MetaTrader API (Forex).
-
----
-
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
