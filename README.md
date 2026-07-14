@@ -35,7 +35,12 @@ The application features a sophisticated Role-Based Access Control (RBAC) system
 ### User Capabilities
 *   **Trading Feed & Dashboard**: View real-time market overviews, top gainers/losers, and trending assets globally.
 *   **Interactive Trading Charts**: High-performance candlestick charts powered by `lightweight-charts`, integrated directly with a **live Binance WebSocket stream** (`wss://stream.binance.com:9443/ws/`) for sub-second crypto kline updates, falling back to REST APIs for traditional assets.
-*   **Paper Trading Sandbox**: Practice trading with zero financial risk using a persistent $100,000 USD virtual portfolio. Features include placing BUY/SELL orders directly on the trading interface, an allocations pie chart, real-time unrealized P&L calculations, and a complete order logs history ledger.
+*   **Paper Trading Sandbox**: Practice trading with zero financial risk using a persistent $100,000 USD virtual portfolio. Features include:
+    *   **Live Positions & Orders**: Place BUY/SELL orders directly on the trading interface, with real-time updates and manual close buttons.
+    *   **Asset Allocation Visualization**: A dynamic Recharts donut chart representing cash vs. open position ratios.
+    *   **High-Water Mark & Drawdown Visualizer**: A Composed Recharts chart mapping portfolio equity, tracking peak portfolio value (HWM), and dynamically shading the area under it to highlight drawdown depth and durations.
+    *   **Monte Carlo Ruin Probability Simulator**: Simulates 1,000+ geometric Brownian motion paths over customizable horizons (15-60 days) and thresholds to predict the probability of reaching a drawdown limit (Risk of Ruin).
+    *   **Institutional Statistics Matrix**: Real-time calculations of Sharpe Ratio, Sortino Ratio, 95% Confidence Value at Risk (VaR), and Pearson correlation coefficients against key asset classes (Bitcoin, S&P 500, Gold, EUR/USD).
 *   **Personalized Settings**: Securely manage user profiles and configure Telegram Webhook IDs for external notifications.
 
 ### Administrator Capabilities
@@ -238,6 +243,45 @@ flowchart LR
     H --> I
 ```
 
+### 📈 Quantitative Risk Analytics Architecture & Math
+
+To support institutional-grade portfolio risk profiling, the platform computes quantitative metrics on client portfolios and simulated strategy returns:
+
+#### 1. Stochastic Price Pathing (Monte Carlo Simulation)
+We model asset and portfolio value fluctuations over forward horizons (15–60 days) using **Geometric Brownian Motion (GBM)**. The continuous stochastic process:
+$$dS_t = \mu S_t dt + \sigma S_t dW_t$$
+
+is discretized and simulated daily over 1,000 distinct paths:
+$$S_{t} = S_{t-1} \exp\left(\left(\mu - \frac{1}{2}\sigma^2\right)\Delta t + \sigma Z \sqrt{\Delta t}\right)$$
+
+Where:
+*   $S_t$ is the simulated portfolio value on day $t$.
+*   $\mu$ is the expected growth rate (drift) estimated from historical daily portfolio returns.
+*   $\sigma$ is the daily historical standard deviation (volatility).
+*   $Z$ is a standard normal random variable generated client-side via the **Box-Muller Transform**:
+    $$Z = \sqrt{-2\ln U_1} \cos(2\pi U_2) \quad \text{where } U_1, U_2 \sim \text{Uniform}(0, 1)$$
+
+The **Risk of Ruin** represents the probability ($P$) that the portfolio value drops below the user-specified liquidation threshold (e.g., $75,000 or a 25% drawdown) at any point during the path horizon:
+$$\text{Risk of Ruin} = \frac{1}{M}\sum_{m=1}^{M} \mathbb{I}\left( \min_{0 \le t \le N} S_{t,m} < \text{Threshold} \right) \times 100\%$$
+
+#### 2. Risk-Adjusted Performance Ratios
+*   **Sharpe Ratio**: Measures the portfolio excess return per unit of total risk (standard deviation):
+    $$\text{Sharpe} = \frac{R_p - R_f}{\sigma_p} \times \sqrt{252}$$
+    where $R_p$ is average daily return, $R_f$ is risk-free return rate, and $\sigma_p$ is standard deviation.
+*   **Sortino Ratio**: Refines the Sharpe ratio by penalizing only downside deviation (negative volatility), ignoring positive returns that would otherwise inflate standard deviation:
+    $$\text{Sortino} = \frac{R_p - R_f}{\sigma_d} \times \sqrt{252}$$
+    where $\sigma_d$ is the downside standard deviation:
+    $$\sigma_d = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left[\min\left(0, R_{p,i} - R_f\right)\right]^2}$$
+
+#### 3. Parametric Value at Risk (VaR)
+Estimates the maximum dollar loss expected over a 1-day holding period at a given confidence interval ($1-\alpha$):
+$$\text{VaR}_{1-\alpha} = \text{Portfolio Value} \times \left( Z_{\alpha} \times \sigma_p \sqrt{t} \right)$$
+Where $Z_{\alpha}$ is the normal distribution critical value ($1.645$ for $95\%$ confidence, $2.326$ for $99\%$ confidence), $\sigma_p$ is the portfolio standard deviation, and $t = 1$ day.
+
+#### 4. Pearson Correlation Matrix
+Correlates simulated portfolio returns against global asset classes (Bitcoin, S&P 500, Gold, EUR/USD):
+$$\rho_{X,Y} = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^{n} (X_i - \bar{X})^2 \sum_{i=1}^{n} (Y_i - \bar{Y})^2}}$$
+
 ---
 
 ## 🌐 External API Integrations
@@ -321,6 +365,7 @@ multi-asset-algorithmic-trading-software/
 │   │   ├── paperTradingService.ts  # Virtual trade ledger & balance store
 │   │   └── telegramService.ts      # Push notification dispatcher
 │   ├── utils/                      # Mocks and helpers
+│   │   └── riskCalculators.ts      # Sharpe, Sortino, VaR, & Monte Carlo calculations
 │   ├── App.tsx                     # Routing & RBAC Gatekeeper
 │   ├── main.tsx                    # React DOM entry
 │   └── index.css                   # Tailwind base imports
