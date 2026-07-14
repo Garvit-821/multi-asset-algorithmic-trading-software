@@ -41,6 +41,8 @@ The application features a sophisticated Role-Based Access Control (RBAC) system
     *   **High-Water Mark & Drawdown Visualizer**: A Composed Recharts chart mapping portfolio equity, tracking peak portfolio value (HWM), and dynamically shading the area under it to highlight drawdown depth and durations.
     *   **Monte Carlo Ruin Probability Simulator**: Simulates 1,000+ geometric Brownian motion paths over customizable horizons (15-60 days) and thresholds to predict the probability of reaching a drawdown limit (Risk of Ruin).
     *   **Institutional Statistics Matrix**: Real-time calculations of Sharpe Ratio, Sortino Ratio, 95% Confidence Value at Risk (VaR), and Pearson correlation coefficients against key asset classes (Bitcoin, S&P 500, Gold, EUR/USD).
+*   **CryptoAgent Landing Page**: A high-impact entry showcase exhibiting core capabilities, including real-time WebSocket speeds, Monte Carlo simulator previews, Sharpe/Sortino indicators, and direct terminal workspace entry points.
+*   **Mobile-Responsive UI & Sidebar Drawer**: Fluid styling for all screen sizes, incorporating mobile hamburger triggers, auto-collapsing sidebar navigation drawers, backdrop overlays, and scrollable data/chart containers.
 *   **Personalized Settings**: Securely manage user profiles and configure Telegram Webhook IDs for external notifications.
 
 ### Administrator Capabilities

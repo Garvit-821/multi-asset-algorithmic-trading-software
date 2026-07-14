@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -7,11 +7,13 @@ import { ManualTrades } from './components/ManualTrades';
 import { AIStrategyBuilder } from './components/AIStrategyBuilder';
 import { UserDashboard } from './components/UserDashboard';
 import { PaperTrading } from './components/PaperTrading';
+import { LandingPage } from './components/LandingPage';
 
-type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed' | 'paper';
+type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed' | 'paper' | 'landing';
 
 function App() {
-  const [currentView, setCurrentView] = useState<View>('userfeed');
+  const [currentView, setCurrentView] = useState<View>('landing');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Login is removed as a whole; user is always authenticated as the administrator
   const user = { email: 'crypto@crypto.com', id: 'mock-admin-id' };
@@ -35,14 +37,46 @@ function App() {
     ? [...userMenuItems, ...adminMenuItems]
     : userMenuItems;
 
+  // If the view is the Landing Page, render full width outside the dashboard shell
+  if (currentView === 'landing') {
+    return <LandingPage onLaunch={() => setCurrentView('userfeed')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
-          <div className="p-6 border-b border-gray-200">
+    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col h-screen overflow-hidden">
+      {/* Mobile Top Header (hidden on desktop) */}
+      <header className="flex md:hidden items-center justify-between px-6 py-4 bg-white border-b border-gray-200 shadow-sm z-30">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-extrabold text-lg text-gray-900 tracking-tight">CryptoAgent</span>
+        </div>
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors focus:outline-none"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </header>
+
+      <div className="flex flex-1 relative overflow-hidden">
+        {/* Mobile menu backdrop overlay */}
+        {mobileMenuOpen && (
+          <div 
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 md:hidden transition-opacity"
+          />
+        )}
+
+        {/* Sidebar Navigation Drawer */}
+        <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-40 fixed inset-y-0 left-0 transform ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0 md:relative transition-transform duration-300 ease-in-out h-full`}>
+          
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/10">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -50,61 +84,84 @@ function App() {
                 <p className="text-xs text-gray-500">Trading Platform</p>
               </div>
             </div>
+            
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 md:hidden"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
               // Prevent non-admin from accessing admin pages
               const isAdminPage = ['alerts', 'manual', 'ai'].includes(item.id);
               if (isAdminPage && !isAdmin) {
-                return null; // Don't render admin menu items for non-admin users
+                return null;
               }
               return (
                 <button
                   key={item.id}
-                  onClick={() => setCurrentView(item.id)}
+                  onClick={() => {
+                    setCurrentView(item.id);
+                    setMobileMenuOpen(false); // Close drawer on selection
+                  }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
                     isActive
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <span>{item.label}</span>
                 </button>
               );
             })}
           </nav>
 
-          {/* User Section */}
-          <div className="p-4 border-t border-gray-200 space-y-2">
+          {/* User & Settings Panel */}
+          <div className="p-4 border-t border-gray-200 space-y-2 bg-white">
+            <button
+              onClick={() => {
+                setCurrentView('landing');
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-2.5 text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all border border-dashed border-gray-300"
+            >
+              <Home className="w-5 h-5 text-gray-500" />
+              <span className="font-semibold text-sm">Exit to Home</span>
+            </button>
+
             <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-lg">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-semibold text-gray-900 truncate">
                   {user.email?.split('@')[0] || 'User'}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-xs text-gray-500 truncate font-mono">{user.email}</p>
               </div>
             </div>
 
             <button
-              onClick={() => setCurrentView('settings')}
-              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all"
+              onClick={() => {
+                setCurrentView('settings');
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all text-sm font-semibold"
             >
-              <Settings className="w-5 h-5" />
-              <span className="font-medium">Settings</span>
+              <Settings className="w-5 h-5 text-gray-500" />
+              <span>Settings</span>
             </button>
-
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-hidden bg-gray-50">
+        {/* Main Content Viewport */}
+        <main className="flex-1 overflow-hidden bg-gray-50 h-full">
           {currentView === 'userfeed' && (
             <div className="h-full overflow-y-auto">
               <UserDashboard />
@@ -113,14 +170,14 @@ function App() {
           {currentView === 'trading' && <MarketDashboard />}
           {currentView === 'paper' && (
             <div className="h-full overflow-y-auto">
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 <PaperTrading />
               </div>
             </div>
           )}
           {currentView === 'dashboard' && (
             <div className="h-full overflow-y-auto">
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 <Dashboard />
               </div>
             </div>
@@ -128,68 +185,72 @@ function App() {
           {currentView === 'alerts' && isAdmin && <AlertsManager />}
           {currentView === 'manual' && isAdmin && (
             <div className="h-full overflow-y-auto">
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 <ManualTrades />
               </div>
             </div>
           )}
           {currentView === 'ai' && isAdmin && (
             <div className="h-full overflow-y-auto">
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 <AIStrategyBuilder />
               </div>
             </div>
           )}
-          {/* Redirect non-admin users away from admin pages */}
+
+          {/* Redirect unauthorized requests */}
           {!isAdmin && (currentView === 'alerts' || currentView === 'manual' || currentView === 'ai') && (
-            <div className="h-full overflow-y-auto flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-gray-600 text-lg">Access Denied</p>
-                <p className="text-gray-500 mt-2">You don't have permission to access this page.</p>
+            <div className="h-full overflow-y-auto flex items-center justify-center p-6">
+              <div className="text-center max-w-sm">
+                <p className="text-red-500 text-lg font-bold">Access Denied</p>
+                <p className="text-gray-500 mt-2 text-sm">You don't have permission to access administrator components.</p>
                 <button
                   onClick={() => setCurrentView('userfeed')}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm"
                 >
-                  Go to Trading Feed
+                  Return to Dashboard
                 </button>
               </div>
             </div>
           )}
+
           {currentView === 'settings' && (
             <div className="h-full overflow-y-auto">
-              <div className="p-8">
-                <div className="max-w-4xl">
+              <div className="p-4 sm:p-8">
+                <div className="max-w-3xl">
                   <h2 className="text-2xl font-bold mb-6 text-gray-900">Settings</h2>
                   <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Settings</h3>
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Configuration</h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Primary Email Address
                         </label>
                         <input
                           type="email"
                           value={user.email || ''}
                           disabled
-                          className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
+                          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Telegram Chat ID (for alerts)
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Telegram Chat ID (Alert Notifications)
                         </label>
                         <input
                           type="text"
-                          placeholder="Enter your Telegram chat ID"
-                          className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500"
+                          placeholder="e.g. 582910482"
+                          className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Get your chat ID from @userinfobot on Telegram
+                        <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                          Enter your Telegram chat identifier to receive background price crossing and strategy signals. Get your ID instantly by messaging <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">@userinfobot</span>.
                         </p>
                       </div>
-                      <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                        Save Settings
-                      </button>
+                      <div className="pt-2">
+                        <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">
+                          Save Configurations
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
