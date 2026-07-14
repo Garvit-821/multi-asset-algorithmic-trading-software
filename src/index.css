@@ -1,6 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #f7f7f7;
+    color: #5b616e;
+  }
+  
+  /* Apply tabular font rendering to numerical outputs */
+  .font-mono, 
+  [class*="price"], 
+  [class*="balance"],
+  [class*="value"],
+  [class*="amount"] {
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+}
 
 @keyframes slideIn {
   from {
