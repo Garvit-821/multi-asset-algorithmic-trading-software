@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2 } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -12,6 +12,7 @@ import { VisualStrategyBuilder } from './components/VisualStrategyBuilder';
 import { PortfolioOptimizer } from './components/PortfolioOptimizer';
 import { MarketReplay } from './components/MarketReplay';
 import { SocialSentiment } from './components/SocialSentiment';
+import { paperTradingService } from './services/paperTradingService';
 
 type View = 
   | 'dashboard' 
@@ -31,6 +32,13 @@ type View =
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+
+  const handleResetAccount = () => {
+    if (window.confirm('Are you sure you want to reset your paper portfolio to $100,000 USD? All trade history and positions will be cleared.')) {
+      paperTradingService.resetPortfolio();
+      alert('Portfolio successfully reset to $100,000 USD.');
+    }
+  };
 
   // Login is removed as a whole; user is always authenticated as the administrator
   const user = { email: 'crypto@crypto.com', id: 'mock-admin-id' };
@@ -85,12 +93,12 @@ function App() {
         {mobileMenuOpen && (
           <div 
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 md:hidden transition-opacity"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 md:hidden transition-opacity"
           />
         )}
 
         {/* Sidebar Navigation Drawer */}
-        <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-40 fixed inset-y-0 left-0 transform ${
+        <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50 fixed inset-y-0 left-0 transform ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 md:relative transition-transform duration-300 ease-in-out h-full`}>
           
@@ -351,6 +359,20 @@ function App() {
                         </button>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mt-6">
+                    <h3 className="text-lg font-semibold mb-2 text-red-600">Reset Paper Portfolio</h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      This will permanently clear all simulated positions, order histories, and reset your available virtual paper balance back to $100,000 USD.
+                    </p>
+                    <button
+                      onClick={handleResetAccount}
+                      className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Reset Portfolio Account</span>
+                    </button>
                   </div>
                 </div>
               </div>

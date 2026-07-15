@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, Star, Bell, Plus, Minus, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, TrendingUp, Star, Bell, Plus, Minus, ArrowRight, CheckCircle2, AlertCircle, ChevronDown } from 'lucide-react';
 import { TradingViewChart, AssetType } from './TradingViewChart';
 import { searchSymbols } from '../services/dataFeed';
 import { supabase } from '../lib/supabase';
@@ -178,35 +178,36 @@ export function MarketDashboard() {
     <div className="flex flex-col h-full bg-gray-50 text-gray-900">
       {/* Top Navigation */}
       <div className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
-          <div className="flex flex-wrap items-center gap-1 bg-gray-100 rounded-lg p-1">
-            {markets.map((market) => (
-              <button
-                key={market.type}
-                onClick={() => setActiveMarket(market.type)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeMarket === market.type
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                }`}
-              >
-                {market.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative w-full lg:max-w-md z-50">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowSearch(true)}
-                placeholder="Search symbol..."
-                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        <div className="flex items-center mb-4">
+          {/* Unified Asset Selector & Search Bar */}
+          <div className="relative w-full max-w-xl z-20">
+            <div className="relative flex items-center bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden shadow-sm">
+              <div className="relative border-r border-gray-200 bg-gray-50 shrink-0">
+                <select
+                  value={activeMarket}
+                  onChange={(e) => setActiveMarket(e.target.value as AssetType)}
+                  className="appearance-none pl-4 pr-8 py-2 bg-transparent text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer"
+                >
+                  {markets.map((market) => (
+                    <option key={market.type} value={market.type}>
+                      {market.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+              </div>
+              
+              <div className="flex-1 relative flex items-center">
+                <Search className="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSearch(true)}
+                  placeholder={`Search ${activeMarket === 'crypto' ? 'crypto' : activeMarket === 'stock' ? 'stocks' : activeMarket === 'commodity' ? 'commodities' : 'forex'}...`}
+                  className="w-full pl-10 pr-4 py-2 bg-transparent text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
+                />
+              </div>
             </div>
 
             {/* Search Results Dropdown */}

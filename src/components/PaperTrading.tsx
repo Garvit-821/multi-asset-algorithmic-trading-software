@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, BookOpen, PieChart as PieIcon, Trash2, ShieldAlert, BarChart3, LineChart as LineIcon, Activity, HelpCircle } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, BookOpen, PieChart as PieIcon, ShieldAlert, BarChart3, LineChart as LineIcon, Activity, HelpCircle } from 'lucide-react';
 import { 
   PieChart, 
   Pie, 
@@ -74,14 +74,7 @@ export const PaperTrading: React.FC = () => {
     setUpdating(false);
   };
 
-  const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset your paper portfolio to $100,000 USD? All trade history and positions will be cleared.')) {
-      paperTradingService.resetPortfolio();
-      const updated = paperTradingService.getPortfolio();
-      setPortfolio(updated);
-      setLivePrices({});
-    }
-  };
+
 
   const handleClosePosition = (pos: Position) => {
     const currentPrice = livePrices[pos.symbol] || pos.averageEntryPrice;
@@ -298,13 +291,6 @@ export const PaperTrading: React.FC = () => {
             title="Refresh Prices"
           >
             <RefreshCw className={`w-5 h-5 ${updating ? 'animate-spin text-blue-600' : ''}`} />
-          </button>
-          <button
-            onClick={handleReset}
-            className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Reset Account</span>
           </button>
         </div>
       </div>
