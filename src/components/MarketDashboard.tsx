@@ -178,8 +178,8 @@ export function MarketDashboard() {
     <div className="flex flex-col h-full bg-gray-50 text-gray-900">
       {/* Top Navigation */}
       <div className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-1 bg-gray-100 rounded-lg p-1">
             {markets.map((market) => (
               <button
                 key={market.type}
@@ -196,7 +196,7 @@ export function MarketDashboard() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-md mx-4">
+          <div className="relative w-full lg:max-w-md z-50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
