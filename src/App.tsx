@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -8,8 +8,25 @@ import { AIStrategyBuilder } from './components/AIStrategyBuilder';
 import { UserDashboard } from './components/UserDashboard';
 import { PaperTrading } from './components/PaperTrading';
 import { LandingPage } from './components/LandingPage';
+import { VisualStrategyBuilder } from './components/VisualStrategyBuilder';
+import { PortfolioOptimizer } from './components/PortfolioOptimizer';
+import { MarketReplay } from './components/MarketReplay';
+import { SocialSentiment } from './components/SocialSentiment';
 
-type View = 'dashboard' | 'trading' | 'alerts' | 'manual' | 'ai' | 'settings' | 'userfeed' | 'paper' | 'landing';
+type View = 
+  | 'dashboard' 
+  | 'trading' 
+  | 'alerts' 
+  | 'manual' 
+  | 'ai' 
+  | 'settings' 
+  | 'userfeed' 
+  | 'paper' 
+  | 'landing' 
+  | 'visualbuilder' 
+  | 'optimizer' 
+  | 'replay' 
+  | 'sentiment';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
@@ -19,23 +36,26 @@ function App() {
   const user = { email: 'crypto@crypto.com', id: 'mock-admin-id' };
   const isAdmin = true;
 
-  // Menu items based on user role
-  const userMenuItems = [
+  // Categorized Sidebar Navigation Items
+  const coreMenuItems = [
     { id: 'userfeed' as View, label: 'Trading Feed', icon: Zap },
     { id: 'trading' as View, label: 'Trading', icon: TrendingUp },
     { id: 'paper' as View, label: 'Paper Trading', icon: Wallet },
     { id: 'dashboard' as View, label: 'Dashboard', icon: LayoutDashboard },
   ];
 
-  const adminMenuItems = [
-    { id: 'alerts' as View, label: 'Alerts', icon: Bell },
-    { id: 'manual' as View, label: 'Manual Trades', icon: LayoutDashboard },
-    { id: 'ai' as View, label: 'AI Strategy', icon: LayoutDashboard },
+  const labMenuItems = [
+    { id: 'optimizer' as View, label: 'Portfolio Optimizer', icon: Target },
+    { id: 'replay' as View, label: 'Market Replay', icon: History },
+    { id: 'sentiment' as View, label: 'Social Sentiment', icon: MessageSquare },
   ];
 
-  const menuItems = isAdmin 
-    ? [...userMenuItems, ...adminMenuItems]
-    : userMenuItems;
+  const adminMenuItems = [
+    { id: 'visualbuilder' as View, label: 'Visual Builder', icon: Sparkles },
+    { id: 'ai' as View, label: 'AI Strategy', icon: LayoutDashboard },
+    { id: 'alerts' as View, label: 'Alerts', icon: Bell },
+    { id: 'manual' as View, label: 'Manual Trades', icon: LayoutDashboard },
+  ];
 
   // If the view is the Landing Page, render full width outside the dashboard shell
   if (currentView === 'landing') {
@@ -93,33 +113,92 @@ function App() {
             </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentView === item.id;
-              // Prevent non-admin from accessing admin pages
-              const isAdminPage = ['alerts', 'manual', 'ai'].includes(item.id);
-              if (isAdminPage && !isAdmin) {
-                return null;
-              }
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setCurrentView(item.id);
-                    setMobileMenuOpen(false); // Close drawer on selection
-                  }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+          <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+            {/* Core Workspace */}
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Core Workspace</p>
+              <div className="space-y-1">
+                {coreMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentView === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setCurrentView(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
+                        isActive
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quantitative Labs */}
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Quantitative Labs</p>
+              <div className="space-y-1">
+                {labMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentView === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setCurrentView(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
+                        isActive
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* System Administration */}
+            {isAdmin && (
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">System Administration</p>
+                <div className="space-y-1">
+                  {adminMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = currentView === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setCurrentView(item.id);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
+                          isActive
+                            ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </nav>
 
           {/* User & Settings Panel */}
@@ -182,6 +261,26 @@ function App() {
               </div>
             </div>
           )}
+          {currentView === 'optimizer' && (
+            <div className="h-full overflow-y-auto">
+              <PortfolioOptimizer />
+            </div>
+          )}
+          {currentView === 'replay' && (
+            <div className="h-full overflow-y-auto">
+              <MarketReplay />
+            </div>
+          )}
+          {currentView === 'sentiment' && (
+            <div className="h-full overflow-y-auto">
+              <SocialSentiment />
+            </div>
+          )}
+          {currentView === 'visualbuilder' && isAdmin && (
+            <div className="h-full overflow-y-auto">
+              <VisualStrategyBuilder />
+            </div>
+          )}
           {currentView === 'alerts' && isAdmin && <AlertsManager />}
           {currentView === 'manual' && isAdmin && (
             <div className="h-full overflow-y-auto">
@@ -199,7 +298,7 @@ function App() {
           )}
 
           {/* Redirect unauthorized requests */}
-          {!isAdmin && (currentView === 'alerts' || currentView === 'manual' || currentView === 'ai') && (
+          {!isAdmin && (currentView === 'alerts' || currentView === 'manual' || currentView === 'ai' || currentView === 'visualbuilder') && (
             <div className="h-full overflow-y-auto flex items-center justify-center p-6">
               <div className="text-center max-w-sm">
                 <p className="text-red-500 text-lg font-bold">Access Denied</p>

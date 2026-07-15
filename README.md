@@ -39,6 +39,10 @@
 - **Institutional Risk Metrics Matrix**: Real-time calculators for Value at Risk (VaR) at 95% confidence, Sharpe Ratio, Sortino Ratio (measuring downside volatility), and Pearson correlation coefficients against key asset classes.
 - **Monte Carlo Ruin Probability Simulator**: Generates 1,000+ stochastic price paths utilizing Geometric Brownian Motion (GBM) to forecast risk of ruin percentages.
 - **AI Strategy Builder & Backtester**: Fetches historical OHLCV data, calculates technical indicators (EMA, RSI, MACD, Bollinger Bands) in TypeScript, executes backtests, and runs optimization loops over variables.
+- **No-Code Visual Strategy Builder**: Compile custom multi-conditional logic paths (Indicators, Operators, Parameters, Actions) into executable TypeScript strategy backtests without code.
+- **Modern Portfolio Optimizer**: Construct client-side Markowitz Efficient Frontiers and optimize asset allocations using mean-variance models and historical covariances.
+- **Historical Market Crisis Replay**: Replays second-by-second historical liquidations (FTX collapse, COVID Crash, Terra depegging) for manual order placement under high-stress simulator environments.
+- **Alternative Social Sentiment Stream**: Computes real-time keyword sentiment averages from Twitter and Reddit to trigger automated Telegram notifications.
 - **Background Conditional Alerts Manager**: Configure price-above, price-below, or price-cross targets. A background service polls active alert rows and dispatches Telegram notifications to mobile.
 
 ---
@@ -140,9 +144,13 @@ multi-asset-algorithmic-trading-software/
 │   │   ├── LandingPage.tsx         # Coinbase-style entrance page
 │   │   ├── ManualTrades.tsx        # Publish trading signals to feed
 │   │   ├── MarketDashboard.tsx     # Candle charts & order placement forms
+│   │   ├── MarketReplay.tsx        # Historical simulator & replay dashboard (New!)
 │   │   ├── PaperTrading.tsx        # Sandbox balances & Composed HWM chart
+│   │   ├── PortfolioOptimizer.tsx  # Markowitz Efficient Frontier optimization (New!)
+│   │   ├── SocialSentiment.tsx     # Social index feeds and sentiment rules (New!)
 │   │   ├── StrategyAlerts.tsx      # Interactive alert notification stream
 │   │   ├── TradingViewChart.tsx    # Live WebSocket lightweight-charts wrapper
+│   │   ├── VisualStrategyBuilder.tsx # Visual strategy block sandbox (New!)
 │   │   └── UserDashboard.tsx       # Central feed workspace
 │   ├── lib/
 │   │   └── supabase.ts             # Supabase client instantiation
@@ -211,6 +219,15 @@ The diagram below charts how price data, user orders, alerts, and backtesting st
   - Maps uniform coordinates to standard normal coordinates using the **Box-Muller Transform**:
     $$Z = \sqrt{-2\ln U_1} \cos(2\pi U_2) \quad \text{where } U_1, U_2 \sim \text{Uniform}(0,1)$$
   - Runs 1,000 path projections over customizable horizons (15-60 days).
+- **Modern Portfolio Optimization Engine**: Runs client-side Markowitz Mean-Variance allocations:
+  - Annualized portfolio return: $E(R_p) = \sum w_i E(R_i) \times 252$
+  - Annualized portfolio volatility: $\sigma_p = \sqrt{W^T \Sigma W} \times \sqrt{252}$ where $\Sigma$ is the covariance matrix of daily return series.
+  - Simulates 500 random portfolio vectors $W$ to solve:
+    $$\max_{W} \frac{E(R_p) - R_f}{\sigma_p}$$
+    plotting the resulting **Efficient Frontier** and identifying the Tangency and Global Minimum Variance (GMV) targets.
+- **No-Code Strategy Block Compiler**: Takes structured JSON rule flows (e.g. `RSI crosses below 30`), parses them into executable logic conditionals, calculates indicators client-side (EMA, RSI), and processes historical series evaluations to generate equity curves.
+- **Historical Crisis Simulator (Flight Mode)**: Uses actual, high-frequency price paths from systemic collapses (FTX bankruptcy, COVID crash, LUNA depeg) to feed an interactive mock trading desk, letting traders verify execution psychology.
+- **Social Sentiment Index Streamer**: Accumulates mentions from Twitter and Reddit feeds, scores vocabulary polarity indexes (-1.0 to 1.0), and maps rolling sentiment averages to trigger automated Telegram notifications when indexes breach boundaries.
 - **Institutional Statistics Matrix**: Computes key metrics on the fly:
   - **Sharpe Ratio**: Measures the portfolio excess return per unit of volatility:
     $$\text{Sharpe} = \frac{R_p - R_f}{\sigma_p} \times \sqrt{252}$$
