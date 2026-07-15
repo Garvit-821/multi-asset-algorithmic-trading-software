@@ -264,7 +264,7 @@ export const PaperTrading: React.FC = () => {
           <p className="text-gray-600 mt-1">Practice trading with zero financial risk using a $100,000 sandbox portfolio</p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Tab switches */}
           <div className="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
             <button

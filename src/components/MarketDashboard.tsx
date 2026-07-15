@@ -272,9 +272,9 @@ export function MarketDashboard() {
       </div>
 
       {/* Main Terminal Grid split */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Chart Canvas */}
-        <div className="flex-1 p-6 overflow-hidden">
+        <div className="flex-1 p-4 sm:p-6 lg:overflow-hidden min-h-[350px] sm:min-h-[450px] lg:min-h-0">
           <TradingViewChart
             symbol={selectedSymbol}
             assetType={activeMarket}
@@ -285,7 +285,7 @@ export function MarketDashboard() {
         </div>
 
         {/* Paper Trade Sidebar Panel */}
-        <div className="w-80 bg-white border-l border-gray-200 p-6 flex flex-col justify-between shadow-sm overflow-y-auto">
+        <div className="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-6 flex flex-col justify-between shadow-sm lg:overflow-y-auto shrink-0">
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-1">Place Paper Order</h3>

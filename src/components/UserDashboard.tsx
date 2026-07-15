@@ -290,7 +290,7 @@ export function UserDashboard() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg p-1">
+      <div className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -344,21 +344,21 @@ export function UserDashboard() {
               key={`${item.type}-${item.id}`}
               className="bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3 flex-1">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
+                <div className="flex items-start space-x-3 flex-1 min-w-0">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-2 shrink-0">
                     {getItemIcon(item)}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900">{symbol}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">{symbol}</h3>
                       {getItemTypeBadge(item)}
                     </div>
                     {item.condition_type && (
-                      <p className="text-sm text-gray-600">{item.condition_type}</p>
+                      <p className="text-sm text-gray-600 truncate">{item.condition_type}</p>
                     )}
                     {item.currentPrice && (
-                      <div className="flex items-center space-x-2 mt-1">
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
                         <span className="text-sm text-gray-700">Current: </span>
                         <span className="text-lg font-mono font-semibold text-gray-900">
                           ${item.currentPrice.toFixed(4)}
@@ -381,7 +381,7 @@ export function UserDashboard() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center text-xs text-gray-500">
+                <div className="flex items-center text-xs text-gray-500 shrink-0 self-start sm:self-auto">
                   <Clock className="w-3 h-3 mr-1" />
                   {formatTime(item.triggered_at || item.created_at)}
                 </div>
@@ -396,7 +396,7 @@ export function UserDashboard() {
               )}
 
               {(item.entry_price || item.target_price) && (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {item.entry_price && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-gray-600 text-xs mb-1">Entry Price</p>

@@ -29,6 +29,15 @@ export function TradingViewChart({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    const getResponsiveHeight = () => {
+      if (window.innerWidth < 640) return 300;
+      if (window.innerWidth < 1024) return 400;
+      return height;
+    };
+
+    const initialHeight = getResponsiveHeight();
+    chartContainerRef.current.style.height = `${initialHeight}px`;
+
     // Create chart
     const chart = createChart(chartContainerRef.current, {
       layout: {
@@ -40,7 +49,7 @@ export function TradingViewChart({
         horzLines: { color: '#1e222d' },
       },
       width: chartContainerRef.current.clientWidth,
-      height: height,
+      height: initialHeight,
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
@@ -68,8 +77,11 @@ export function TradingViewChart({
     // Handle resize
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
+        const currentHeight = getResponsiveHeight();
+        chartContainerRef.current.style.height = `${currentHeight}px`;
         chartRef.current.applyOptions({
           width: chartContainerRef.current.clientWidth,
+          height: currentHeight,
         });
       }
     };
