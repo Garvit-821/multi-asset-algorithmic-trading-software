@@ -539,6 +539,31 @@ docker run -p 8080:80 \
 
 ---
 
+## 📜 Project Changelog & Recent Commits
+
+Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
+
+*   **`c322c98` (HEAD) - Unified Search Bar & Portfolio Reset**:
+    *   Consolidated the asset category selector and search input into a single unified search component.
+    *   Implemented the system-wide Paper Portfolio Reset setting within the centralized Settings page, removing it from the Paper Trading view for cleaner aesthetics.
+    *   Corrected mobile z-indexing on side drawer navigation to prevent search bar overlays from bleeding through active menus.
+*   **`470d670` - Responsive Navigation Tabs & Search Layout**:
+    *   Made the market selector responsive to wrap gracefully on smaller displays.
+*   **`79190c0` - Dashboard Responsive Overhaul & Chart Sizing**:
+    *   Added dynamic chart container resize math for Lightweight Charts to scale height correctly.
+    *   Converted the market dashboard from a fixed sidebar layout to a responsive vertical stacking column on mobile/tablet viewports.
+    *   Adjusted the Trading Feed cards and Paper Trading button bar to prevent horizontal screen overflow.
+*   **`82645f0` - Quantitative Documentation**:
+    *   Added mathematical formulas (Geometric Brownian Motion, Box-Muller, Markowitz Portfolio theory, Sharpe/Sortino ratios, and technical indicator calculations) directly to the README.
+*   **`7699bdf` - Advanced Quantitative Analytics Modules**:
+    *   Integrated Portfolio Optimizer (Markowitz Frontier), Market Replay, Social Sentiment Index, and No-Code Visual Strategy Builder interfaces.
+*   **`db0f0d9` to `8954b90` - Core Features & Sandbox Setup**:
+    *   Overhauled the landing page and navigation styles.
+    *   Integrated paper trading simulation modules, local storage persistence, and live price feeds.
+    *   Bypassed mandatory logins to establish immediate administrator access for local sandboxing.
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
