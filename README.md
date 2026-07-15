@@ -19,15 +19,16 @@
    - [Directory Structure](#directory-structure)
    - [Data Flow & Request Lifecycle](#data-flow--request-lifecycle)
    - [Key Components](#key-components)
-   - [Database Schema](#database-schema)
-6. [Environment Variables](#environment-variables)
-7. [Available Scripts](#available-scripts)
-8. [Testing & Verification](#testing--verification)
-9. [Deployment](#deployment)
+    - [Database Schema](#database-schema)
+6. [Mathematical Foundations & Core Algorithms](#mathematical-foundations--core-algorithms)
+7. [Environment Variables](#environment-variables)
+8. [Available Scripts](#available-scripts)
+9. [Testing & Verification](#testing--verification)
+10. [Deployment](#deployment)
    - [Vite Static Frontend (Vercel/Netlify)](#vite-static-frontend-vercelnetlify)
    - [Docker Deployment](#docker-deployment)
-10. [Troubleshooting](#troubleshooting)
-11. [License](#license)
+11. [Troubleshooting](#troubleshooting)
+12. [License](#license)
 
 ---
 
@@ -276,6 +277,155 @@ The diagram below charts how price data, user orders, alerts, and backtesting st
    ├── trades_count (integer)
    └── updated_at (timestamp)
 ```
+
+---
+
+## 🧠 Mathematical Foundations & Core Algorithms
+
+This section outlines the complete quantitative systems, algorithms, and mathematical formulations engineered into the platform.
+
+### 1. Stochastic Path Simulator (Monte Carlo Risk of Ruin)
+
+The sandbox dashboard employs **Geometric Brownian Motion (GBM)** to project future portfolio valuations based on historical return distributions:
+
+$$S_t = S_{t-1} \exp\left(\left(\mu - \frac{1}{2}\sigma^2\right)\Delta t + \sigma Z \sqrt{\Delta t}\right)$$
+
+Where:
+- $S_t$ is the simulated price at time step $t$.
+- $S_{t-1}$ is the price at time step $t-1$.
+- $\mu$ is the drift coefficient, calculated as the historical mean log return: $\mu = \frac{1}{n} \sum_{i=1}^n \ln(P_i / P_{i-1})$.
+- $\sigma$ is the historical volatility coefficient, calculated as the standard deviation of daily log returns: $\sigma = \sqrt{\frac{1}{n-1} \sum_{i=1}^n \left(\ln(P_i / P_{i-1}) - \mu\right)^2}$.
+- $\Delta t$ represents the time step parameter ($1/252$ for annualized daily scales, or $1.0$ for discrete day intervals).
+- $Z$ is a standard normal random variable ($Z \sim \mathcal{N}(0, 1)$).
+
+#### Box-Muller Transform
+To synthesize the normally distributed variable $Z$ on the client side, the simulation processes two uniformly distributed independent random values $U_1, U_2 \sim \text{Uniform}(0, 1)$ using the Box-Muller transform:
+
+$$Z_0 = \sqrt{-2 \ln U_1} \cos(2 \pi U_2)$$
+$$Z_1 = \sqrt{-2 \ln U_1} \sin(2 \pi U_2)$$
+
+The simulated paths evaluate the **Probability of Ruin ($P_{\text{ruin}}$)**, defined as the percentage of the $M = 1,000$ runs that fall below the margin threshold $C_{\text{ruin}}$ (e.g. $10\%$ of initial equity):
+
+$$P_{\text{ruin}} = \frac{1}{M} \sum_{j=1}^M \mathbb{I}\left( \min_{0 \le t \le T} S_{t, j} \le C_{\text{ruin}} \right)$$
+
+---
+
+### 2. Markowitz Modern Portfolio Theory (MPT) & Efficient Frontier
+
+The Portfolio Optimizer maps the risk-return landscape of selected assets (e.g. BTC, ETH, SOL) using variance-covariance arrays.
+
+#### Expected Return
+The expected annualized portfolio return $E(R_p)$ is computed as the weighted sum of historical asset returns:
+
+$$E(R_p) = W^T E(R) \times 252 = \sum_{i=1}^N w_i E(R_i) \times 252$$
+
+Where $W = [w_1, w_2, \dots, w_N]^T$ represents the portfolio weight vector, satisfying the constraint:
+
+$$\sum_{i=1}^N w_i = 1.0 \quad \text{and} \quad w_i \ge 0$$
+
+#### Covariance Matrix ($\Sigma$)
+The sample covariance between asset returns $R_i$ and $R_j$ over $M$ days is formulated as:
+
+$$\Sigma_{ij} = \text{Cov}(R_i, R_j) = \frac{1}{M-1} \sum_{t=1}^M \left( R_{t,i} - \bar{R}_i \right) \left( R_{t,j} - \bar{R}_j \right)$$
+
+#### Portfolio Variance & Volatility
+The portfolio's annualized variance $\sigma_p^2$ and volatility $\sigma_p$ are computed as:
+
+$$\sigma_p^2 = \left( W^T \Sigma W \right) \times 252$$
+$$\sigma_p = \sqrt{W^T \Sigma W} \times \sqrt{252}$$
+
+#### Optimization Profiles
+The simulator runs $500$ random weight vectors to identify two distinct portfolios:
+1. **Maximum Sharpe Ratio (Tangency Portfolio)**: Maximizes excess return per unit of volatility:
+   $$\max_{W} S_p = \frac{E(R_p) - R_f}{\sigma_p}$$
+   where $R_f$ is the risk-free rate (configured as $2\%$ or $0.02$).
+2. **Global Minimum Variance (GMV) Portfolio**: Minimizes total portfolio risk:
+   $$\min_{W} \sigma_p^2 = W^T \Sigma W \quad \text{subject to } \sum w_i = 1$$
+
+---
+
+### 3. Risk Metrics Matrix
+
+#### Value at Risk (VaR)
+We employ the parametric Variance-Covariance Value at Risk (VaR) to project potential maximum loss over a 1-day horizon with $1-\alpha = 95\%$ confidence:
+
+$$\text{VaR}_{95\%} = \text{Portfolio Value} \times \left( Z_{0.95} \times \sigma_{\text{daily}} \right)$$
+
+Where $Z_{0.95} = 1.645$ and $\sigma_{\text{daily}} = \sqrt{W^T \Sigma W}$.
+
+#### Sortino Ratio
+The Sortino ratio evaluates risk-adjusted returns focusing exclusively on downside deviation $\sigma_d$:
+
+$$\text{Sortino} = \frac{E(R_p) - R_f}{\sigma_d} \times \sqrt{252}$$
+
+Where downside deviation $\sigma_d$ isolates returns falling below the target risk-free rate $R_f$:
+
+$$\sigma_d = \sqrt{\frac{1}{M} \sum_{t=1}^M \left[ \min\left(0, R_t - R_f\right] \right]^2}$$
+
+#### Beta Coefficient ($\beta$)
+Beta measures systemic risk relative to a benchmark asset (e.g. Bitcoin):
+
+$$\beta_i = \frac{\text{Cov}(R_i, R_m)}{\text{Var}(R_m)}$$
+
+#### Pearson Correlation Coefficient ($\rho_{xy}$)
+Used to evaluate asset class correlation profiles:
+
+$$\rho_{xy} = \frac{\sum_{t=1}^M (x_t - \bar{x})(y_t - \bar{y})}{\sqrt{\sum_{t=1}^M (x_t - \bar{x})^2 \sum_{t=1}^M (y_t - \bar{y})^2}}$$
+
+---
+
+### 4. Technical Indicators Algorithms
+
+The client-side backtesting engine executes indicators directly in TypeScript:
+
+#### Exponential Moving Average (EMA)
+The EMA applies a multiplier to prioritize recent price actions:
+
+$$\text{EMA}_t = \left( P_t \times \alpha \right) + \left( \text{EMA}_{t-1} \times (1 - \alpha) \right)$$
+
+Where the smoothing multiplier $\alpha$ is defined by the window period $N$:
+
+$$\alpha = \frac{2}{N+1}$$
+
+#### Relative Strength Index (RSI)
+RSI measures the velocity and magnitude of price momentum:
+
+$$\text{RSI} = 100 - \frac{100}{1 + \text{RS}}$$
+
+Where RS is the ratio of smoothed positive price gains ($U$) to negative price losses ($D$):
+
+$$\text{RS} = \frac{\text{EMA}_U(t)}{\text{EMA}_D(t)}$$
+- $U_t = \max(0, P_t - P_{t-1})$
+- $D_t = \max(0, P_{t-1} - P_t)$
+
+#### Moving Average Convergence Divergence (MACD)
+Calculates relationship trends between two moving averages:
+
+$$\text{MACD Line} = \text{EMA}_{12}(P) - \text{EMA}_{26}(P)$$
+$$\text{Signal Line} = \text{EMA}_9(\text{MACD Line})$$
+
+#### Bollinger Bands (BB)
+Constructs volatility bands above and below a Simple Moving Average:
+
+$$\text{Middle Band} = \text{SMA}_N(P) = \frac{1}{N} \sum_{i=0}^{N-1} P_{t-i}$$
+$$\text{Upper Band} = \text{SMA}_N(P) + \left( K \times \sigma_N(P) \right)$$
+$$\text{Lower Band} = \text{SMA}_N(P) - \left( K \times \sigma_N(P) \right)$$
+
+Where $K = 2.0$ represents standard deviation multipliers and $\sigma_N(P)$ is the sample standard deviation.
+
+---
+
+### 5. Alternative Data Social Sentiment Indexes
+
+#### Text Polarity Scoring
+Simulated titles are parsed for pre-defined positive and negative vocabulary sets:
+
+$$\text{score} = \sum \text{weight}_{\text{positive\_keys}} - \sum \text{weight}_{\text{negative\_keys}}$$
+
+#### Fear & Greed Index Scale
+Aggregates $M$ active posts into a unified rolling score scaled from 0 (Extreme Fear) to 100 (Extreme Greed):
+
+$$\text{Index} = \min\left(100, \max\left(0, \text{round}\left( (S_{\text{avg}} + 1.0) \times 50 \right) \right)\right) \quad \text{where } S_{\text{avg}} = \frac{1}{M} \sum_{i=1}^M \text{score}_i$$
 
 ---
 
