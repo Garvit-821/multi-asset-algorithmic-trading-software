@@ -2,6 +2,9 @@
 
 **CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Monte Carlo risk of ruin simulations, and real-time conditional alert notifications dispatched directly to Telegram.
 
+> [!TIP]
+> 🎥 **[Watch the Platform Demo Video](https://drive.google.com/file/d/1CitbQAg6HIxaCRUKjIXe-MtDhnwnZMbV/view?usp=sharing)** to see the live charts, paper trading, and strategy builder in action.
+
 ---
 
 ## 📑 Table of Contents
