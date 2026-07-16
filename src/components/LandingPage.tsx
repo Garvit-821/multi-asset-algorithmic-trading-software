@@ -131,7 +131,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
             </h1>
 
             <p className="text-[#a8acb3] text-base md:text-lg font-normal leading-relaxed">
-              Connect to Binance low-latency WebSocket feeds, configure custom AI indicators, and simulate risk exposures using our quantitative portfolio engine.
+              Connect to live low-latency WebSocket feeds, configure custom AI indicators, and simulate risk exposures using our quantitative portfolio engine.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
