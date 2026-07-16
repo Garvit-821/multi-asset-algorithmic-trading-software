@@ -4,6 +4,10 @@
 
 > [!TIP]
 > 🎥 **[Watch the Platform Demo Video](https://drive.google.com/file/d/1CitbQAg6HIxaCRUKjIXe-MtDhnwnZMbV/view?usp=sharing)** to see the live charts, paper trading, and strategy builder in action.
+>
+> 🚀 **Live Production Access**:
+> - **Primary (Vercel)**: [stratrade.vercel.app](https://stratrade.vercel.app)
+> - **Backup/Alternative (Netlify)**: [stratrade.netlify.app](https://stratrade.netlify.app) *(use if the Vercel primary deployment is down)*
 
 ---
 
