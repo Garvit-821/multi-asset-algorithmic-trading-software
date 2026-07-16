@@ -242,7 +242,7 @@ The diagram below charts how price data, user orders, alerts, and backtesting st
   - **Sortino Ratio**: penalizes downside deviation ($\sigma_d$) rather than standard deviation:
     $$\text{Sortino} = \frac{R_p - R_f}{\sigma_d} \times \sqrt{252} \quad \text{where } \sigma_d = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left[\min\left(0, R_{i} - R_f\right)\right]^2}$$
   - **Value at Risk (VaR)**: Determines the maximum loss expected on the portfolio over a 1-day horizon with 95% confidence:
-    $$\text{VaR}_{95\%} = \text{Portfolio Value} \times \left( 1.645 \times \sigma_p \right)$$
+    $$\text{VaR}_{0.95} = \text{Portfolio Value} \times \left( 1.645 \times \sigma_p \right)$$
 - **Alert Monitor Background Daemon**: Runs an active polling sequence querying Supabase for `'active'` alerts. When current prices cross target thresholds, it updates the alert state to `'triggered'` and calls the Telegram API.
 
 ### Database Schema
@@ -311,7 +311,7 @@ To synthesize the normally distributed variable $Z$ on the client side, the simu
 $$Z_0 = \sqrt{-2 \ln U_1} \cos(2 \pi U_2)$$
 $$Z_1 = \sqrt{-2 \ln U_1} \sin(2 \pi U_2)$$
 
-The simulated paths evaluate the **Probability of Ruin ($P_{\text{ruin}}$)**, defined as the percentage of the $M = 1,000$ runs that fall below the margin threshold $C_{\text{ruin}}$ (e.g. $10\%$ of initial equity):
+The simulated paths evaluate the **Probability of Ruin ($P_{\text{ruin}}$)**, defined as the percentage of the $M = 1,000$ runs that fall below the margin threshold $C_{\text{ruin}}$ (e.g. 10% of initial equity):
 
 $$P_{\text{ruin}} = \frac{1}{M} \sum_{j=1}^M \mathbb{I}\left( \min_{0 \le t \le T} S_{t, j} \le C_{\text{ruin}} \right)$$
 
@@ -345,7 +345,7 @@ $$\sigma_p = \sqrt{W^T \Sigma W} \times \sqrt{252}$$
 The simulator runs $500$ random weight vectors to identify two distinct portfolios:
 1. **Maximum Sharpe Ratio (Tangency Portfolio)**: Maximizes excess return per unit of volatility:
    $$\max_{W} S_p = \frac{E(R_p) - R_f}{\sigma_p}$$
-   where $R_f$ is the risk-free rate (configured as $2\%$ or $0.02$).
+   where $R_f$ is the risk-free rate (configured as 2% or 0.02).
 2. **Global Minimum Variance (GMV) Portfolio**: Minimizes total portfolio risk:
    $$\min_{W} \sigma_p^2 = W^T \Sigma W \quad \text{subject to } \sum w_i = 1$$
 
@@ -354,9 +354,9 @@ The simulator runs $500$ random weight vectors to identify two distinct portfoli
 ### 3. Risk Metrics Matrix
 
 #### Value at Risk (VaR)
-We employ the parametric Variance-Covariance Value at Risk (VaR) to project potential maximum loss over a 1-day horizon with $1-\alpha = 95\%$ confidence:
+We employ the parametric Variance-Covariance Value at Risk (VaR) to project potential maximum loss over a 1-day horizon with $1-\alpha = 0.95$ (95%) confidence:
 
-$$\text{VaR}_{95\%} = \text{Portfolio Value} \times \left( Z_{0.95} \times \sigma_{\text{daily}} \right)$$
+$$\text{VaR}_{0.95} = \text{Portfolio Value} \times \left( Z_{0.95} \times \sigma_{\text{daily}} \right)$$
 
 Where $Z_{0.95} = 1.645$ and $\sigma_{\text{daily}} = \sqrt{W^T \Sigma W}$.
 
@@ -367,7 +367,7 @@ $$\text{Sortino} = \frac{E(R_p) - R_f}{\sigma_d} \times \sqrt{252}$$
 
 Where downside deviation $\sigma_d$ isolates returns falling below the target risk-free rate $R_f$:
 
-$$\sigma_d = \sqrt{\frac{1}{M} \sum_{t=1}^M \left[ \min\left(0, R_t - R_f\right] \right]^2}$$
+$$\sigma_d = \sqrt{\frac{1}{M} \sum_{t=1}^M \left[ \min\left(0, R_t - R_f\right) \right]^2}$$
 
 #### Beta Coefficient ($\beta$)
 Beta measures systemic risk relative to a benchmark asset (e.g. Bitcoin):
@@ -427,7 +427,7 @@ Where $K = 2.0$ represents standard deviation multipliers and $\sigma_N(P)$ is t
 #### Text Polarity Scoring
 Simulated titles are parsed for pre-defined positive and negative vocabulary sets:
 
-$$\text{score} = \sum \text{weight}_{\text{positive\_keys}} - \sum \text{weight}_{\text{negative\_keys}}$$
+$$\text{score} = \sum \text{weight}_{\text{positive keys}} - \sum \text{weight}_{\text{negative keys}}$$
 
 #### Fear & Greed Index Scale
 Aggregates $M$ active posts into a unified rolling score scaled from 0 (Extreme Fear) to 100 (Extreme Greed):
