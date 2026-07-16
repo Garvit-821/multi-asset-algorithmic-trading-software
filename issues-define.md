@@ -33,6 +33,11 @@ This document serves as a repository for tracking platform bugs, layout glitches
 * **Priority:** Low
 * **Description:** Incorporate progressive web app (PWA) manifest files, service worker configuration, and add-to-home-screen install prompts to allow users to install the dashboard as a native mobile application.
 
+### 6. [ISSUE-006] Email OTP Login & Forgot/Reset Password Support
+* **Status:** New
+* **Priority:** High
+* **Description:** Implement one-time passwords (OTP) sent directly to users' email addresses for secure login, alongside a standard forgot password recovery email flow that sends password-reset tokens/links to set new credentials.
+
 ---
 
 ## 📋 Issue Log Template
