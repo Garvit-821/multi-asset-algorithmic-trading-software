@@ -578,7 +578,20 @@ bash setup-android.sh
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
-*   **`c322c98` (HEAD) - Unified Search Bar & Portfolio Reset**:
+*   **`71d4eed` (HEAD) - GitHub Star Integration & Header CTA**:
+    *   Added direct GitHub repository star links to the landing page navbar and main application header.
+*   **`cff68ea` to `984f896` (tag: v1.0.0) - Android Mobile App Packaging & Capacitor Pipeline**:
+    *   Configured Capacitor framework integration for native Android deployment.
+    *   Created `setup-android.sh` automation script for one-command APK compilation and Android Studio synchronization.
+    *   Added comprehensive step-by-step Android build guide detailing APK generation, environmental configuration, and system architecture.
+*   **`613fb7d` to `005b826` - Project Roadmap & Issue Definitions**:
+    *   Created `ROADMAP.md` outlining multi-asset platform milestones (Short, Medium, and Long-Term).
+    *   Established `issues-define.md` to track feature requests including Email OTP Authentication (ISSUE-006) and Native Mobile Packaging (ISSUE-005).
+*   **`a95f049` - Quantitative Math & LaTeX Syntax Standardizing**:
+    *   Standardized quantitative algorithms (Geometric Brownian Motion, Box-Muller, Markowitz Portfolio theory, Sharpe/Sortino/VaR ratios) into LaTeX notation across documentation.
+*   **`7ed6587` to `28b11ce` - Live Production Deployment & Demo Video Links**:
+    *   Embedded official Vercel live production deployment links (`https://stratrade.vercel.app`) and platform demonstration video guides in `README.md`.
+*   **`c322c98` - Unified Search Bar & Portfolio Reset**:
     *   Consolidated the asset category selector and search input into a single unified search component.
     *   Implemented the system-wide Paper Portfolio Reset setting within the centralized Settings page, removing it from the Paper Trading view for cleaner aesthetics.
     *   Corrected mobile z-indexing on side drawer navigation to prevent search bar overlays from bleeding through active menus.
