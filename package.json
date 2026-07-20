@@ -12,6 +12,7 @@
     "cap:add": "cap add android",
     "cap:sync": "cap sync",
     "cap:open": "cap open android",
+    "setup:android": "bash setup-android.sh",
     "build:apk": "vite build && cap sync && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
