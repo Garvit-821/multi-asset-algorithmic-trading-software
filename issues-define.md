@@ -28,10 +28,10 @@ This document serves as a repository for tracking platform bugs, layout glitches
 * **Priority:** Medium
 * **Description:** Extend the background alert monitor daemon (`alertMonitor.ts`) to dispatch real-time price-crossing signals via email (e.g., using SendGrid, Resend, or SMTP) as an alternative to Telegram bot notifications.
 
-### 5. [ISSUE-005] Add React Native / PWA Mobile Install Add-on
+### 5. [ISSUE-005] Native Android App & APK Build Integration (Capacitor)
 * **Status:** New
-* **Priority:** Low
-* **Description:** Incorporate progressive web app (PWA) manifest files, service worker configuration, and add-to-home-screen install prompts to allow users to install the dashboard as a native mobile application.
+* **Priority:** Medium
+* **Description:** Package the React Vite application into a native Android app (`.apk` / `.aab`) using Ionic Capacitor (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`). Includes setting up native Android WebView bridge, safe-area inset paddings, haptic feedback integration, native push notifications, and build scripts for compiling `.apk` files via Gradle.
 
 ### 6. [ISSUE-006] Email OTP Login & Forgot/Reset Password Support
 * **Status:** New
