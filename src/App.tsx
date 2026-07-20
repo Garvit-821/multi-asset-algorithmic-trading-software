@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2 } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -80,12 +80,23 @@ function App() {
           </div>
           <span className="font-extrabold text-lg text-gray-900 tracking-tight">CryptoAgent</span>
         </div>
-        <button 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors focus:outline-none"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center space-x-3">
+          <a
+            href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1 px-3 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg"
+          >
+            <Github className="w-3.5 h-3.5 text-amber-400" />
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+          </a>
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors focus:outline-none"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </header>
 
       <div className="flex flex-1 relative overflow-hidden">
@@ -233,6 +244,19 @@ function App() {
                 <p className="text-xs text-gray-500 truncate font-mono">{user.email}</p>
               </div>
             </div>
+
+            <a
+              href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg transition-all text-sm font-semibold shadow-sm group"
+            >
+              <div className="flex items-center space-x-2.5">
+                <Github className="w-4 h-4 text-amber-400" />
+                <span>Star on GitHub</span>
+              </div>
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform" />
+            </a>
 
             <button
               onClick={() => {

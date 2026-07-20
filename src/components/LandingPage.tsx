@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, ShieldAlert, Cpu, Zap, ArrowRight, CheckCircle, Globe, Smartphone, Menu, X, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, ShieldAlert, Cpu, Zap, ArrowRight, CheckCircle, Globe, Smartphone, Menu, X, ArrowUpRight, Github, Star } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunch: () => void;
@@ -44,7 +44,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
           </nav>
 
           {/* Nav CTAs */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            <a
+              href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-11 px-4 bg-[#16181c] hover:bg-[#202328] text-white rounded-full font-semibold text-sm transition-all border border-[#26282c] flex items-center space-x-2 shadow-xs group"
+            >
+              <Github className="w-4 h-4 text-amber-400" />
+              <span>Star on GitHub</span>
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform" />
+            </a>
+
             <button
               onClick={onLaunch}
               className="h-11 px-5 bg-[#0052ff] hover:bg-[#003ecc] text-white rounded-full font-semibold text-sm transition-all shadow-sm flex items-center space-x-2"
@@ -89,15 +100,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
             </a>
             <hr className="border-[#eef0f3]" />
             <div className="flex flex-col space-y-3 pt-2">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onLaunch();
-                }}
-                className="w-full text-center py-3 text-sm font-bold text-[#0a0b0d] hover:bg-[#f7f7f7] rounded-full transition-colors"
+              <a
+                href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 bg-[#16181c] text-white rounded-full font-bold text-sm transition-all text-center flex items-center justify-center space-x-2 border border-[#26282c]"
               >
-                Sign In
-              </button>
+                <Github className="w-4 h-4 text-amber-400" />
+                <span>Star on GitHub</span>
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              </a>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -144,10 +156,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               </button>
 
               <a
-                href="#features"
-                className="w-full sm:w-auto h-14 px-8 bg-[#16181c] hover:bg-[#202328] text-white rounded-full font-semibold text-base border border-[#26282c] transition-all flex items-center justify-center"
+                href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto h-14 px-8 bg-[#16181c] hover:bg-[#202328] text-white rounded-full font-semibold text-base border border-[#26282c] transition-all flex items-center justify-center space-x-2.5 group"
               >
-                Explore Features
+                <Github className="w-5 h-5 text-amber-400" />
+                <span>Star on GitHub</span>
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform" />
               </a>
             </div>
 
@@ -448,6 +464,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
           </div>
 
           <div className="flex items-center space-x-6 text-xs text-[#5b616e]">
+            <a
+              href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center text-[#0a0b0d] hover:text-[#0052ff] font-semibold transition-colors"
+            >
+              <Github className="w-4 h-4 mr-1.5 text-amber-500" />
+              <span>Star on GitHub</span>
+            </a>
             <span className="flex items-center"><Globe className="w-4 h-4 mr-1 text-[#7c828a]" /> Web Terminal</span>
             <span className="flex items-center"><Smartphone className="w-4 h-4 mr-1 text-[#7c828a]" /> Mobile Sandbox</span>
           </div>
