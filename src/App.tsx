@@ -14,19 +14,19 @@ import { MarketReplay } from './components/MarketReplay';
 import { SocialSentiment } from './components/SocialSentiment';
 import { paperTradingService } from './services/paperTradingService';
 
-type View = 
-  | 'dashboard' 
-  | 'trading' 
-  | 'alerts' 
-  | 'manual' 
-  | 'ai' 
-  | 'settings' 
-  | 'userfeed' 
-  | 'paper' 
-  | 'landing' 
-  | 'visualbuilder' 
-  | 'optimizer' 
-  | 'replay' 
+type View =
+  | 'dashboard'
+  | 'trading'
+  | 'alerts'
+  | 'manual'
+  | 'ai'
+  | 'settings'
+  | 'userfeed'
+  | 'paper'
+  | 'landing'
+  | 'visualbuilder'
+  | 'optimizer'
+  | 'replay'
   | 'sentiment';
 
 function App() {
@@ -78,7 +78,7 @@ function App() {
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
-          <span className="font-extrabold text-lg text-gray-900 tracking-tight">CryptoAgent</span>
+          <span className="font-extrabold text-lg text-gray-900 tracking-tight">Stratrade</span>
         </div>
         <div className="flex items-center space-x-3">
           <a
@@ -90,7 +90,7 @@ function App() {
             <Github className="w-3.5 h-3.5 text-amber-400" />
             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
           </a>
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors focus:outline-none"
           >
@@ -102,29 +102,28 @@ function App() {
       <div className="flex flex-1 relative overflow-hidden">
         {/* Mobile menu backdrop overlay */}
         {mobileMenuOpen && (
-          <div 
+          <div
             onClick={() => setMobileMenuOpen(false)}
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 md:hidden transition-opacity"
           />
         )}
 
         {/* Sidebar Navigation Drawer */}
-        <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50 fixed inset-y-0 left-0 transform ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 md:relative transition-transform duration-300 ease-in-out h-full`}>
-          
+        <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50 fixed inset-y-0 left-0 transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          } md:translate-x-0 md:relative transition-transform duration-300 ease-in-out h-full`}>
+
           <div className="p-6 border-b border-gray-200 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/10">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">CryptoAgent</h1>
+                <h1 className="text-xl font-bold text-gray-900">Stratrade</h1>
                 <p className="text-xs text-gray-500">Trading Platform</p>
               </div>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => setMobileMenuOpen(false)}
               className="p-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 md:hidden"
             >
@@ -147,11 +146,10 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
-                        isActive
+                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
                           ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
-                      }`}
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -175,11 +173,10 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
-                        isActive
+                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
                           ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
-                      }`}
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -204,11 +201,10 @@ function App() {
                           setCurrentView(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${
-                          isActive
+                        className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
                             ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
-                        }`}
+                          }`}
                       >
                         <Icon className="w-4 h-4" />
                         <span>{item.label}</span>

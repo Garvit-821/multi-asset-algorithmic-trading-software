@@ -32,7 +32,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight text-[#0a0b0d]" style={{ letterSpacing: '-0.5px' }}>
-              CryptoAgent
+              Stratrade
             </span>
           </div>
 
@@ -479,7 +479,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
 
         <div className="max-w-[1200px] mx-auto mt-8 pt-6 border-t border-[#eef0f3] text-center text-3xs text-[#7c828a] tracking-wide uppercase font-semibold">
-          © 2026 CryptoAgent Inc. All rights reserved.
+          © 2026 Stratrade Inc. All rights reserved.
         </div>
       </footer>
 
