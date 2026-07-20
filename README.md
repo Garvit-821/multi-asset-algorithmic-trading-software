@@ -513,6 +513,31 @@ docker run -p 8080:80 \
   -d cryptoagent-terminal:latest
 ```
 
+### Android Mobile App (Capacitor APK)
+
+To package the platform into a native Android `.apk` file using Ionic Capacitor:
+
+1. **Install Dependencies & Build Project**:
+   ```bash
+   npm install
+   npm run build
+   ```
+2. **Add & Sync Android Native Platform**:
+   ```bash
+   npm run cap:add
+   npm run cap:sync
+   ```
+3. **Compile Debug APK (Option A - Command Line)**:
+   ```bash
+   npm run build:apk
+   ```
+   *The generated `.apk` will be output to: `android/app/build/outputs/apk/debug/app-debug.apk`.*
+4. **Open in Android Studio (Option B - IDE)**:
+   ```bash
+   npm run cap:open
+   ```
+   In Android Studio, go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+
 ---
 
 ## Troubleshooting

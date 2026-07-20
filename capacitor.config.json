@@ -1,0 +1,15 @@
+{
+  "appId": "com.cryptoagent.app",
+  "appName": "CryptoAgent",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#ffffff",
+      "showSpinner": false
+    }
+  }
+}
