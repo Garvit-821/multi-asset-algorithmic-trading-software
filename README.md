@@ -1,6 +1,6 @@
 # CryptoAgent - Multi-Asset Algorithmic Trading Platform 
 
-**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Monte Carlo risk of ruin simulations, and real-time conditional alert notifications dispatched directly to Telegram.
+**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, real-world exchange execution, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Depth of Market (DOM L2) liquidity visualization, institutional execution algorithms (TWAP, VWAP, Iceberg), and real-time conditional alert notifications dispatched directly to Telegram.
 
 > [!TIP]
 > 🎥 **[Watch the Platform Demo Video](https://drive.google.com/file/d/1CitbQAg6HIxaCRUKjIXe-MtDhnwnZMbV/view?usp=sharing)** to see the live charts, paper trading, and strategy builder in action.
@@ -14,28 +14,30 @@
 ## 📑 Table of Contents
 
 1. [Key Features](#key-features)
-2. [Tech Stack](#tech-stack)
-3. [Prerequisites](#prerequisites)
-4. [Getting Started](#getting-started)
+2. [Newly Implemented Features (Phase 1 Real-World Execution)](#-newly-implemented-features-phase-1-real-world-execution)
+3. [Tech Stack](#tech-stack)
+4. [Prerequisites](#prerequisites)
+5. [Getting Started](#getting-started)
    - [1. Clone the Repository](#1-clone-the-repository)
    - [2. Install Dependencies](#2-install-dependencies)
    - [3. Environment Setup](#3-environment-setup)
    - [4. Database Migration Setup](#4-database-migration-setup)
    - [5. Start the Development Server](#5-start-the-development-server)
-5. [Architecture Overview](#architecture-overview)
+6. [Architecture Overview](#architecture-overview)
    - [Directory Structure](#directory-structure)
    - [Data Flow & Request Lifecycle](#data-flow--request-lifecycle)
    - [Key Components](#key-components)
-    - [Database Schema](#database-schema)
-6. [Mathematical Foundations & Core Algorithms](#mathematical-foundations--core-algorithms)
-7. [Environment Variables](#environment-variables)
-8. [Available Scripts](#available-scripts)
-9. [Testing & Verification](#testing--verification)
-10. [Deployment](#deployment)
+   - [Database Schema](#database-schema)
+7. [Mathematical Foundations & Core Algorithms](#mathematical-foundations--core-algorithms)
+8. [Environment Variables](#environment-variables)
+9. [Available Scripts](#available-scripts)
+10. [Testing & Verification](#testing--verification)
+11. [Deployment](#deployment)
    - [Vite Static Frontend (Vercel/Netlify)](#vite-static-frontend-vercelnetlify)
    - [Docker Deployment](#docker-deployment)
-11. [Troubleshooting](#troubleshooting)
-12. [License](#license)
+   - [Android Mobile App (Capacitor APK)](#android-mobile-app-capacitor-apk)
+12. [Troubleshooting](#troubleshooting)
+13. [License](#license)
 
 ---
 
@@ -52,6 +54,64 @@
 - **Historical Market Crisis Replay**: Replays second-by-second historical liquidations (FTX collapse, COVID Crash, Terra depegging) for manual order placement under high-stress simulator environments.
 - **Alternative Social Sentiment Stream**: Computes real-time keyword sentiment averages from Twitter and Reddit to trigger automated Telegram notifications.
 - **Background Conditional Alerts Manager**: Configure price-above, price-below, or price-cross targets. A background service polls active alert rows and dispatches Telegram notifications to mobile.
+- **Real-World Multi-Exchange API Security**: Client-side **AES-GCM 256-bit passphrase encryption** via the Web Crypto API. Securely persist encrypted API keys for **Binance (Live/Testnet)**, **Coinbase Advanced Trade**, and **Kraken** without transmitting plaintext secrets to external servers.
+- **Institutional Algorithmic Execution Suite**: Launch, monitor, and control automated execution strategies including **TWAP** (Time-Weighted Average Price with random size variance masking), **VWAP** (Volume-Weighted Average Price), and **Iceberg Orders** (hidden reserve order book slicing).
+- **Depth of Market (DOM) & L2 Order Book**: Live L2 depth order book with bid/ask visual depth fill bars, order imbalance percentage ratio gauge, and real-time buy wall / sell wall concentration detection.
+- **Mobile-First Responsive Layout & Harmonized Color Theme**: Full mobile responsiveness across smartphones and tablets, featuring cohesive light elevation aesthetics matching the core application design.
+
+---
+
+## ⚡ Newly Implemented Features (Phase 1 Real-World Execution)
+
+This section provides a detailed technical breakdown of the newly added institutional trading modules, their functionality, architecture, and underlying mechanisms.
+
+### 1. 🔒 Multi-Exchange API Vault & Security Service
+- **Components & Files**: [`ExchangeSettingsModal.tsx`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/components/ExchangeSettingsModal.tsx), [`cryptoSecurity.ts`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/utils/cryptoSecurity.ts), [`exchangeConnector.ts`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/services/exchangeConnector.ts)
+- **What Was Added**: Client-side encrypted credential vault for managing real-world exchange API keys, secrets, and passphrases.
+- **How It Works**:
+  - Uses the native browser **Web Crypto API (SubtleCrypto)** with **256-bit AES-GCM** encryption and **PBKDF2 key derivation** (100,000 iterations with SHA-256).
+  - API keys and secrets are encrypted in the user's browser using a master passphrase before persisting to local storage.
+  - Plaintext credentials exist strictly in application memory while unlocked and are never sent to third-party databases.
+- **Key Functionality**:
+  - **Unlock & Encrypt**: Passphrase-protected vault authorization and key generation.
+  - **Connector Manager**: Manage credentials for **Binance (Live & Testnet)**, **Coinbase Advanced Trade**, and **Kraken**.
+  - **Latency Diagnostics**: Test real-time API connectivity and measure REST ping latency (`ms`).
+  - **Active Router**: One-click switching to set the active execution engine across the entire terminal.
+
+### 2. ⚡ Institutional Algorithmic Order Manager
+- **Components & Files**: [`AlgoOrderManager.tsx`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/components/AlgoOrderManager.tsx), [`algoExecutionService.ts`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/services/algoExecutionService.ts)
+- **What Was Added**: An institutional order execution engine capable of slicing large orders into smaller sub-orders over time to minimize market impact and slippage.
+- **Supported Strategies**:
+  1. **TWAP (Time-Weighted Average Price)**:
+     - Slices a large order evenly over a specified duration (e.g. 1.0 BTC split into 10 slices over 5 minutes).
+     - Incorporates an optional **Random Size Variance (±15%)** slider to vary individual slice quantities stochastically, disguising trade intent from market-making algorithms and front-running bots.
+  2. **VWAP (Volume-Weighted Average Price)**:
+     - Dynamically weights slice quantities according to intraday volume profiles (higher volume at market open/close, lower volume mid-day).
+  3. **Iceberg Orders**:
+     - Splits large institutional orders into small, visible display quantities (e.g., display 0.1 BTC on the order book while keeping 0.9 BTC hidden in reserve).
+- **Key Functionality**:
+  - **Interactive Setup Form**: Configure order side (BUY/SELL), total quantity, slice interval, duration, and display limits.
+  - **Live Order Monitor**: Track active algorithms in real time with progress bars, filled vs total quantities, and live status badges (`RUNNING`, `PAUSED`, `COMPLETED`, `CANCELLED`).
+  - **Control Actions**: Start, pause, resume, or cancel active algorithmic execution tasks on demand.
+  - **Slice Execution Drawer**: Inspect granular execution logs for each order slice, including slice index, timestamp, executed quantity, filled price, and status.
+
+### 3. 📊 Depth of Market (DOM) & L2 Order Book Visualizer
+- **Components & Files**: [`OrderBookDOM.tsx`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/components/OrderBookDOM.tsx), [`MarketDashboard.tsx`](file:///mnt/Garvit%20Prakash/Projects/multi-asset-algorthimic-trading-tool/multi-asset-algorithmic-trading-software/src/components/MarketDashboard.tsx)
+- **What Was Added**: High-density Level-2 (L2) Depth of Market order book rendering live bids and asks alongside technical charts.
+- **How It Works**:
+  - Establishes a direct sub-second WebSocket connection (`wss://stream.binance.com:9443/ws/<symbol>@depth10@100ms`) for real-time crypto order book depth.
+  - Implements a seamless simulation fallback for non-crypto assets or socket disconnections.
+- **Key Functionality**:
+  - **L2 Order Book Table**: Real-time top 10 Bids (buyers) and Asks (sellers) with cumulative totals and visual depth fill bars (`%`).
+  - **Order Imbalance Ratio Bar**: Calculates real-time % Bid vs % Ask liquidity distribution to highlight market buying/selling pressure.
+  - **Buy & Sell Wall Badges**: Automatically detects large liquidity concentrations (e.g., `BUY WALL: 24.5 BTC @ $51,200`) and displays warning badges.
+  - **Interactive Price Click**: Click any bid/ask price level to instantly populate order forms in the main terminal.
+
+### 4. 🎨 Color Theme Harmonization & Mobile Responsiveness
+- **What Was Added**: Comprehensive styling overhaul across all new components to align with the core application brand and ensure 100% responsiveness on mobile devices.
+- **Key Enhancements**:
+  - **Unified Light Theme**: Aligned modal headers, borders, and cards with soft gray elevations (`bg-gray-50`), clean white cards, and Coinbase blue (`bg-blue-600`) highlights.
+  - **Mobile Layout System**: Fully responsive flex and grid layouts (`flex-col lg:flex-row`, `max-h-[92vh]`, `overflow-y-auto`) enabling seamless trading operation on smartphones, tablets, and desktop displays.
 
 ---
 
@@ -59,12 +119,13 @@
 
 - **Language**: TypeScript 5.0+ (100% strict type safety)
 - **Frontend Core**: React 18+ initialized via Vite
+- **Security & Encryption**: Web Crypto API (256-bit AES-GCM & PBKDF2 Key Derivation)
 - **Database Engine**: PostgreSQL 16 (hosted on Supabase)
-- **Real-Time Data**: Binance WebSocket API (`wss://`)
+- **Real-Time Data**: Binance WebSocket API (`wss://`) & L2 Depth Streams (`depth10@100ms`)
 - **Background Notification Routing**: Telegram Bot API HTTP Webhooks
 - **Styling**: TailwindCSS utility framework with CSS custom base styles
 - **Visualization**: `lightweight-charts` (TradingView) & `recharts` (financial curves)
-- **State Persistence**: Browser `localStorage` for sandbox portfolio ledgers
+- **State Persistence**: Browser `localStorage` for sandbox portfolio ledgers & encrypted API vaults
 
 ---
 
@@ -147,12 +208,15 @@ multi-asset-algorithmic-trading-software/
 ├── src/
 │   ├── components/                 # UI components
 │   │   ├── AIStrategyBuilder.tsx   # Strategy backtester & parameter optimizer
+│   │   ├── AlgoOrderManager.tsx    # Institutional TWAP, VWAP & Iceberg execution suite (New!)
 │   │   ├── AlertsManager.tsx       # Create/edit price alerts
 │   │   ├── Dashboard.tsx           # Portfolio indicators & metric highlights
+│   │   ├── ExchangeSettingsModal.tsx # AES-GCM 256-bit API Vault & Exchange router (New!)
 │   │   ├── LandingPage.tsx         # Coinbase-style entrance page
 │   │   ├── ManualTrades.tsx        # Publish trading signals to feed
-│   │   ├── MarketDashboard.tsx     # Candle charts & order placement forms
+│   │   ├── MarketDashboard.tsx     # Candle charts, Order Book DOM & Algo execution tabs
 │   │   ├── MarketReplay.tsx        # Historical simulator & replay dashboard (New!)
+│   │   ├── OrderBookDOM.tsx        # L2 Depth of Market & liquidity imbalance visualizer (New!)
 │   │   ├── PaperTrading.tsx        # Sandbox balances & Composed HWM chart
 │   │   ├── PortfolioOptimizer.tsx  # Markowitz Efficient Frontier optimization (New!)
 │   │   ├── SocialSentiment.tsx     # Social index feeds and sentiment rules (New!)
@@ -163,12 +227,15 @@ multi-asset-algorithmic-trading-software/
 │   ├── lib/
 │   │   └── supabase.ts             # Supabase client instantiation
 │   ├── services/                   # Business logic and workers
+│   │   ├── algoExecutionService.ts # TWAP, VWAP & Iceberg slice execution engine (New!)
 │   │   ├── alertMonitor.ts         # Polling loop for active alerts
 │   │   ├── dataFeed.ts             # Binance historical REST & Live Websocket data
+│   │   ├── exchangeConnector.ts    # Unified REST/WebSocket API client with HMAC-SHA256 (New!)
 │   │   ├── marketSimulation.ts     # Global rates cache services
 │   │   ├── paperTradingService.ts  # Ledger database and balance store
 │   │   └── telegramService.ts      # Push notification messenger
-│   ├── utils/                      # Calculations
+│   ├── utils/                      # Security & Quantitative Calculations
+│   │   ├── cryptoSecurity.ts       # Web Crypto API 256-bit AES-GCM encryption (New!)
 │   │   └── riskCalculators.ts      # Monte Carlo, Sharpe, Sortino, VaR, & correlation math
 │   ├── App.tsx                     # Routing & responsive sidebar navigation drawer
 │   ├── index.css                   # Global styling sheet & font configurations
@@ -185,38 +252,37 @@ multi-asset-algorithmic-trading-software/
 The diagram below charts how price data, user orders, alerts, and backtesting streams route between services:
 
 ```text
-                                  +-----------------------+
-                                  |  Binance WebSocket    |
-                                  |  (wss:// stream)      |
-                                  +-----------+-----------+
-                                              |
-                                              | Live Tick Data (<150ms)
-                                              v
-+------------------+   Read Orders   +--------+--------+   Candle Feed   +-----------------------+
-|  Browser Local   |<----------------|  Trading View   |<----------------|  Binance REST API     |
-|   Storage DB     |                 |  Lightweight    |                 |  (api.binance.com)    |
-+--------+---------+                 |  Charts Canvas  |                 +-----------+-----------+
-         |                           +-----------------+                             |
-         | Read/Write Ledger                                                         | Historical
-         v                                                                           | Candle Data
-+--------+---------+                 +-----------------+                             v
-|  Paper Trading   |                 |  User / Admin   |                 +-----------+-----------+
-|  Service Engine  |---------------->|   Components    |<----------------|  AI Strategy Builder  |
-+------------------+                 +--------+--------+                 |  Backtesting Engine   |
-                                              |                          +-----------------------+
-                                              | Writes Alerts
-                                              v
-                                     +--------+--------+                 +-----------------------+
-                                     |  Supabase PG    |<----------------|  alertMonitor.ts      |
-                                     |  (price_alerts) |  Polls Active   |  Background Service   |
-                                     +-----------------+                 +-----------+-----------+
-                                                                                     |
-                                                                                     | Dispatch triggers
-                                                                                     v
-                                                                         +-----------+-----------+
-                                                                         |  Telegram Bot API     |
-                                                                         |  (Push Alert Mobile)  |
-                                                                         +-----------------------+
+                                   +-----------------------+
+                                   |  Binance WebSocket    |
+                                   |  (wss:// stream & L2) |
+                                   +-----------+-----------+
+                                               |
+                                               | Live Ticks & L2 Depth (<100ms)
+                                               v
++------------------+   Read/Write   +--------+--------+   Candle Feed   +-----------------------+
+|  Encrypted Local |<-------------->| OrderBook DOM   |<----------------|  Exchange Connector   |
+|  Key Storage DB  |  AES-GCM Vault | & Trading View  |                 |  (Binance/Coinbase/   |
++--------+---------+                +--------+--------+                 |   Kraken REST/WS)     |
+         |                           +-----------------+                 +-----------+-----------+
+         | Unlocks Credentials                                                       |
+         v                                                                           | Authenticated
++--------+---------+                +-----------------+                              | REST Requests
+|  Algo Execution  |                |  User / Admin   |                              v
+|  Engine (TWAP)   |--------------->|   Components    |<--------------------+-----------------------+
++------------------+                +--------+--------+                     |  Paper Trading Engine |
+                                             |                              +-----------------------+
+                                             | Writes Alerts
+                                             v
+                                    +--------+--------+                 +-----------------------+
+                                    |  Supabase PG    |<----------------|  alertMonitor.ts      |
+                                    |  (price_alerts) |  Polls Active   |  Background Service   |
+                                    +-----------------+                 +-----------+-----------+
+                                                                                    |
+                                                                                    v
+                                                                        +-----------+-----------+
+                                                                        |  Telegram Bot API     |
+                                                                        |  (Push Alert Mobile)  |
+                                                                        +-----------------------+
 ```
 
 ### Key Components
@@ -291,7 +357,36 @@ The diagram below charts how price data, user orders, alerts, and backtesting st
 
 This section outlines the complete quantitative systems, algorithms, and mathematical formulations engineered into the platform.
 
-### 1. Stochastic Path Simulator (Monte Carlo Risk of Ruin)
+### 1. Client-Side API Encryption (Web Crypto API AES-GCM)
+
+Sensitive API credentials (API Keys & Secrets) are encrypted client-side using **AES-GCM (Galois/Counter Mode)** with 256-bit key length and PBKDF2 key derivation:
+
+1. **Key Derivation (PBKDF2)**:
+   $$\text{Key} = \text{PBKDF2}\left(\text{Passphrase}, \text{Salt}_{16}, \text{iterations}=100,000, \text{hash}=\text{"SHA-256"}\right)$$
+2. **Ciphertext Encryption**:
+   $$\text{Ciphertext} = \text{AES-GCM-Encrypt}\left(\text{Key}, \text{IV}_{12}, \text{Plaintext Payload}\right)$$
+
+Secrets are decrypted strictly in memory upon user authentication and are never transmitted in plaintext.
+
+---
+
+### 2. Institutional Execution Math (TWAP & VWAP Slicing)
+
+#### TWAP Slicing Formulation
+For a target total order quantity $Q$ to be executed across $N$ equal slice intervals over duration $T$:
+
+$$q_i = \frac{Q}{N} \times \left(1 + \delta_i\right) \quad \text{where } \delta_i \sim \text{Uniform}(-\gamma, +\gamma)$$
+
+Where $\gamma$ is the randomize variance percentage parameter (e.g. 15%), ensuring slice quantities vary stochastically to disguise execution intent.
+
+#### VWAP Distribution Profiling
+Volume-Weighted Average Price slicing dynamically allocates order sizes according to historical volume profiles $v(t)$:
+
+$$q_i = Q \times \frac{v(t_i)}{\sum_{k=1}^N v(t_k)}$$
+
+---
+
+### 3. Stochastic Path Simulator (Monte Carlo Risk of Ruin)
 
 The sandbox dashboard employs **Geometric Brownian Motion (GBM)** to project future portfolio valuations based on historical return distributions:
 
@@ -317,7 +412,7 @@ $$P_{\text{ruin}} = \frac{1}{M} \sum_{j=1}^M \mathbb{I}\left( \min_{0 \le t \le 
 
 ---
 
-### 2. Markowitz Modern Portfolio Theory (MPT) & Efficient Frontier
+### 4. Markowitz Modern Portfolio Theory (MPT) & Efficient Frontier
 
 The Portfolio Optimizer maps the risk-return landscape of selected assets (e.g. BTC, ETH, SOL) using variance-covariance arrays.
 
@@ -351,7 +446,7 @@ The simulator runs $500$ random weight vectors to identify two distinct portfoli
 
 ---
 
-### 3. Risk Metrics Matrix
+### 5. Risk Metrics Matrix
 
 #### Value at Risk (VaR)
 We employ the parametric Variance-Covariance Value at Risk (VaR) to project potential maximum loss over a 1-day horizon with $1-\alpha = 0.95$ (95%) confidence:
@@ -381,7 +476,7 @@ $$\rho_{xy} = \frac{\sum_{t=1}^M (x_t - \bar{x})(y_t - \bar{y})}{\sqrt{\sum_{t=1
 
 ---
 
-### 4. Technical Indicators Algorithms
+### 6. Technical Indicators Algorithms
 
 The client-side backtesting engine executes indicators directly in TypeScript:
 
@@ -422,7 +517,7 @@ Where $K = 2.0$ represents standard deviation multipliers and $\sigma_N(P)$ is t
 
 ---
 
-### 5. Alternative Data Social Sentiment Indexes
+### 7. Alternative Data Social Sentiment Indexes
 
 #### Text Polarity Scoring
 Simulated titles are parsed for pre-defined positive and negative vocabulary sets:
@@ -578,6 +673,12 @@ bash setup-android.sh
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
+*   **Phase 1 Release - Real-World Execution & Brokerage Integrations**:
+    *   Added `cryptoSecurity.ts` for Web Crypto API 256-bit AES-GCM credential vault storage.
+    *   Integrated multi-exchange REST/WebSocket connector (`exchangeConnector.ts`) supporting **Binance (Live/Testnet)**, **Coinbase Advanced Trade**, and **Kraken** with HMAC-SHA256 request signing.
+    *   Built `algoExecutionService.ts` and `AlgoOrderManager.tsx` offering **TWAP**, **VWAP**, and **Iceberg** algorithmic execution.
+    *   Integrated live **Depth of Market (OrderBookDOM.tsx)** L2 bids/asks visualization, buy/sell wall concentration detection, and order imbalance ratios.
+    *   Overhauled responsive mobile layouts and aligned visual color themes across all new components.
 *   **`71d4eed` (HEAD) - GitHub Star Integration & Header CTA**:
     *   Added direct GitHub repository star links to the landing page navbar and main application header.
 *   **`cff68ea` to `984f896` (tag: v1.0.0) - Android Mobile App Packaging & Capacitor Pipeline**:
