@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowRight, Play, Settings, Plus, Trash2, HelpCircle, Sparkles, TrendingUp, ShieldAlert, Award } from 'lucide-react';
+import { useState, Fragment } from 'react';
+import { ArrowRight, Play, Trash2, Sparkles, ShieldAlert } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { fetchChartData } from '../services/dataFeed';
 
@@ -94,7 +94,7 @@ export function VisualStrategyBuilder() {
       }
 
       // Fetch historical candles
-      const candles = await fetchChartData(selectedAsset.symbol, '1d', 100);
+      const candles = await fetchChartData(selectedAsset.symbol, 'crypto', undefined);
       if (!candles || candles.length === 0) {
         throw new Error('Could not fetch historical data for ' + selectedAsset.symbol);
       }
@@ -324,7 +324,7 @@ export function VisualStrategyBuilder() {
             
             <div className="flex flex-col md:flex-row items-center justify-center md:space-x-4 space-y-4 md:space-y-0 relative py-8">
               {nodes.map((node, index) => (
-                <React.Fragment key={node.id}>
+                <Fragment key={node.id}>
                   {/* Node Card */}
                   <div className="w-full max-w-[200px] bg-gray-50 border border-gray-200 rounded-2xl p-4 flex flex-col justify-between relative shadow-xs">
                     <button
@@ -391,7 +391,7 @@ export function VisualStrategyBuilder() {
                   {index < nodes.length - 1 && (
                     <ArrowRight className="w-5 h-5 text-gray-400 rotate-90 md:rotate-0" />
                   )}
-                </React.Fragment>
+                </Fragment>
               ))}
             </div>
           </div>

@@ -7,14 +7,14 @@ This roadmap outlines the planned enhancements, new features, and technical upda
 ## 📈 Phase 1: Real-World Execution & Brokerage Integrations
 *Goal: Move from paper trading simulation to real-world deployment.*
 
-- [ ] **Multi-Exchange API Support**
+- [x] **Multi-Exchange API Support**
   - Integrate secure REST/WebSocket connectors for **Coinbase Advanced Trade**, **Binance (Live/Testnet)**, and **Kraken**.
   - Securely persist encrypted API keys in browser storage (or hashed/encrypted backend sessions).
-- [ ] **Institutional Algorithmic Order Execution**
+- [x] **Institutional Algorithmic Order Execution**
   - **TWAP (Time-Weighted Average Price):** Execute large orders over specified time periods to minimize market impact.
   - **VWAP (Volume-Weighted Average Price):** Track historical volume profiles to execute trades dynamically.
   - **Iceberg Orders:** Split large orders into smaller visible/hidden portions.
-- [ ] **Depth of Market (DOM) & L2 Order Book**
+- [x] **Depth of Market (DOM) & L2 Order Book**
   - Render live L2 order book bids/asks directly alongside lightweight-charts.
   - Create volume/buy-sell wall density bars for instant visualization of market depth.
 

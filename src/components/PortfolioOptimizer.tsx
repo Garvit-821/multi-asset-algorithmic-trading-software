@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Target, TrendingUp, BarChart3, Shield, Loader2 } from 'lucide-react';
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { fetchChartData } from '../services/dataFeed';
 
 interface OptimizedPortfolio {
@@ -48,7 +48,7 @@ export function PortfolioOptimizer() {
       const priceSeriesData: Record<string, number[]> = {};
       
       for (const symbol of selectedAssets) {
-        const candles = await fetchChartData(symbol, '1d', lookback);
+        const candles = await fetchChartData(symbol, 'crypto', undefined);
         if (!candles || candles.length < 5) {
           throw new Error(`Insufficient historical data found for ${symbol}`);
         }

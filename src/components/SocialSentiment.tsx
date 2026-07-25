@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, ThumbsUp, ThumbsDown, AlertCircle, Send, BellRing, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageSquare, ThumbsUp, ThumbsDown, AlertCircle, BellRing } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { sendTelegramAlert } from '../services/telegramService';
 
@@ -131,7 +131,7 @@ export function SocialSentiment() {
     setAlertRules(alertRules.filter(r => r.id !== id));
   };
 
-  const evaluateAlerts = async (post: SocialPost, currentAvg: number) => {
+  const evaluateAlerts = async (_post: SocialPost, currentAvg: number) => {
     for (const rule of alertRules) {
       if (!rule.active) continue;
 
@@ -150,9 +150,10 @@ export function SocialSentiment() {
         if (rule.telegramChatId) {
           try {
             await sendTelegramAlert(rule.telegramChatId, {
-              symbol: 'SENTIMENT_ALERT',
+              symbol: 'SENTIMENT',
+              assetType: 'crypto',
+              alertType: 'sentiment',
               currentPrice: currentAvg,
-              alert_type: 'sentiment',
               message: msg
             });
           } catch (e) {
@@ -256,6 +257,23 @@ export function SocialSentiment() {
                 <span>Save Alert Rule</span>
               </button>
             </div>
+
+            {alertRules.length > 0 && (
+              <div className="pt-3 border-t border-gray-100 space-y-2">
+                <p className="text-[11px] font-bold text-gray-500 uppercase">Active Rules ({alertRules.length})</p>
+                {alertRules.map((rule) => (
+                  <div key={rule.id} className="flex items-center justify-between text-xs p-2 bg-gray-50 rounded-lg">
+                    <span>{rule.direction} {rule.threshold}</span>
+                    <button
+                      onClick={() => removeAlertRule(rule.id)}
+                      className="text-red-500 hover:text-red-700 font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
