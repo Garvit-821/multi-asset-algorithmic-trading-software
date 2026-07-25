@@ -120,32 +120,32 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden text-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-3xl my-auto max-h-[92vh] flex flex-col overflow-hidden text-gray-900">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-6 py-5 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="bg-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-gray-200 shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
-              <Key className="w-5 h-5 text-blue-400" />
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+              <Key className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">Multi-Exchange API Vault</h2>
-              <p className="text-xs text-slate-300">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Multi-Exchange API Vault</h2>
+              <p className="text-xs text-gray-500">
                 AES-GCM Client-Side Encrypted API Key Storage & Router
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Passphrase & Unlock Banner */}
-        <div className="p-6 bg-slate-50 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 bg-gray-50 border-b border-gray-200 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3">
             <div className="flex-1">
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                 Vault Passphrase {hasEncrypted && !isUnlocked && '(Required to Unlock)'}
@@ -156,18 +156,18 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
                   value={passphrase}
                   onChange={(e) => setPassphrase(e.target.value)}
                   placeholder="Enter passphrase for 256-bit AES encryption..."
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
                 />
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
-            <div className="flex items-end space-x-2">
+            <div className="flex items-center space-x-2 shrink-0">
               {hasEncrypted && !isUnlocked ? (
                 <button
                   onClick={handleUnlock}
                   disabled={loading}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm flex items-center space-x-2 shadow-md shadow-blue-500/10 transition-all"
+                  className="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-sm transition-all"
                 >
                   <Unlock className="w-4 h-4" />
                   <span>Unlock Vault</span>
@@ -176,7 +176,7 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
                 <button
                   onClick={handleSaveAndEncrypt}
                   disabled={loading}
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm flex items-center space-x-2 shadow-md shadow-indigo-500/10 transition-all"
+                  className="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-sm transition-all"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>Encrypt & Save</span>
@@ -201,10 +201,10 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
         </div>
 
         {/* Modal Main Body */}
-        <div className="flex flex-col md:flex-row h-[420px]">
+        <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
           {/* Exchange Selector Sidebar */}
-          <div className="w-full md:w-56 bg-white border-r border-gray-200 p-3 space-y-1">
-            <p className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Connectors</p>
+          <div className="w-full md:w-56 bg-gray-50/50 border-b md:border-b-0 md:border-r border-gray-200 p-3 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible shrink-0 gap-2 md:gap-1">
+            <p className="hidden md:block px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Connectors</p>
             {exchanges.map((ex) => {
               const status = statuses[ex.id];
               const isActive = activeTab === ex.id;
@@ -212,18 +212,18 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
                 <button
                   key={ex.id}
                   onClick={() => setActiveTab(ex.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all ${
+                  className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-between transition-all shrink-0 md:w-full ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center space-x-2 truncate">
-                    <Server className="w-4 h-4 text-gray-400" />
+                    <Server className="w-4 h-4 text-gray-400 shrink-0" />
                     <span className="truncate">{ex.name}</span>
                   </div>
                   <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${
+                    className={`w-2 h-2 rounded-full shrink-0 ml-2 ${
                       status.status === 'connected'
                         ? 'bg-green-500 shadow-sm shadow-green-500/50'
                         : status.status === 'testing'
@@ -237,23 +237,23 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
               );
             })}
 
-            <div className="pt-6 px-3">
+            <div className="pt-2 md:pt-6 md:px-1 shrink-0">
               <button
                 onClick={() => exchangeConnector.setActiveExchange(activeTab)}
-                className="w-full py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm"
+                className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm"
               >
-                <Cpu className="w-3.5 h-3.5 text-blue-400" />
+                <Cpu className="w-3.5 h-3.5" />
                 <span>Set Active Engine</span>
               </button>
             </div>
           </div>
 
           {/* Active Connector Credentials Form */}
-          <div className="flex-1 p-6 bg-white overflow-y-auto flex flex-col justify-between">
+          <div className="flex-1 p-4 sm:p-6 bg-white overflow-y-auto flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900">
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900">
                     {exchangeConnector.getExchangeName(activeTab)}
                   </h3>
                   <p className="text-xs text-gray-500">
@@ -263,7 +263,7 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
 
                 <div className="flex items-center space-x-2">
                   <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                    className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${
                       statuses[activeTab].status === 'connected'
                         ? 'bg-green-100 text-green-800'
                         : statuses[activeTab].status === 'testing'

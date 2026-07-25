@@ -175,21 +175,21 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-100 rounded-xl overflow-hidden border border-slate-800 shadow-xl font-mono text-xs select-none">
+    <div className="flex flex-col h-[480px] sm:h-[550px] lg:h-full bg-slate-900 text-slate-100 rounded-xl overflow-hidden border border-slate-800 shadow-lg font-mono text-[11px] sm:text-xs select-none">
       {/* Header */}
-      <div className="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-slate-950 px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Layers className="w-4 h-4 text-blue-400" />
-          <span className="font-bold text-sm text-slate-200">Depth of Market (DOM L2)</span>
+          <span className="font-bold text-xs sm:text-sm text-slate-200">Depth of Market (DOM L2)</span>
         </div>
-        <div className="flex items-center space-x-2 text-[10px]">
+        <div className="flex items-center space-x-1.5 text-[10px]">
           <span className="text-slate-400">Spread:</span>
           <span className="font-bold text-amber-400">${spread.amount} ({spread.percentage}%)</span>
         </div>
       </div>
 
       {/* Liquidity Imbalance Ratio Bar */}
-      <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 space-y-1">
+      <div className="px-3.5 py-2 bg-slate-900 border-b border-slate-800 space-y-1">
         <div className="flex justify-between text-[10px] font-sans font-semibold">
           <span className="text-emerald-400 flex items-center space-x-1">
             <TrendingUp className="w-3 h-3" />
@@ -202,7 +202,7 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
           </span>
         </div>
 
-        <div className="w-full bg-rose-950 h-1.5 rounded-full overflow-hidden flex">
+        <div className="w-full bg-rose-950/80 h-1.5 rounded-full overflow-hidden flex">
           <div
             className="bg-emerald-500 h-full transition-all duration-300"
             style={{ width: `${imbalancePct}%` }}
@@ -212,15 +212,15 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
 
       {/* Liquidity Wall Concentration Badges */}
       {(buyWall || sellWall) && (
-        <div className="px-3 py-1.5 bg-slate-950/80 border-b border-slate-800/80 flex items-center justify-between text-[10px]">
+        <div className="px-3 py-1.5 bg-slate-950/80 border-b border-slate-800 flex flex-wrap items-center justify-between gap-1 text-[10px]">
           {buyWall && (
-            <div className="flex items-center space-x-1 text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-2 py-0.5 rounded">
+            <div className="flex items-center space-x-1 text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">
               <AlertOctagon className="w-3 h-3 shrink-0" />
               <span>BUY WALL: {buyWall.size} @ ${buyWall.price}</span>
             </div>
           )}
           {sellWall && (
-            <div className="flex items-center space-x-1 text-rose-400 bg-rose-950/50 border border-rose-800/40 px-2 py-0.5 rounded ml-auto">
+            <div className="flex items-center space-x-1 text-rose-400 bg-rose-950/60 border border-rose-800/40 px-2 py-0.5 rounded ml-auto">
               <AlertOctagon className="w-3 h-3 shrink-0" />
               <span>SELL WALL: {sellWall.size} @ ${sellWall.price}</span>
             </div>
@@ -242,13 +242,13 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
             <div
               key={`ask-${ask.price}`}
               onClick={() => onSelectPrice && onSelectPrice(ask.price)}
-              className={`relative grid grid-cols-3 py-1 px-1 rounded cursor-pointer hover:bg-slate-800/60 transition-colors group ${
+              className={`relative grid grid-cols-3 py-1 px-1.5 rounded cursor-pointer hover:bg-slate-800/60 transition-colors group ${
                 ask.isWall ? 'ring-1 ring-rose-500/40 bg-rose-950/20' : ''
               }`}
             >
               {/* Depth Visual Fill Bar */}
               <div
-                className="absolute right-0 top-0 bottom-0 bg-rose-500/10 pointer-events-none rounded-r transition-all"
+                className="absolute right-0 top-0 bottom-0 bg-rose-500/15 pointer-events-none rounded-r transition-all"
                 style={{ width: `${ask.depthPct}%` }}
               />
 
@@ -262,9 +262,9 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
         </div>
 
         {/* Current Mid Price Divider */}
-        <div className="bg-slate-950 py-2 px-4 border-y border-slate-800 flex items-center justify-between text-sm font-sans font-bold">
+        <div className="bg-slate-950 py-2 px-3.5 border-y border-slate-800 flex items-center justify-between text-xs font-sans font-bold">
           <div className="flex items-center space-x-2">
-            <span className="text-slate-400 text-xs">Mid Price:</span>
+            <span className="text-slate-400 text-[11px]">Mid Price:</span>
             <span className="text-slate-100">${currentPrice ? currentPrice.toFixed(2) : '---'}</span>
           </div>
           <span className="text-[10px] text-emerald-400 font-mono">LIVE L2 FEED</span>
@@ -276,13 +276,13 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
             <div
               key={`bid-${bid.price}`}
               onClick={() => onSelectPrice && onSelectPrice(bid.price)}
-              className={`relative grid grid-cols-3 py-1 px-1 rounded cursor-pointer hover:bg-slate-800/60 transition-colors group ${
+              className={`relative grid grid-cols-3 py-1 px-1.5 rounded cursor-pointer hover:bg-slate-800/60 transition-colors group ${
                 bid.isWall ? 'ring-1 ring-emerald-500/40 bg-emerald-950/20' : ''
               }`}
             >
               {/* Depth Visual Fill Bar */}
               <div
-                className="absolute right-0 top-0 bottom-0 bg-emerald-500/10 pointer-events-none rounded-r transition-all"
+                className="absolute right-0 top-0 bottom-0 bg-emerald-500/15 pointer-events-none rounded-r transition-all"
                 style={{ width: `${bid.depthPct}%` }}
               />
 

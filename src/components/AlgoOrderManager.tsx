@@ -68,22 +68,22 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
   return (
     <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-gray-900">
       {/* Top Header */}
-      <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-white text-gray-900 p-4 sm:p-5 border-b border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 bg-blue-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center">
-            <Zap className="w-5 h-5 text-blue-400" />
+          <div className="w-9 h-9 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-base font-bold">Institutional Algorithmic Execution</h2>
-            <p className="text-xs text-slate-400">TWAP, VWAP & Iceberg Order Management for {symbol}</p>
+            <h2 className="text-base font-bold text-gray-900">Institutional Algorithmic Execution</h2>
+            <p className="text-xs text-gray-500">TWAP, VWAP & Iceberg Order Management for {symbol}</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-full sm:w-auto">
           <select
             value={exchangeId}
             onChange={(e) => setExchangeId(e.target.value as ExchangeId)}
-            className="bg-slate-800 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 text-slate-200 focus:outline-none"
+            className="w-full sm:w-auto bg-gray-50 text-xs font-semibold px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="binance_testnet">Binance Testnet</option>
             <option value="binance">Binance (Live)</option>
@@ -93,16 +93,16 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden min-h-0">
         {/* Order Configuration Panel */}
-        <div className="lg:col-span-5 p-5 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50 flex flex-col justify-between overflow-y-auto">
+        <div className="w-full lg:w-5/12 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50 flex flex-col justify-between overflow-y-auto shrink-0 space-y-5">
           <div className="space-y-5">
             {/* Strategy Selector Tabs */}
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">
                 Execution Strategy
               </label>
-              <div className="grid grid-cols-3 gap-2 bg-gray-200 p-1 rounded-lg">
+              <div className="grid grid-cols-3 gap-1.5 bg-gray-200/70 p-1 rounded-lg">
                 <button
                   onClick={() => setActiveStrategy('TWAP')}
                   className={`py-2 text-xs font-bold rounded-md flex items-center justify-center space-x-1 transition-all ${
@@ -142,7 +142,7 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
             </div>
 
             {/* Side Switch */}
-            <div className="grid grid-cols-2 gap-2 bg-gray-200 p-1 rounded-lg">
+            <div className="grid grid-cols-2 gap-2 bg-gray-200/70 p-1 rounded-lg">
               <button
                 onClick={() => setSide('BUY')}
                 className={`py-2 font-bold text-xs rounded-md transition-all ${
@@ -266,10 +266,10 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
             )}
           </div>
 
-          <div className="pt-4">
+          <div className="pt-2">
             <button
               onClick={handleLaunchOrder}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md shadow-blue-500/10 transition-all flex items-center justify-center space-x-2 text-sm"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center space-x-2 text-sm"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>Launch {activeStrategy} Algo Order</span>
@@ -278,7 +278,7 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
         </div>
 
         {/* Active Algo Orders Monitor & History */}
-        <div className="lg:col-span-7 p-5 bg-white flex flex-col justify-between overflow-y-auto">
+        <div className="w-full lg:w-7/12 p-4 sm:p-5 bg-white flex flex-col justify-between overflow-y-auto shrink-0">
           <div>
             <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
               <h3 className="text-sm font-bold text-gray-900 flex items-center space-x-2">

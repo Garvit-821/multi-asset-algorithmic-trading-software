@@ -242,11 +242,11 @@ export function MarketDashboard() {
           </div>
 
           {/* Mode Switcher Tabs & Exchange API Vault Button */}
-          <div className="flex items-center space-x-2 shrink-0">
-            <div className="bg-gray-100 p-1 rounded-lg flex items-center space-x-1 border border-gray-200">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end shrink-0">
+            <div className="bg-gray-100 p-1 rounded-lg flex items-center space-x-1 border border-gray-200 flex-1 sm:flex-initial justify-between">
               <button
                 onClick={() => setTerminalTab('standard')}
-                className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-bold flex items-center justify-center space-x-1.5 transition-all ${
                   terminalTab === 'standard'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
@@ -258,7 +258,7 @@ export function MarketDashboard() {
 
               <button
                 onClick={() => setTerminalTab('dom')}
-                className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-bold flex items-center justify-center space-x-1.5 transition-all ${
                   terminalTab === 'dom'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
@@ -270,7 +270,7 @@ export function MarketDashboard() {
 
               <button
                 onClick={() => setTerminalTab('algo')}
-                className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-bold flex items-center justify-center space-x-1.5 transition-all ${
                   terminalTab === 'algo'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
@@ -283,11 +283,11 @@ export function MarketDashboard() {
 
             <button
               onClick={() => setShowExchangeModal(true)}
-              className="px-3.5 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shadow-sm"
+              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1.5 shadow-sm shrink-0"
               title="Configure Exchange API Keys"
             >
-              <Key className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Exchange APIs</span>
+              <Key className="w-3.5 h-3.5" />
+              <span>Exchange APIs</span>
             </button>
           </div>
         </div>
@@ -351,7 +351,7 @@ export function MarketDashboard() {
 
           {/* Right Panel: Standard Order Form OR Order Book DOM */}
           {terminalTab === 'dom' ? (
-            <div className="w-full lg:w-96 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-4 shrink-0 lg:overflow-y-auto">
+            <div className="w-full lg:w-96 bg-gray-50 border-t lg:border-t-0 lg:border-l border-gray-200 p-4 shrink-0 lg:overflow-y-auto">
               <OrderBookDOM
                 symbol={selectedSymbol}
                 assetType={activeMarket}
