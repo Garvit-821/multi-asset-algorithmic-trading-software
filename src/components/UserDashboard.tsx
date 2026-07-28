@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, Activity, Clock, Bell, Send, Zap, ArrowUpRigh
 import { supabase, StrategyAlert, ManualTrade } from '../lib/supabase';
 import { fetchRealtimePrice } from '../services/dataFeed';
 import type { AssetType } from './TradingViewChart';
+import { UserDashboardSkeleton } from './Skeleton';
+
 
 interface TriggeredPriceAlert {
   id: string;
@@ -273,12 +275,9 @@ export function UserDashboard() {
     : feedItems.filter(item => item.type === filter);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-gray-400">Loading dashboard...</div>
-      </div>
-    );
+    return <UserDashboardSkeleton />;
   }
+
 
   return (
     <div className="space-y-6 p-6 bg-gray-50 text-gray-900">
