@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star, BrainCircuit } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -13,6 +13,7 @@ import { PortfolioOptimizer } from './components/PortfolioOptimizer';
 import { MarketReplay } from './components/MarketReplay';
 import { SocialSentiment } from './components/SocialSentiment';
 import { AdvancedBacktester } from './components/AdvancedBacktester';
+import { AIMarketIntelligence } from './components/AIMarketIntelligence';
 import { paperTradingService } from './services/paperTradingService';
 import {
   UserDashboardSkeleton,
@@ -21,6 +22,7 @@ import {
   SocialSentimentSkeleton,
   MarketReplaySkeleton,
   BacktesterSkeleton,
+  AIMarketIntelligenceSkeleton,
   GenericPageSkeleton,
 } from './components/Skeleton';
 
@@ -45,13 +47,14 @@ function useViewSkeleton(view: string, delayMs = 600) {
 /** Pick the right skeleton for the current view */
 function ViewSkeleton({ view }: { view: string }) {
   switch (view) {
-    case 'userfeed':    return <UserDashboardSkeleton />;
-    case 'trading':     return <MarketDashboardSkeleton />;
-    case 'dashboard':   return <DashboardSkeleton />;
-    case 'sentiment':   return <SocialSentimentSkeleton />;
-    case 'replay':      return <MarketReplaySkeleton />;
-    case 'backtest':    return <BacktesterSkeleton />;
-    default:            return <div className="p-4 sm:p-8"><GenericPageSkeleton /></div>;
+    case 'userfeed':      return <UserDashboardSkeleton />;
+    case 'trading':       return <MarketDashboardSkeleton />;
+    case 'dashboard':     return <DashboardSkeleton />;
+    case 'sentiment':     return <SocialSentimentSkeleton />;
+    case 'replay':        return <MarketReplaySkeleton />;
+    case 'backtest':      return <BacktesterSkeleton />;
+    case 'intelligence':  return <AIMarketIntelligenceSkeleton />;
+    default:              return <div className="p-4 sm:p-8"><GenericPageSkeleton /></div>;
   }
 }
 
@@ -70,7 +73,8 @@ type View =
   | 'optimizer'
   | 'replay'
   | 'sentiment'
-  | 'backtest';
+  | 'backtest'
+  | 'intelligence';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
@@ -97,6 +101,7 @@ function App() {
   ];
 
   const labMenuItems = [
+    { id: 'intelligence' as View, label: 'AI Intelligence Hub', icon: BrainCircuit },
     { id: 'backtest' as View, label: 'Advanced Backtester', icon: Target },
     { id: 'optimizer' as View, label: 'Portfolio Optimizer', icon: Target },
     { id: 'replay' as View, label: 'Market Replay', icon: History },
@@ -340,6 +345,11 @@ function App() {
                   <div className="p-4 sm:p-8">
                     <Dashboard />
                   </div>
+                </div>
+              )}
+              {currentView === 'intelligence' && (
+                <div className="h-full overflow-y-auto">
+                  <AIMarketIntelligence />
                 </div>
               )}
               {currentView === 'backtest' && (

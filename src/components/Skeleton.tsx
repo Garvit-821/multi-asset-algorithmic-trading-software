@@ -354,6 +354,25 @@ export function BacktesterSkeleton() {
   );
 }
 
+/** Skeleton for AIMarketIntelligence */
+export function AIMarketIntelligenceSkeleton() {
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+      <Skeleton className="h-36 w-full rounded-3xl" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="space-y-6">
+          <Skeleton className="h-64 w-full rounded-3xl" />
+          <Skeleton className="h-28 w-full rounded-3xl" />
+        </div>
+        <div className="lg:col-span-2">
+          <Skeleton className="h-[550px] w-full rounded-3xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Skeleton for the generic list-based views (PaperTrading, AIStrategy, etc.) */
 export function GenericPageSkeleton() {
   return (
