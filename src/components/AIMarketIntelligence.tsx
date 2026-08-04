@@ -6,16 +6,11 @@ import {
   Sliders,
   Send,
   Sparkles,
-  ShieldAlert,
-  TrendingUp,
   RefreshCw,
   Zap,
   CheckCircle2,
   AlertTriangle,
   ArrowUpRight,
-  PieChart as PieIcon,
-  Search,
-  Check,
   Play
 } from 'lucide-react';
 import {
@@ -57,7 +52,7 @@ export function AIMarketIntelligence() {
 
   // Tab 3: Grid Search Optimizer State
   const [optStrategy, setOptStrategy] = useState<'rsi' | 'ema_crossover'>('rsi');
-  const [optSymbol, setOptSymbol] = useState('BTC/USDT');
+  const [optSymbol] = useState('BTC/USDT');
   const [optSummary, setOptSummary] = useState<GridOptimizationSummary | null>(null);
   const [optLoading, setOptLoading] = useState(false);
 
@@ -472,7 +467,7 @@ export function AIMarketIntelligence() {
                 <select
                   value={optStrategy}
                   onChange={(e) => {
-                    const strat = e.target.value as any;
+                    const strat = e.target.value as 'rsi' | 'ema_crossover';
                     setOptStrategy(strat);
                     handleRunOptimizer(strat, optSymbol);
                   }}

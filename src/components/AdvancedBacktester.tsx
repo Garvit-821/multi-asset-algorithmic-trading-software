@@ -1,23 +1,15 @@
 import { useState, useEffect } from 'react';
 import {
   TrendingUp,
-  BarChart3,
   Dices,
   Calendar,
   Play,
   Sparkles,
   ShieldAlert,
-  Activity,
   Clock,
-  ArrowUpRight,
-  ArrowDownRight,
-  Percent,
   Settings2,
   RefreshCw,
-  FileText,
-  CheckCircle2,
-  Info,
-  DollarSign
+  FileText
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -27,9 +19,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend,
-  BarChart,
-  Bar,
   LineChart,
   Line
 } from 'recharts';

@@ -1,4 +1,4 @@
-import { paperTradingService, Portfolio, Position } from './paperTradingService';
+import { paperTradingService, Portfolio } from './paperTradingService';
 
 export interface CopilotMessage {
   id: string;
@@ -51,7 +51,7 @@ class AICopilotService {
     return this.generateGeneralResponse(portfolio, query);
   }
 
-  private generateExposureAnalysis(portfolio: Portfolio, query: string): CopilotMessage {
+  private generateExposureAnalysis(portfolio: Portfolio, _query: string): CopilotMessage {
     const totalCash = portfolio.cash;
     let totalPositionValue = 0;
     const sectorValues: Record<string, number> = {
@@ -86,7 +86,7 @@ class AICopilotService {
     const breakdown = [
       { category: 'Cash (USD)', value: Number(totalCash.toFixed(2)), percent: cashPct },
       ...Object.entries(sectorValues)
-        .filter(([_, val]) => val > 0)
+        .filter(([_cat, val]) => val > 0)
         .map(([cat, val]) => ({
           category: cat,
           value: Number(val.toFixed(2)),
@@ -127,7 +127,7 @@ class AICopilotService {
     };
   }
 
-  private generateTradeAuditAnalysis(portfolio: Portfolio, query: string): CopilotMessage {
+  private generateTradeAuditAnalysis(portfolio: Portfolio, _query: string): CopilotMessage {
     const orders = portfolio.orders;
     const totalOrders = orders.length;
 
@@ -167,7 +167,7 @@ class AICopilotService {
     };
   }
 
-  private generateRiskRebalanceAnalysis(portfolio: Portfolio, query: string): CopilotMessage {
+  private generateRiskRebalanceAnalysis(_portfolio: Portfolio, _query: string): CopilotMessage {
     const responseText = `🛡️ **Portfolio Risk & Rebalance Protocol**:\n\n` +
       `1. **Cross-Asset Correlation Alert**: BTC/USDT and ETH/USDT display a high correlation coefficient of **0.88**. Holding max size in both increases downside tail risk.\n` +
       `2. **Recommended Action**: Reallocate 15% of crypto profits into non-correlated hedges (e.g. GOLD or cash reserve).\n` +
@@ -189,7 +189,7 @@ class AICopilotService {
     };
   }
 
-  private generateGeneralResponse(portfolio: Portfolio, query: string): CopilotMessage {
+  private generateGeneralResponse(portfolio: Portfolio, _query: string): CopilotMessage {
     const responseText = `🤖 **Stratrade Intelligence Assistant**:\n\n` +
       `I have audited your trading state. Here is a snapshot:\n` +
       `• **Liquid Cash**: $${portfolio.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +

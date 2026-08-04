@@ -1,3 +1,4 @@
+import { Time } from 'lightweight-charts';
 import { fetchChartData } from './dataFeed';
 import { calculateRSI, calculateEMA } from './backtestEngine';
 
@@ -53,7 +54,7 @@ export async function runGridSearchOptimization(
     let p = 50000;
     for (let i = 250; i > 0; i--) {
       p = p * (1 + (Math.random() - 0.49) * 0.02);
-      candles.push({ time: (Date.now() / 1000 - i * 3600) as any, open: p, high: p * 1.01, low: p * 0.99, close: p });
+      candles.push({ time: (Date.now() / 1000 - i * 3600) as Time, open: p, high: p * 1.01, low: p * 0.99, close: p });
     }
   }
 

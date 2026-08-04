@@ -1,3 +1,4 @@
+import { Time } from 'lightweight-charts';
 import { CandleData, fetchChartData } from './dataFeed';
 
 export interface TradeRecord {
@@ -235,7 +236,7 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
   let maxDrawdownPct = 0;
   let position: {
     entryPrice: number;
-    entryTime: number;
+    entryTimestamp: number;
     entryDate: string;
     size: number;
     type: 'BUY';
@@ -365,7 +366,7 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
 
       position = {
         entryPrice: executionEntryPrice,
-        entryTime: timestamp,
+        entryTimestamp: timestamp,
         entryDate: dateStr,
         size,
         type: 'BUY',
@@ -554,8 +555,8 @@ function runMonteCarloSimulation(
   const steps = 30; // 30 projection steps across simulated timeframe
   const runsEquityCurves: number[][] = [];
   let ruinCount = 0;
-  let totalDrawdowns: number[] = [];
-  let totalReturns: number[] = [];
+  const totalDrawdowns: number[] = [];
+  const totalReturns: number[] = [];
 
   const tradePnlPcts = trades.length > 0
     ? trades.map(t => t.pnlPercent)
@@ -627,7 +628,7 @@ function runMonteCarloSimulation(
  */
 function generateMonthlyReturns(
   trades: TradeRecord[],
-  equityCurve: EquityPoint[],
+  _equityCurve: EquityPoint[],
   initialCapital: number
 ): MonthlyReturn[] {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -676,7 +677,7 @@ function generateSyntheticCandles(symbol: string, count = 250): CandleData[] {
   let price = symbol.includes('BTC') ? 64000 : symbol.includes('ETH') ? 3400 : 150;
 
   for (let i = count; i > 0; i--) {
-    const time = (now - i * 3600) as any; // 1h intervals
+    const time = (now - i * 3600) as Time; // 1h intervals
     const change = (Math.random() - 0.49) * 0.02;
     const open = price;
     const high = open * (1 + Math.random() * 0.012);
