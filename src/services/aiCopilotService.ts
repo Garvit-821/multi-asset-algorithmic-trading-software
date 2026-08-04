@@ -34,24 +34,24 @@ class AICopilotService {
 
     // 1. Tech / Crypto / Asset Class Exposure Query
     if (lower.includes('exposure') || lower.includes('tech') || lower.includes('allocation') || lower.includes('crypto') || lower.includes('portfolio')) {
-      return this.generateExposureAnalysis(portfolio, query);
+      return this.generateExposureAnalysis(portfolio);
     }
 
     // 2. Worst Losing Trades / Trade Performance Audit Query
     if (lower.includes('worst') || lower.includes('loss') || lower.includes('losing') || lower.includes('trades') || lower.includes('win rate') || lower.includes('performance')) {
-      return this.generateTradeAuditAnalysis(portfolio, query);
+      return this.generateTradeAuditAnalysis(portfolio);
     }
 
     // 3. Risk & Rebalance Advice
     if (lower.includes('risk') || lower.includes('rebalance') || lower.includes('hedge') || lower.includes('protect')) {
-      return this.generateRiskRebalanceAnalysis(portfolio, query);
+      return this.generateRiskRebalanceAnalysis();
     }
 
     // 4. Default Intelligent General Assistant Query
-    return this.generateGeneralResponse(portfolio, query);
+    return this.generateGeneralResponse(portfolio);
   }
 
-  private generateExposureAnalysis(portfolio: Portfolio, _query: string): CopilotMessage {
+  private generateExposureAnalysis(portfolio: Portfolio): CopilotMessage {
     const totalCash = portfolio.cash;
     let totalPositionValue = 0;
     const sectorValues: Record<string, number> = {
@@ -86,7 +86,7 @@ class AICopilotService {
     const breakdown = [
       { category: 'Cash (USD)', value: Number(totalCash.toFixed(2)), percent: cashPct },
       ...Object.entries(sectorValues)
-        .filter(([_cat, val]) => val > 0)
+        .filter(([, val]) => val > 0)
         .map(([cat, val]) => ({
           category: cat,
           value: Number(val.toFixed(2)),
@@ -127,7 +127,7 @@ class AICopilotService {
     };
   }
 
-  private generateTradeAuditAnalysis(portfolio: Portfolio, _query: string): CopilotMessage {
+  private generateTradeAuditAnalysis(portfolio: Portfolio): CopilotMessage {
     const orders = portfolio.orders;
     const totalOrders = orders.length;
 
@@ -167,7 +167,7 @@ class AICopilotService {
     };
   }
 
-  private generateRiskRebalanceAnalysis(_portfolio: Portfolio, _query: string): CopilotMessage {
+  private generateRiskRebalanceAnalysis(): CopilotMessage {
     const responseText = `🛡️ **Portfolio Risk & Rebalance Protocol**:\n\n` +
       `1. **Cross-Asset Correlation Alert**: BTC/USDT and ETH/USDT display a high correlation coefficient of **0.88**. Holding max size in both increases downside tail risk.\n` +
       `2. **Recommended Action**: Reallocate 15% of crypto profits into non-correlated hedges (e.g. GOLD or cash reserve).\n` +
@@ -189,7 +189,7 @@ class AICopilotService {
     };
   }
 
-  private generateGeneralResponse(portfolio: Portfolio, _query: string): CopilotMessage {
+  private generateGeneralResponse(portfolio: Portfolio): CopilotMessage {
     const responseText = `🤖 **Stratrade Intelligence Assistant**:\n\n` +
       `I have audited your trading state. Here is a snapshot:\n` +
       `• **Liquid Cash**: $${portfolio.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +
