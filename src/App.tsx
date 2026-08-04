@@ -12,6 +12,7 @@ import { VisualStrategyBuilder } from './components/VisualStrategyBuilder';
 import { PortfolioOptimizer } from './components/PortfolioOptimizer';
 import { MarketReplay } from './components/MarketReplay';
 import { SocialSentiment } from './components/SocialSentiment';
+import { AdvancedBacktester } from './components/AdvancedBacktester';
 import { paperTradingService } from './services/paperTradingService';
 import {
   UserDashboardSkeleton,
@@ -19,6 +20,7 @@ import {
   MarketDashboardSkeleton,
   SocialSentimentSkeleton,
   MarketReplaySkeleton,
+  BacktesterSkeleton,
   GenericPageSkeleton,
 } from './components/Skeleton';
 
@@ -48,6 +50,7 @@ function ViewSkeleton({ view }: { view: string }) {
     case 'dashboard':   return <DashboardSkeleton />;
     case 'sentiment':   return <SocialSentimentSkeleton />;
     case 'replay':      return <MarketReplaySkeleton />;
+    case 'backtest':    return <BacktesterSkeleton />;
     default:            return <div className="p-4 sm:p-8"><GenericPageSkeleton /></div>;
   }
 }
@@ -66,7 +69,8 @@ type View =
   | 'visualbuilder'
   | 'optimizer'
   | 'replay'
-  | 'sentiment';
+  | 'sentiment'
+  | 'backtest';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
@@ -93,6 +97,7 @@ function App() {
   ];
 
   const labMenuItems = [
+    { id: 'backtest' as View, label: 'Advanced Backtester', icon: Target },
     { id: 'optimizer' as View, label: 'Portfolio Optimizer', icon: Target },
     { id: 'replay' as View, label: 'Market Replay', icon: History },
     { id: 'sentiment' as View, label: 'Social Sentiment', icon: MessageSquare },
@@ -335,6 +340,11 @@ function App() {
                   <div className="p-4 sm:p-8">
                     <Dashboard />
                   </div>
+                </div>
+              )}
+              {currentView === 'backtest' && (
+                <div className="h-full overflow-y-auto">
+                  <AdvancedBacktester />
                 </div>
               )}
               {currentView === 'optimizer' && (

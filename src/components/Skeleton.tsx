@@ -316,6 +316,44 @@ export function MarketReplaySkeleton() {
   );
 }
 
+/** Skeleton for AdvancedBacktester */
+export function BacktesterSkeleton() {
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+      {/* Top Banner Header */}
+      <Skeleton className="h-36 w-full rounded-3xl" />
+
+      {/* Configuration Panel */}
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-6">
+        <Skeleton className="h-5 w-56" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Skeleton className="h-12 w-full rounded-2xl" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+        </div>
+      </div>
+
+      {/* Metric Cards Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white border border-gray-200 rounded-3xl p-5 space-y-3">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        ))}
+      </div>
+
+      {/* Main Chart Card */}
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-6">
+        <Skeleton className="h-6 w-64" />
+        <Skeleton className="h-[320px] w-full rounded-2xl" />
+      </div>
+    </div>
+  );
+}
+
 /** Skeleton for the generic list-based views (PaperTrading, AIStrategy, etc.) */
 export function GenericPageSkeleton() {
   return (
