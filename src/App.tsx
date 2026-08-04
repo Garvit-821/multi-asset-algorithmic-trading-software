@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star, BrainCircuit } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star, BrainCircuit, BarChart2 } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -102,7 +102,7 @@ function App() {
 
   const labMenuItems = [
     { id: 'intelligence' as View, label: 'AI Intelligence Hub', icon: BrainCircuit },
-    { id: 'backtest' as View, label: 'Advanced Backtester', icon: Target },
+    { id: 'backtest' as View, label: 'Advanced Backtester', icon: BarChart2 },
     { id: 'optimizer' as View, label: 'Portfolio Optimizer', icon: Target },
     { id: 'replay' as View, label: 'Market Replay', icon: History },
     { id: 'sentiment' as View, label: 'Social Sentiment', icon: MessageSquare },
@@ -184,7 +184,7 @@ function App() {
           <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
             {/* Core Workspace */}
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Core Workspace</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Core Workspace</p>
               <div className="space-y-1">
                 {coreMenuItems.map((item) => {
                   const Icon = item.icon;
@@ -196,13 +196,13 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
+                      className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
                           ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                         }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
                     </button>
                   );
                 })}
@@ -211,7 +211,7 @@ function App() {
 
             {/* Quantitative Labs */}
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">Quantitative Labs</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Quantitative Labs</p>
               <div className="space-y-1">
                 {labMenuItems.map((item) => {
                   const Icon = item.icon;
@@ -223,13 +223,13 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
+                      className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
                           ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                         }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
                     </button>
                   );
                 })}
@@ -239,7 +239,7 @@ function App() {
             {/* System Administration */}
             {isAdmin && (
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 mb-2">System Administration</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">System Administration</p>
                 <div className="space-y-1">
                   {adminMenuItems.map((item) => {
                     const Icon = item.icon;
@@ -251,13 +251,13 @@ function App() {
                           setCurrentView(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all ${isActive
+                        className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
                             ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                           }`}
                       >
-                        <Icon className="w-4 h-4" />
-                        <span>{item.label}</span>
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
                       </button>
                     );
                   })}
