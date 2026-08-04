@@ -97,49 +97,81 @@ export function DerivativesOptionsDashboard() {
           </div>
         </div>
 
-        {/* Asset Selector */}
-        <div className="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-xl p-1.5 self-start md:self-auto">
-          {(['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'AAPL'] as const).map((sym) => (
-            <button
-              key={sym}
-              onClick={() => handleSymbolChange(sym)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                symbol === sym
-                  ? 'bg-white text-blue-600 shadow-xs border border-gray-200'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+        {/* Asset Selector — dropdown on mobile, pills on sm+ */}
+        <div className="self-start md:self-auto">
+          {/* Mobile dropdown */}
+          <div className="sm:hidden">
+            <select
+              value={symbol}
+              onChange={(e) => handleSymbolChange(e.target.value as any)}
+              className="w-full px-3 py-2 text-sm font-semibold bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {sym}
-            </button>
-          ))}
+              {(['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'AAPL'] as const).map((sym) => (
+                <option key={sym} value={sym}>{sym}</option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop pills */}
+          <div className="hidden sm:flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-xl p-1.5">
+            {(['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'AAPL'] as const).map((sym) => (
+              <button
+                key={sym}
+                onClick={() => handleSymbolChange(sym)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  symbol === sym
+                    ? 'bg-white text-blue-600 shadow-xs border border-gray-200'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {sym}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Tabs Bar */}
-      <div className="flex overflow-x-auto whitespace-nowrap space-x-2 border-b border-gray-200 pb-2 scrollbar-none">
-        {[
-          { id: 'calculator', label: 'Black-Scholes Calculator', icon: Calculator },
-          { id: 'chain', label: 'Options Chain Matrix', icon: Layers },
-          { id: 'payoff', label: 'Strategy Payoff Diagrams', icon: TrendingUp },
-          { id: 'surface', label: 'IV Volatility Surface', icon: Activity },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all ${
-                isActive
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+      {/* Tabs Bar — dropdown on mobile, pills on sm+ */}
+      <div>
+        {/* Mobile: select dropdown */}
+        <div className="sm:hidden">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value as any)}
+            className="w-full px-3 py-2.5 text-sm font-semibold bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
+          >
+            <option value="calculator">🧮 Black-Scholes Calculator</option>
+            <option value="chain">📊 Options Chain Matrix</option>
+            <option value="payoff">📈 Strategy Payoff Diagrams</option>
+            <option value="surface">🌊 IV Volatility Surface</option>
+          </select>
+        </div>
+
+        {/* Desktop: scrollable tab pills */}
+        <div className="hidden sm:flex overflow-x-auto whitespace-nowrap space-x-2 border-b border-gray-200 pb-2 scrollbar-none">
+          {[
+            { id: 'calculator', label: 'Black-Scholes Calculator', icon: Calculator },
+            { id: 'chain', label: 'Options Chain Matrix', icon: Layers },
+            { id: 'payoff', label: 'Strategy Payoff Diagrams', icon: TrendingUp },
+            { id: 'surface', label: 'IV Volatility Surface', icon: Activity },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* TAB 1: BLACK-SCHOLES CALCULATOR */}
