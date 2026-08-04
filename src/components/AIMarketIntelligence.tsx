@@ -135,9 +135,9 @@ export function AIMarketIntelligence() {
   };
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-3 sm:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Top Banner Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 p-6 sm:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 p-5 sm:p-8 rounded-2xl sm:rounded-3xl text-white shadow-xl relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-2">
@@ -145,19 +145,19 @@ export function AIMarketIntelligence() {
             <BrainCircuit className="w-3.5 h-3.5" />
             <span>AI Market Intelligence Hub</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white">
             AI Copilot, Correlation & Optimizer
           </h1>
-          <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
             Query your live portfolio in natural language, detect cross-asset correlation exposure risks, and auto-tune strategy parameters using grid search optimization.
           </p>
         </div>
 
-        {/* Tab Selector Buttons */}
-        <div className="relative z-10 bg-slate-800/80 p-1.5 rounded-2xl flex items-center space-x-1 border border-slate-700">
+        {/* Tab Selector Buttons Horizontal Swipe Container */}
+        <div className="relative z-10 bg-slate-800/80 p-1.5 rounded-2xl flex items-center space-x-1 border border-slate-700 overflow-x-auto no-scrollbar w-full md:w-auto">
           <button
             onClick={() => setActiveTab('copilot')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'copilot' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
             }`}
           >
@@ -166,7 +166,7 @@ export function AIMarketIntelligence() {
           </button>
           <button
             onClick={() => setActiveTab('correlation')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'correlation' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
             }`}
           >
@@ -175,7 +175,7 @@ export function AIMarketIntelligence() {
           </button>
           <button
             onClick={() => setActiveTab('optimizer')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'optimizer' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:text-white'
             }`}
           >
@@ -187,13 +187,13 @@ export function AIMarketIntelligence() {
 
       {/* TAB 1: AI TRADING COPILOT */}
       {activeTab === 'copilot' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Quick Prompts Panel */}
           <div className="space-y-6">
-            <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-4">
+            <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-bold text-gray-900">Recommended Natural Language Queries</h3>
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">Recommended Natural Language Queries</h3>
               </div>
               <p className="text-xs text-gray-500">Click any prompt to instantly query your portfolio and strategy performance.</p>
 
@@ -203,7 +203,7 @@ export function AIMarketIntelligence() {
                   className="w-full text-left p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-2xl text-xs font-semibold text-gray-700 hover:text-blue-700 transition-all flex items-center justify-between group"
                 >
                   <span>"What is my exposure to tech stocks?"</span>
-                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0 ml-2" />
                 </button>
 
                 <button
@@ -211,7 +211,7 @@ export function AIMarketIntelligence() {
                   className="w-full text-left p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-2xl text-xs font-semibold text-gray-700 hover:text-blue-700 transition-all flex items-center justify-between group"
                 >
                   <span>"Analyze my worst losing trades this week"</span>
-                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0 ml-2" />
                 </button>
 
                 <button
@@ -219,7 +219,7 @@ export function AIMarketIntelligence() {
                   className="w-full text-left p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-2xl text-xs font-semibold text-gray-700 hover:text-blue-700 transition-all flex items-center justify-between group"
                 >
                   <span>"Suggest portfolio rebalancing steps"</span>
-                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0 ml-2" />
                 </button>
 
                 <button
@@ -227,15 +227,15 @@ export function AIMarketIntelligence() {
                   className="w-full text-left p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-2xl text-xs font-semibold text-gray-700 hover:text-blue-700 transition-all flex items-center justify-between group"
                 >
                   <span>"Audit my portfolio cash & win rate"</span>
-                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0 ml-2" />
                 </button>
               </div>
             </div>
 
             {/* AI Assistant Status */}
-            <div className="bg-blue-50/60 border border-blue-200 rounded-3xl p-6 space-y-3">
+            <div className="bg-blue-50/60 border border-blue-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-3">
               <div className="flex items-center space-x-2 text-blue-700 font-bold text-xs">
-                <Zap className="w-4 h-4" />
+                <Zap className="w-4 h-4 shrink-0" />
                 <span>Live Portfolio Integration Active</span>
               </div>
               <p className="text-xs text-blue-900/80 leading-relaxed">
@@ -245,15 +245,15 @@ export function AIMarketIntelligence() {
           </div>
 
           {/* Conversational Chat Window */}
-          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-3xl shadow-xs flex flex-col h-[600px] overflow-hidden">
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl shadow-xs flex flex-col h-[500px] sm:h-[600px] overflow-hidden">
             {/* Chat Header */}
             <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-                  <Bot className="w-5 h-5" />
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900">Stratrade AI Copilot</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-gray-900">Stratrade AI Copilot</h3>
                   <span className="text-[10px] text-green-600 font-bold flex items-center space-x-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
                     <span>Connected to Portfolio Engine</span>
@@ -263,14 +263,14 @@ export function AIMarketIntelligence() {
             </div>
 
             {/* Chat Stream Messages */}
-            <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+            <div className="flex-1 p-3.5 sm:p-6 overflow-y-auto space-y-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-3xl p-4 sm:p-5 shadow-xs space-y-3 ${
+                    className={`max-w-[90%] sm:max-w-[85%] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-3 ${
                       msg.sender === 'user'
                         ? 'bg-blue-600 text-white rounded-br-none'
                         : 'bg-gray-50 border border-gray-200 text-gray-900 rounded-bl-none'
@@ -332,8 +332,8 @@ export function AIMarketIntelligence() {
 
               {copilotLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-50 border border-gray-200 rounded-3xl p-4 text-xs text-gray-500 flex items-center space-x-2">
-                    <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 text-xs text-gray-500 flex items-center space-x-2">
+                    <RefreshCw className="w-4 h-4 animate-spin text-blue-600 shrink-0" />
                     <span>Analyzing portfolio state & market parameters...</span>
                   </div>
                 </div>
@@ -342,7 +342,7 @@ export function AIMarketIntelligence() {
             </div>
 
             {/* Input Bar */}
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <div className="p-3.5 sm:p-4 border-t border-gray-200 bg-white">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -354,13 +354,13 @@ export function AIMarketIntelligence() {
                   type="text"
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
-                  placeholder="Ask AI Copilot about portfolio exposure, losing trades, or risk..."
-                  className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                  placeholder="Ask AI Copilot about portfolio exposure or trades..."
+                  className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                 />
                 <button
                   type="submit"
                   disabled={!inputQuery.trim() || copilotLoading}
-                  className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-2xl transition-all shadow-md shadow-blue-500/20"
+                  className="p-2.5 sm:p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl sm:rounded-2xl transition-all shadow-md shadow-blue-500/20 shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -372,17 +372,17 @@ export function AIMarketIntelligence() {
 
       {/* TAB 2: MULTI-ASSET CORRELATION MATRIX */}
       {activeTab === 'correlation' && correlationData && (
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+        <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs space-y-5 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
             <div>
-              <h3 className="text-base font-bold text-gray-900">Cross-Asset Pearson Correlation Heatmap Matrix</h3>
+              <h3 className="text-sm sm:text-base font-bold text-gray-900">Cross-Asset Pearson Correlation Heatmap Matrix</h3>
               <p className="text-xs text-gray-500">Real-time correlation coefficients ($r \in [-1.0, +1.0]$) across Crypto, Equities, Forex, and Commodities.</p>
             </div>
             <div className="flex items-center space-x-3">
               <span className="text-xs text-gray-500 font-mono">Updated: {correlationData.lastUpdated}</span>
               <button
                 onClick={handleRefreshCorrelation}
-                className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 flex items-center space-x-1.5 transition-all"
+                className="px-3 sm:px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 flex items-center space-x-1.5 transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Refresh Matrix</span>
@@ -392,14 +392,14 @@ export function AIMarketIntelligence() {
 
           {/* High Risk Alerts Header */}
           {correlationData.highRiskPairs.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-2">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 space-y-2">
               <div className="flex items-center space-x-2 text-amber-800 font-bold text-xs">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>High Correlation Over-Exposure Warning ({correlationData.highRiskPairs.length} Pairs Detected)</span>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
                 {correlationData.highRiskPairs.map((pair, idx) => (
-                  <span key={idx} className="px-3 py-1 bg-white border border-amber-300 text-amber-900 text-xs font-bold rounded-full font-mono shadow-2xs">
+                  <span key={idx} className="px-2.5 py-1 bg-white border border-amber-300 text-amber-900 text-[11px] sm:text-xs font-bold rounded-full font-mono shadow-2xs">
                     {pair.assetA} & {pair.assetB} (r = +{pair.correlation})
                   </span>
                 ))}
@@ -409,7 +409,7 @@ export function AIMarketIntelligence() {
 
           {/* Heatmap Matrix Grid */}
           <div className="overflow-x-auto">
-            <table className="w-full text-center border-collapse">
+            <table className="w-full text-center border-collapse min-w-[580px]">
               <thead>
                 <tr>
                   <th className="p-3 text-xs font-bold text-gray-400 uppercase text-left">Asset Pair</th>
@@ -427,7 +427,6 @@ export function AIMarketIntelligence() {
                     {correlationData.matrix[rowIndex].map((val, colIndex) => {
                       const isSelf = rowIndex === colIndex;
                       const isPositive = val > 0;
-                      const absVal = Math.abs(val);
 
                       // Dynamic heatmap color intensity
                       let bgClass = 'bg-gray-100 text-gray-800';
@@ -462,14 +461,14 @@ export function AIMarketIntelligence() {
       {activeTab === 'optimizer' && (
         <div className="space-y-6">
           {/* Controls Panel */}
-          <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-6">
+          <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs space-y-5 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
               <div>
-                <h3 className="text-base font-bold text-gray-900">Auto Parameter Optimizer (Grid Search)</h3>
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">Auto Parameter Optimizer (Grid Search)</h3>
                 <p className="text-xs text-gray-500">Automatically test range combinations across visual strategies to find peak Sharpe Ratio settings.</p>
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                 <select
                   value={optStrategy}
                   onChange={(e) => {
@@ -477,7 +476,7 @@ export function AIMarketIntelligence() {
                     setOptStrategy(strat);
                     handleRunOptimizer(strat, optSymbol);
                   }}
-                  className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900"
+                  className="w-full sm:w-auto px-3.5 sm:px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="rsi">RSI Mean Reversion Optimization</option>
                   <option value="ema_crossover">EMA Crossover Optimization</option>
@@ -486,7 +485,7 @@ export function AIMarketIntelligence() {
                 <button
                   onClick={() => handleRunOptimizer()}
                   disabled={optLoading}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shadow-xs"
+                  className="w-full sm:w-auto justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shadow-xs shrink-0 whitespace-nowrap"
                 >
                   {optLoading ? (
                     <>
@@ -495,8 +494,8 @@ export function AIMarketIntelligence() {
                     </>
                   ) : (
                     <>
-                      <Play className="w-3.5 h-3.5 fill-white" />
-                      <span>Run Grid Search</span>
+                      <Play className="w-3.5 h-3.5 fill-white shrink-0" />
+                      <span className="whitespace-nowrap">Run Grid Search</span>
                     </>
                   )}
                 </button>
@@ -505,12 +504,12 @@ export function AIMarketIntelligence() {
 
             {/* Best Result Snapshot Card */}
             {optSummary && (
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-extrabold rounded-full uppercase tracking-wider font-mono">
+                  <span className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-extrabold rounded-full uppercase tracking-wider font-mono inline-block">
                     OPTIMAL PARAMETER CONFIGURATION DISCOVERED
                   </span>
-                  <h4 className="text-xl font-black text-emerald-950 font-mono mt-1">
+                  <h4 className="text-lg sm:text-xl font-black text-emerald-950 font-mono mt-1">
                     {optSummary.bestResult.paramLabel}
                   </h4>
                   <p className="text-xs text-emerald-800">
@@ -518,18 +517,18 @@ export function AIMarketIntelligence() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 w-full sm:w-auto">
-                  <div className="bg-white border border-emerald-200 rounded-xl p-3 text-center">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase block">Sharpe Ratio</span>
-                    <span className="text-lg font-extrabold text-emerald-600 font-mono">{optSummary.bestResult.sharpeRatio}</span>
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3 w-full lg:w-auto">
+                  <div className="bg-white border border-emerald-200 rounded-xl p-2.5 sm:p-3 text-center">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase block truncate">Sharpe</span>
+                    <span className="text-base sm:text-lg font-extrabold text-emerald-600 font-mono">{optSummary.bestResult.sharpeRatio}</span>
                   </div>
-                  <div className="bg-white border border-emerald-200 rounded-xl p-3 text-center">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase block">Win Rate</span>
-                    <span className="text-lg font-extrabold text-blue-600 font-mono">{optSummary.bestResult.winRatePct}%</span>
+                  <div className="bg-white border border-emerald-200 rounded-xl p-2.5 sm:p-3 text-center">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase block truncate">Win Rate</span>
+                    <span className="text-base sm:text-lg font-extrabold text-blue-600 font-mono">{optSummary.bestResult.winRatePct}%</span>
                   </div>
-                  <div className="bg-white border border-emerald-200 rounded-xl p-3 text-center">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase block">Net Profit</span>
-                    <span className="text-lg font-extrabold text-green-600 font-mono">+{optSummary.bestResult.totalReturnPct}%</span>
+                  <div className="bg-white border border-emerald-200 rounded-xl p-2.5 sm:p-3 text-center">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase block truncate">Net Profit</span>
+                    <span className="text-base sm:text-lg font-extrabold text-green-600 font-mono">+{optSummary.bestResult.totalReturnPct}%</span>
                   </div>
                 </div>
               </div>
@@ -540,10 +539,10 @@ export function AIMarketIntelligence() {
           {optSummary && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Leaderboard Table */}
-              <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-4">
+              <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
                 <h4 className="text-sm font-bold text-gray-900">Top 5 Parameter Configurations (Ranked by Sharpe)</h4>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                  <table className="w-full text-left text-xs min-w-[450px]">
                     <thead className="bg-gray-50 text-gray-500 font-semibold uppercase tracking-wider border-y border-gray-200">
                       <tr>
                         <th className="px-3 py-2.5">Rank</th>
@@ -569,14 +568,14 @@ export function AIMarketIntelligence() {
               </div>
 
               {/* Sharpe Surface Visualization Chart */}
-              <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-4">
+              <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
                 <h4 className="text-sm font-bold text-gray-900">Parameter Sharpe Surface Point Cloud</h4>
-                <div className="h-[260px] w-full">
+                <div className="h-[220px] sm:h-[260px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={optSummary.surface2D.slice(0, 10)}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="label" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                      <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} label={{ value: 'Sharpe Ratio', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+                      <XAxis dataKey="label" stroke="#94a3b8" fontSize={9} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={9} tickLine={false} label={{ value: 'Sharpe Ratio', angle: -90, position: 'insideLeft', fontSize: 9 }} />
                       <Tooltip />
                       <Bar dataKey="z" name="Sharpe Ratio" fill="#2563eb" radius={[8, 8, 0, 0]} />
                     </BarChart>
