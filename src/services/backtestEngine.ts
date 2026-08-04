@@ -81,6 +81,11 @@ export interface BacktestMetrics {
   beta: number;
   benchmarkReturnPct: number;
   spyReturnPct: number;
+  // High-Fidelity Execution Metrics
+  totalMakerFeesPaid: number;
+  totalTakerFeesPaid: number;
+  totalSlippagePaid: number;
+  latencyDragPnlImpact: number;
 }
 
 export interface BacktestConfig {
@@ -104,6 +109,13 @@ export interface BacktestConfig {
   macdSignal?: number;
   bbPeriod?: number;
   bbStdDev?: number;
+  // High-Fidelity & Granular Execution parameters
+  feeTier?: 'standard' | 'vip_maker' | 'vip_taker' | 'custom';
+  makerFeePct?: number;
+  takerFeePct?: number;
+  marketImpactFactor?: number;
+  networkLatencyMs?: number;
+  executionMode?: 'ohlc_bar' | 'tick_granular';
 }
 
 export interface BacktestFullResult {
@@ -230,6 +242,17 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
   const macdData = calculateMACD(prices, config.macdFast || 12, config.macdSlow || 26, config.macdSignal || 9);
   const bbData = calculateBollingerBands(prices, config.bbPeriod || 20, config.bbStdDev || 2);
 
+  // High-Fidelity Execution Settings
+  const makerFeePct = config.makerFeePct ?? (config.feeTier === 'vip_maker' ? 0.02 : 0.075);
+  const takerFeePct = config.takerFeePct ?? (config.feeTier === 'vip_taker' ? 0.04 : 0.10);
+  const marketImpact = config.marketImpactFactor ?? 0.02;
+  const latencyMs = config.networkLatencyMs ?? 50;
+
+  let totalMakerFeesPaid = 0;
+  let totalTakerFeesPaid = 0;
+  let totalSlippagePaid = 0;
+  let latencyDragPnlImpact = 0;
+
   // Simulation State Variables
   let balance = config.initialCapital;
   let maxEquity = balance;
@@ -240,6 +263,7 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
     entryDate: string;
     size: number;
     type: 'BUY';
+    entrySlippage: number;
   } | null = null;
 
   const trades: TradeRecord[] = [];
@@ -254,7 +278,6 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
   const spyPrices: number[] = [spyInitialPrice];
   for (let i = 1; i < prices.length; i++) {
     const assetReturn = (prices[i] - prices[i - 1]) / prices[i - 1];
-    // SPY tends to have ~0.5 beta with crypto or broad markets with lower volatility
     const spyReturn = assetReturn * 0.35 + (Math.random() - 0.48) * 0.002;
     spyPrice = spyPrice * (1 + spyReturn);
     spyPrices.push(spyPrice);
@@ -263,7 +286,8 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
   // 2. Step-by-step Backtest Execution Loop
   for (let i = 1; i < prices.length; i++) {
     const price = prices[i];
-    const timestamp = typeof candles[i].time === 'number' ? (candles[i].time as number) * 1000 : Date.now();
+    const candle = candles[i];
+    const timestamp = typeof candle.time === 'number' ? (candle.time as number) * 1000 : Date.now();
     const dateStr = dates[i];
 
     const prevPrice = prices[i - 1];
@@ -304,15 +328,19 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
         break;
 
       case 'grid_trading':
-        // Simple grid bounce signal
         if (i % 8 === 0 && rsi < 48) buySignal = true;
         if (i % 8 === 4 && rsi > 52) sellSignal = true;
         break;
     }
 
+    // Tick-Granular execution evaluation
+    const evalPrice = config.executionMode === 'tick_granular' && candle.high && candle.low
+      ? (price > prevPrice ? candle.high : candle.low)
+      : price;
+
     // Handle existing position risk management (Stop Loss & Take Profit)
     if (position) {
-      const priceChangePct = ((price - position.entryPrice) / position.entryPrice) * 100;
+      const priceChangePct = ((evalPrice - position.entryPrice) / position.entryPrice) * 100;
       let isExit = false;
       let exitReason: TradeRecord['exitReason'] = 'SIGNAL_EXIT';
 
@@ -328,11 +356,21 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
       }
 
       if (isExit) {
-        // Calculate exit with slippage and commission
-        const executionExitPrice = price * (1 - config.slippagePct / 100);
+        // High-Fidelity Slippage & Latency calculation
+        const dynamicSlippagePct = (config.slippagePct / 100) + marketImpact * Math.sqrt(position.size / 1000);
+        const latencyDrift = (latencyMs / 60000) * 0.002 * evalPrice;
+        const executionExitPrice = Math.max(0.001, evalPrice * (1 - dynamicSlippagePct) - latencyDrift);
+
+        const slippageAmount = position.size * (evalPrice - executionExitPrice);
+        totalSlippagePaid += Math.max(0, slippageAmount);
+        latencyDragPnlImpact += Math.max(0, position.size * latencyDrift);
+
+        // Taker fee on market exit
+        const exitFee = position.size * executionExitPrice * (takerFeePct / 100);
+        totalTakerFeesPaid += exitFee;
+
         const grossPnl = position.size * (executionExitPrice - position.entryPrice);
-        const totalFee = position.size * executionExitPrice * (config.commissionPct / 100) + position.size * position.entryPrice * (config.commissionPct / 100);
-        const netPnl = grossPnl - totalFee;
+        const netPnl = grossPnl - exitFee;
 
         balance += netPnl;
 
@@ -352,16 +390,22 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
           pnlPercent: Number((((executionExitPrice - position.entryPrice) / position.entryPrice) * 100).toFixed(2)),
           durationMinutes: durationMins,
           exitReason,
-          fee: Number(totalFee.toFixed(2)),
+          fee: Number((exitFee + position.entrySlippage).toFixed(2)),
         });
 
         position = null;
       }
     } else if (buySignal) {
-      // Enter long position
-      const executionEntryPrice = price * (1 + config.slippagePct / 100);
-      const fee = balance * (config.commissionPct / 100);
-      const investableBalance = balance - fee;
+      // Enter position with Maker/Taker fees & Latency
+      const dynamicSlippagePct = (config.slippagePct / 100) + marketImpact * Math.sqrt(balance / 100000);
+      const latencyDrift = (latencyMs / 60000) * 0.002 * price;
+      const executionEntryPrice = price * (1 + dynamicSlippagePct) + latencyDrift;
+
+      // Maker fee on limit entry
+      const entryFee = balance * (makerFeePct / 100);
+      totalMakerFeesPaid += entryFee;
+      
+      const investableBalance = balance - entryFee;
       const size = investableBalance / executionEntryPrice;
 
       position = {
@@ -370,6 +414,7 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
         entryDate: dateStr,
         size,
         type: 'BUY',
+        entrySlippage: entryFee,
       };
     }
 
@@ -526,6 +571,10 @@ export async function runAdvancedBacktest(config: BacktestConfig): Promise<Backt
     beta,
     benchmarkReturnPct: Number(benchmarkReturnPct.toFixed(2)),
     spyReturnPct: Number(spyReturnPct.toFixed(2)),
+    totalMakerFeesPaid: Number(totalMakerFeesPaid.toFixed(2)),
+    totalTakerFeesPaid: Number(totalTakerFeesPaid.toFixed(2)),
+    totalSlippagePaid: Number(totalSlippagePaid.toFixed(2)),
+    latencyDragPnlImpact: Number(latencyDragPnlImpact.toFixed(2)),
   };
 
   // 4. Monthly Returns Heatmap Grid Generator

@@ -701,6 +701,10 @@ bash setup-android.sh
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
+*   **Phase 2 Release - AI Quantitative Analytics & Derivatives Models**:
+    *   **Black-Scholes Options Calculator & Derivatives Dashboard (`DerivativesOptionsDashboard.tsx`, `blackScholesEngine.ts`)**: Theoretical call/put option valuation, real-time Options Greeks ($\Delta, \Gamma, \Theta, \nu, \rho$), Newton-Raphson IV solver, institutional option chain matrix, multi-leg payoff diagrams (Straddles, Iron Condors, Spreads), and 2D Implied Volatility (IV) surface heatmaps.
+    *   **Machine Learning Price Forecasting & Chart Overlays (`mlForecastingService.ts`, `ml_service.py`, `TradingViewChart.tsx`)**: FastAPI Python backend microservice delivering PyTorch/LSTM price horizon predictions with 80%/95% confidence corridor bands overlaid directly on TradingView charts.
+    *   **High-Fidelity Granular Backtest Engine (`backtestEngine.ts`, `AdvancedBacktester.tsx`)**: VIP Maker/Taker fee structure tiers, dynamic order-size liquidity impact slippage, network execution latency drift (ms), and intra-bar tick synthesis mode for high-frequency stop loss / take profit verification.
 *   **AI Market Intelligence Hub & Advanced Quantitative Analytics Release**:
     *   Added `AIMarketIntelligence.tsx` and `aiCopilotService.ts` for conversational natural language portfolio exposure auditing, loss analysis, and risk rebalancing protocols.
     *   Integrated multi-asset Pearson correlation matrix (`correlationService.ts`) with automated high-exposure risk alerts ($r \ge +0.80$).

@@ -60,6 +60,12 @@ export function AdvancedBacktester() {
     rsiOverbought: 70,
     fastEmaPeriod: 9,
     slowEmaPeriod: 21,
+    feeTier: 'standard',
+    makerFeePct: 0.02,
+    takerFeePct: 0.05,
+    marketImpactFactor: 0.02,
+    networkLatencyMs: 50,
+    executionMode: 'tick_granular',
   });
 
   const [activeTab, setActiveTab] = useState<'equity' | 'montecarlo' | 'heatmap' | 'trades'>('equity');
@@ -238,7 +244,7 @@ export function AdvancedBacktester() {
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-[11px] font-semibold text-gray-500 mb-1">Est. Slippage (%)</label>
+            <label className="block text-[10px] sm:text-[11px] font-semibold text-gray-500 mb-1">Est. Base Slippage (%)</label>
             <input
               type="number"
               step="0.01"
@@ -246,6 +252,73 @@ export function AdvancedBacktester() {
               onChange={(e) => setConfig({ ...config, slippagePct: parseFloat(e.target.value) || 0.05 })}
               className="w-full px-2.5 sm:px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono font-bold text-gray-900"
             />
+          </div>
+        </div>
+
+        {/* Phase 2: High-Fidelity & Granular Execution Controls */}
+        <div className="bg-gray-50/80 border border-gray-200 rounded-2xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-gray-900 flex items-center space-x-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>Institutional High-Fidelity Simulation Controls</span>
+            </span>
+            <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-md">Phase 2 Granular Mode</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-600 mb-1">Fee Structure Tier</label>
+              <select
+                value={config.feeTier || 'standard'}
+                onChange={(e) => setConfig({ ...config, feeTier: e.target.value as any })}
+                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900"
+              >
+                <option value="standard">Standard (0.075% / 0.10%)</option>
+                <option value="vip_maker">VIP Maker Tier (0.02% / 0.05%)</option>
+                <option value="vip_taker">VIP Taker Tier (0.04% / 0.08%)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-600 mb-1">Network Execution Latency</label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="range"
+                  min="10"
+                  max="500"
+                  step="10"
+                  value={config.networkLatencyMs || 50}
+                  onChange={(e) => setConfig({ ...config, networkLatencyMs: Number(e.target.value) })}
+                  className="w-full accent-blue-600"
+                />
+                <span className="text-xs font-mono font-bold text-gray-900 w-12 text-right">{config.networkLatencyMs || 50}ms</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-600 mb-1">Liquidity Impact Factor</label>
+              <input
+                type="number"
+                step="0.01"
+                value={config.marketImpactFactor || 0.02}
+                onChange={(e) => setConfig({ ...config, marketImpactFactor: parseFloat(e.target.value) || 0.02 })}
+                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-mono font-bold text-gray-900"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-600 mb-1">Execution Granularity</label>
+              <button
+                onClick={() => setConfig({ ...config, executionMode: config.executionMode === 'tick_granular' ? 'ohlc_bar' : 'tick_granular' })}
+                className={`w-full py-1.5 px-3 rounded-xl text-xs font-bold transition-all border ${
+                  config.executionMode === 'tick_granular'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-200'
+                }`}
+              >
+                {config.executionMode === 'tick_granular' ? '⚡ High-Freq Tick Simulation' : '📊 Standard OHLC Bar'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -312,6 +385,26 @@ export function AdvancedBacktester() {
                 <span className="text-lg sm:text-2xl font-extrabold font-mono text-red-600">-{result.metrics.maxDrawdownPct}%</span>
               </div>
               <span className="text-[10px] sm:text-[11px] text-gray-500 mt-1 truncate">Peak-to-Trough</span>
+            </div>
+          </div>
+
+          {/* Phase 2: High-Fidelity Diagnostics Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Maker Fees Paid</span>
+              <span className="text-sm font-bold font-mono text-gray-900">${result.metrics.totalMakerFeesPaid}</span>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Taker Fees Paid</span>
+              <span className="text-sm font-bold font-mono text-gray-900">${result.metrics.totalTakerFeesPaid}</span>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Total Slippage Cost</span>
+              <span className="text-sm font-bold font-mono text-amber-600">${result.metrics.totalSlippagePaid}</span>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Latency Drag Impact</span>
+              <span className="text-sm font-bold font-mono text-rose-600">-${result.metrics.latencyDragPnlImpact}</span>
             </div>
           </div>
 

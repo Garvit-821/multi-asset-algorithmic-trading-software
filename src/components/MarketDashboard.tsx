@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, Star, Bell, Plus, Minus, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Layers, Zap, Key, LayoutGrid } from 'lucide-react';
+import { Search, TrendingUp, Star, Bell, Plus, Minus, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Layers, Zap, Key, LayoutGrid, BrainCircuit } from 'lucide-react';
 import { TradingViewChart, AssetType } from './TradingViewChart';
 import { searchSymbols } from '../services/dataFeed';
 import { supabase } from '../lib/supabase';
@@ -19,6 +19,7 @@ export function MarketDashboard() {
   const [showSearch, setShowSearch] = useState(false);
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [watchlist, setWatchlist] = useState<string[]>([]);
+  const [showMlForecast, setShowMlForecast] = useState<boolean>(false);
 
   // Terminal View Modes & Exchange Modal
   const [terminalTab, setTerminalTab] = useState<TerminalViewTab>('standard');
@@ -311,6 +312,19 @@ export function MarketDashboard() {
 
           <div className="flex items-center space-x-2">
             <button
+              onClick={() => setShowMlForecast(!showMlForecast)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shadow-xs ${
+                showMlForecast
+                  ? 'bg-blue-600 text-white shadow-blue-500/20'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+              title="Toggle AI LSTM Price Forecast Overlay"
+            >
+              <BrainCircuit className={`w-3.5 h-3.5 ${showMlForecast ? 'animate-pulse' : ''}`} />
+              <span>{showMlForecast ? 'ML Forecast: ON' : 'ML Forecast'}</span>
+            </button>
+
+            <button
               onClick={() => toggleWatchlist(selectedSymbol)}
               className={`p-2 rounded-lg transition-colors ${
                 watchlist.includes(selectedSymbol)
@@ -345,6 +359,7 @@ export function MarketDashboard() {
               assetType={activeMarket}
               exchange={selectedExchange}
               height={600}
+              showMlForecast={showMlForecast}
               onPriceUpdate={setCurrentPrice}
             />
           </div>

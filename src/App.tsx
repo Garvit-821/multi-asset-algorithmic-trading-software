@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Trash2, Github, Star, BrainCircuit, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Github, Star, BrainCircuit, BarChart2, Calculator, Trash2 } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -14,6 +14,7 @@ import { MarketReplay } from './components/MarketReplay';
 import { SocialSentiment } from './components/SocialSentiment';
 import { AdvancedBacktester } from './components/AdvancedBacktester';
 import { AIMarketIntelligence } from './components/AIMarketIntelligence';
+import { DerivativesOptionsDashboard } from './components/DerivativesOptionsDashboard';
 import { paperTradingService } from './services/paperTradingService';
 import {
   UserDashboardSkeleton,
@@ -74,7 +75,8 @@ type View =
   | 'replay'
   | 'sentiment'
   | 'backtest'
-  | 'intelligence';
+  | 'intelligence'
+  | 'derivatives';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
@@ -102,6 +104,7 @@ function App() {
 
   const labMenuItems = [
     { id: 'intelligence' as View, label: 'AI Intelligence Hub', icon: BrainCircuit },
+    { id: 'derivatives' as View, label: 'Options & Derivatives', icon: Calculator },
     { id: 'backtest' as View, label: 'Advanced Backtester', icon: BarChart2 },
     { id: 'optimizer' as View, label: 'Portfolio Optimizer', icon: Target },
     { id: 'replay' as View, label: 'Market Replay', icon: History },
@@ -350,6 +353,11 @@ function App() {
               {currentView === 'intelligence' && (
                 <div className="h-full overflow-y-auto">
                   <AIMarketIntelligence />
+                </div>
+              )}
+              {currentView === 'derivatives' && (
+                <div className="h-full overflow-y-auto p-4 sm:p-8">
+                  <DerivativesOptionsDashboard />
                 </div>
               )}
               {currentView === 'backtest' && (

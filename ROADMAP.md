@@ -23,13 +23,13 @@ This roadmap outlines the planned enhancements, new features, and technical upda
 ## 🧠 Phase 2: AI Quantitative Analytics & Derivatives Models
 *Goal: Introduce advanced machine learning and mathematical pricing models.*
 
-- [ ] **Machine Learning Price Forecasting**
+- [x] **Machine Learning Price Forecasting**
   - Build a lightweight backend (FastAPI/Python) for time-series forecasting using LSTM/Transformer models.
   - Overlay projected price corridors on the TradingView charts.
-- [ ] **High-Fidelity Backtesting Engine**
+- [x] **High-Fidelity Backtesting Engine**
   - Incorporate realistic slippage simulations, exchange fee structures (maker/taker rates), and network execution latency.
   - Implement tick-level granular backtests instead of hourly/daily OHLCV aggregates.
-- [ ] **Derivatives & Options Pricing Dashboard**
+- [x] **Derivatives & Options Pricing Dashboard**
   - Implement a **Black-Scholes Options Calculator** showing theoretical options prices.
   - Render implied volatility (IV) surfaces and calculate real-time Options Greeks ($\Delta$, $\Gamma$, $\Theta$, $\mathcal{V}$).
 

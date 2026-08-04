@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createChart, IChartApi, ISeriesApi, ColorType, Time } from 'lightweight-charts';
-import { Loader2 } from 'lucide-react';
+import { Loader2, BrainCircuit } from 'lucide-react';
+import { getMLPriceForecast, MLForecastResult } from '../services/mlForecastingService';
 
 export type AssetType = 'crypto' | 'forex' | 'stock' | 'commodity';
 
@@ -9,22 +10,32 @@ export interface TradingViewChartProps {
   assetType: AssetType;
   exchange?: string;
   height?: number;
+  showMlForecast?: boolean;
+  forecastHorizon?: number;
   onPriceUpdate?: (price: number) => void;
 }
-
 
 export function TradingViewChart({
   symbol,
   assetType,
   exchange,
   height = 500,
+  showMlForecast = false,
+  forecastHorizon = 20,
   onPriceUpdate,
 }: TradingViewChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+
+  // ML Series Refs
+  const mlTrendSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
+  const mlUpperSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
+  const mlLowerSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mlData, setMlData] = useState<MLForecastResult | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -88,7 +99,7 @@ export function TradingViewChart({
 
     window.addEventListener('resize', handleResize);
 
-    // Real-time updates: Use WebSocket for crypto (Binance), fallback to API polling for others
+    // Real-time updates
     let ws: WebSocket | null = null;
     let updateInterval: NodeJS.Timeout | null = null;
 
@@ -143,22 +154,33 @@ export function TradingViewChart({
     };
   }, [symbol, assetType, exchange]);
 
+  // Load and apply ML forecast whenever showMlForecast changes
+  useEffect(() => {
+    if (showMlForecast) {
+      applyMlForecastOverlay();
+    } else {
+      removeMlForecastOverlay();
+    }
+  }, [showMlForecast, forecastHorizon, symbol]);
+
   const loadChartData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Import data service dynamically
       const { fetchChartData } = await import('../services/dataFeed');
       const data = await fetchChartData(symbol, assetType, exchange);
 
       if (seriesRef.current && data.length > 0) {
         seriesRef.current.setData(data);
         
-        // Update price callback
         if (onPriceUpdate && data.length > 0) {
           const latestPrice = data[data.length - 1].close;
           onPriceUpdate(latestPrice);
+        }
+
+        if (showMlForecast) {
+          applyMlForecastOverlay(data);
         }
       }
 
@@ -169,6 +191,87 @@ export function TradingViewChart({
     }
   };
 
+  const applyMlForecastOverlay = async (historicalData?: any[]) => {
+    if (!chartRef.current) return;
+
+    const { fetchChartData } = await import('../services/dataFeed');
+    const data = historicalData || await fetchChartData(symbol, assetType, exchange);
+
+    const fcResult = await getMLPriceForecast(symbol, data, forecastHorizon);
+    setMlData(fcResult);
+
+    removeMlForecastOverlay();
+
+    if (fcResult.forecastPoints.length === 0) return;
+
+    // Last historical candle point for seamless connecting line
+    const lastHistorical = data[data.length - 1];
+    const connectTime = lastHistorical.time as Time;
+    const connectPrice = lastHistorical.close;
+
+    // Forecast Mean Trend Line
+    const trendLine = chartRef.current.addLineSeries({
+      color: '#3b82f6',
+      lineWidth: 2,
+      lineStyle: 2, // Dashed
+      title: 'ML Projected Trend',
+    });
+
+    const upperLine = chartRef.current.addLineSeries({
+      color: '#10b981',
+      lineWidth: 1,
+      lineStyle: 3, // Dotted
+      title: '95% Upper Corridor',
+    });
+
+    const lowerLine = chartRef.current.addLineSeries({
+      color: '#ef4444',
+      lineWidth: 1,
+      lineStyle: 3, // Dotted
+      title: '95% Lower Corridor',
+    });
+
+    const trendPoints = [
+      { time: connectTime, value: connectPrice },
+      ...fcResult.forecastPoints.map(p => ({ time: p.time as Time, value: p.predictedClose }))
+    ];
+
+    const upperPoints = [
+      { time: connectTime, value: connectPrice },
+      ...fcResult.forecastPoints.map(p => ({ time: p.time as Time, value: p.upper95 }))
+    ];
+
+    const lowerPoints = [
+      { time: connectTime, value: connectPrice },
+      ...fcResult.forecastPoints.map(p => ({ time: p.time as Time, value: p.lower95 }))
+    ];
+
+    trendLine.setData(trendPoints);
+    upperLine.setData(upperPoints);
+    lowerLine.setData(lowerPoints);
+
+    mlTrendSeriesRef.current = trendLine;
+    mlUpperSeriesRef.current = upperLine;
+    mlLowerSeriesRef.current = lowerLine;
+  };
+
+  const removeMlForecastOverlay = () => {
+    if (!chartRef.current) return;
+    if (mlTrendSeriesRef.current) {
+      chartRef.current.removeSeries(mlTrendSeriesRef.current);
+      mlTrendSeriesRef.current = null;
+    }
+    if (mlUpperSeriesRef.current) {
+      chartRef.current.removeSeries(mlUpperSeriesRef.current);
+      mlUpperSeriesRef.current = null;
+    }
+    if (mlLowerSeriesRef.current) {
+      chartRef.current.removeSeries(mlLowerSeriesRef.current);
+      mlLowerSeriesRef.current = null;
+    }
+    setMlData(null);
+  };
+
   const updateChartData = async () => {
     try {
       const { fetchLatestCandle } = await import('../services/dataFeed');
@@ -176,7 +279,6 @@ export function TradingViewChart({
 
       if (seriesRef.current && latestCandle) {
         seriesRef.current.update(latestCandle);
-        
         if (onPriceUpdate) {
           onPriceUpdate(latestCandle.close);
         }
@@ -201,8 +303,19 @@ export function TradingViewChart({
           <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
         </div>
       )}
+
+      {/* ML Overlay Badge */}
+      {showMlForecast && mlData && (
+        <div className="absolute top-3 left-3 z-10 flex items-center space-x-2 bg-gray-950/90 border border-blue-500/40 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-md shadow-md">
+          <BrainCircuit className="w-4 h-4 text-blue-400 animate-pulse" />
+          <div>
+            <span className="font-bold text-blue-400">ML Forecast ({mlData.modelType})</span>
+            <span className="text-gray-400 ml-2 font-mono">+{mlData.horizonBars} bars | {mlData.accuracyConfidencePct}% Confidence</span>
+          </div>
+        </div>
+      )}
+
       <div ref={chartContainerRef} style={{ height: `${height}px` }} />
     </div>
   );
 }
-
