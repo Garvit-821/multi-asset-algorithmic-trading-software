@@ -16,6 +16,8 @@ import { AdvancedBacktester } from './components/AdvancedBacktester';
 import { AIMarketIntelligence } from './components/AIMarketIntelligence';
 import { DerivativesOptionsDashboard } from './components/DerivativesOptionsDashboard';
 import { paperTradingService } from './services/paperTradingService';
+import { getGeminiApiKey, setGeminiApiKey } from './services/aiCopilotService';
+
 import {
   UserDashboardSkeleton,
   DashboardSkeleton,
@@ -420,52 +422,40 @@ function App() {
               {currentView === 'settings' && (
                 <div className="h-full overflow-y-auto">
                   <div className="p-4 sm:p-8">
-                    <div className="max-w-3xl">
-                      <h2 className="text-2xl font-bold mb-6 text-gray-900">Settings</h2>
+                    <div className="max-w-3xl space-y-6">
+                      <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+
+                      {/* Account Configuration */}
                       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                         <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Configuration</h3>
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Primary Email Address
-                            </label>
-                            <input
-                              type="email"
-                              value={user.email || ''}
-                              disabled
-                              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none"
-                            />
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Primary Email Address</label>
+                            <input type="email" value={user.email || ''} disabled className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none" />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Telegram Chat ID (Alert Notifications)
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. 582910482"
-                              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Telegram Chat ID (Alert Notifications)</label>
+                            <input type="text" placeholder="e.g. 582910482" className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none" />
                             <p className="text-xs text-gray-500 mt-2 leading-relaxed">
                               Enter your Telegram chat identifier to receive background price crossing and strategy signals. Get your ID instantly by messaging <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">@userinfobot</span>.
                             </p>
                           </div>
                           <div className="pt-2">
-                            <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">
-                              Save Configurations
-                            </button>
+                            <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">Save Configurations</button>
                           </div>
                         </div>
                       </div>
 
-                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mt-6">
+                      {/* AI Copilot Configuration */}
+                      <GeminiApiKeySettings />
+
+                      {/* Reset Paper Portfolio */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                         <h3 className="text-lg font-semibold mb-2 text-red-600">Reset Paper Portfolio</h3>
                         <p className="text-sm text-gray-500 mb-4">
                           This will permanently clear all simulated positions, order histories, and reset your available virtual paper balance back to $100,000 USD.
                         </p>
-                        <button
-                          onClick={handleResetAccount}
-                          className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm"
-                        >
+                        <button onClick={handleResetAccount} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm">
                           <Trash2 className="w-4 h-4" />
                           <span>Reset Portfolio Account</span>
                         </button>
