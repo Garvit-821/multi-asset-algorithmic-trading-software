@@ -62,6 +62,91 @@ function ViewSkeleton({ view }: { view: string }) {
 }
 
 
+// ─── Gemini API Key Settings Card ────────────────────────────────────────────
+function GeminiApiKeySettings() {
+  const [apiKey, setApiKey] = useState(getGeminiApiKey);
+  const [showKey, setShowKey] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    setGeminiApiKey(apiKey);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleClear = () => {
+    setApiKey('');
+    setGeminiApiKey('');
+  };
+
+  const isConfigured = !!apiKey;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+            <BrainCircuit className="w-5 h-5 text-blue-600" />
+            <span>AI Copilot Configuration</span>
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">Connect Google Gemini AI to power the AI Trading Copilot with real intelligent analysis.</p>
+        </div>
+        {isConfigured && (
+          <span className="flex items-center space-x-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
+            <span>Live AI Active</span>
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Google Gemini API Key</label>
+          <div className="relative">
+            <input
+              type={showKey ? 'text' : 'password'}
+              value={apiKey}
+              onChange={(e) => { setApiKey(e.target.value); setSaved(false); }}
+              placeholder="AIza..."
+              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none pr-20"
+            />
+            <button
+              onClick={() => setShowKey(!showKey)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 font-semibold"
+            >
+              {showKey ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+            Get a free API key at{' '}
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">aistudio.google.com</a>.
+            {' '}The key is stored only in your browser's localStorage — never sent to any server.
+          </p>
+        </div>
+
+        <div className="flex items-center space-x-3 pt-1">
+          <button
+            onClick={handleSave}
+            className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+              saved
+                ? 'bg-green-600 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/10'
+            }`}
+          >
+            {saved ? '✓ Saved!' : 'Save API Key'}
+          </button>
+          {apiKey && (
+            <button onClick={handleClear} className="px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-all">
+              Clear Key
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 type View =
   | 'dashboard'
   | 'trading'
