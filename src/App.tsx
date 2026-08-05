@@ -15,8 +15,12 @@ import { SocialSentiment } from './components/SocialSentiment';
 import { AdvancedBacktester } from './components/AdvancedBacktester';
 import { AIMarketIntelligence } from './components/AIMarketIntelligence';
 import { DerivativesOptionsDashboard } from './components/DerivativesOptionsDashboard';
+import { CommandPalette } from './components/CommandPalette';
+import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
+import { HeaderTickerBar } from './components/HeaderTickerBar';
 import { paperTradingService } from './services/paperTradingService';
 import { getGeminiApiKey, setGeminiApiKey } from './services/aiCopilotService';
+
 
 import {
   UserDashboardSkeleton,
@@ -168,7 +172,10 @@ type View =
 function App() {
   const [currentView, setCurrentView] = useState<View>('landing');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('BTC/USDT');
   const showSkeleton = useViewSkeleton(currentView);
+
 
   const handleResetAccount = () => {
     if (window.confirm('Are you sure you want to reset your paper portfolio to $100,000 USD? All trade history and positions will be cleared.')) {
@@ -212,23 +219,31 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col h-screen overflow-hidden">
+      {/* Top Header Ticker Tape Bar */}
+      <HeaderTickerBar onSelectAsset={(sym) => { setSelectedSymbol(sym); setCurrentView('trading'); }} />
+
       {/* Mobile Top Header (hidden on desktop) */}
-      <header className="flex md:hidden items-center justify-between px-6 py-4 bg-white border-b border-gray-200 shadow-sm z-30">
+      <header className="flex md:hidden items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm z-30">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           <span className="font-extrabold text-lg text-gray-900 tracking-tight">Stratrade</span>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCommandPaletteOpen(true)}
+            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 text-xs font-bold flex items-center space-x-1"
+          >
+            <Sparkles className="w-4 h-4 text-blue-600" />
+          </button>
           <a
             href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1 px-3 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg"
+            className="flex items-center space-x-1 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg"
           >
             <Github className="w-3.5 h-3.5 text-amber-400" />
-            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
           </a>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -252,22 +267,36 @@ function App() {
         <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50 fixed inset-y-0 left-0 transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           } md:translate-x-0 md:relative transition-transform duration-300 ease-in-out h-full`}>
 
-          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/10">
-                <TrendingUp className="w-6 h-6 text-white" />
+          <div className="p-4 border-b border-gray-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/10">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">Stratrade</h1>
+                  <p className="text-xs text-gray-500">Trading Platform</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Stratrade</h1>
-                <p className="text-xs text-gray-500">Trading Platform</p>
-              </div>
+
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 md:hidden"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
+            {/* Command Palette Trigger Button */}
             <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 md:hidden"
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full px-3 py-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 rounded-xl text-slate-600 hover:text-blue-700 font-semibold text-xs transition-all flex items-center justify-between group"
             >
-              <X className="w-5 h-5" />
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-blue-600 group-hover:scale-110 transition-transform" />
+                <span>Search / Commands</span>
+              </div>
+              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded font-mono shadow-2xs">Ctrl K</kbd>
             </button>
           </div>
 
@@ -422,7 +451,7 @@ function App() {
                   <UserDashboard />
                 </div>
               )}
-              {currentView === 'trading' && <MarketDashboard />}
+              {currentView === 'trading' && <MarketDashboard initialSymbol={selectedSymbol} />}
               {currentView === 'paper' && (
                 <div className="h-full overflow-y-auto">
                   <div className="p-4 sm:p-8">
@@ -552,8 +581,18 @@ function App() {
             </div>
           )}
         </main>
-
       </div>
+
+      {/* Global Command Palette (Ctrl+K / Cmd+K) */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onNavigate={(v) => setCurrentView(v as View)}
+        onSelectAsset={(sym) => setSelectedSymbol(sym)}
+      />
+
+      {/* Global Floating AI Copilot Drawer (Bottom Right) */}
+      <FloatingAICopilotDrawer />
     </div>
   );
 }

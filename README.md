@@ -701,7 +701,12 @@ bash setup-android.sh
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
-*   **Phase 2 Release - AI Quantitative Analytics & Derivatives Models**:
+*   **Google Gemini 2.0 Flash AI & Institutional UX Release**:
+    *   **Real AI Copilot Integration (`aiCopilotService.ts`, `App.tsx`, `AIMarketIntelligence.tsx`)**: Replaced keyword rules with live Google Gemini 2.0 Flash REST API integration. Injects live portfolio snapshot (positions, unrealized PnL, cash, order history) as system prompt context with 20-turn rolling history. Added secure `localStorage` API key storage in Settings.
+    *   **Global Command Palette (`CommandPalette.tsx`)**: Omnipresent keyboard spotlight search (`Ctrl + K` / `Cmd + K`) for instant view jumping, asset selection (`BTC`, `ETH`, `SOL`, `AAPL`, `NVDA`, `GOLD`), and quick trading actions.
+    *   **Floating AI Copilot Drawer (`FloatingAICopilotDrawer.tsx`)**: Persistent bottom-right floating widget allowing traders to query Gemini AI from any screen without losing context.
+    *   **Live Header Ticker Bar (`HeaderTickerBar.tsx`)**: Top header tick tape displaying live price quotes, mini sparkline indicators, and one-click asset switching.
+    *   **Mobile-Responsive Derivatives Selectors (`DerivativesOptionsDashboard.tsx`)**: Native dropdown selectors for asset switching and option module tabs on small screens.
     *   **Black-Scholes Options Calculator & Derivatives Dashboard (`DerivativesOptionsDashboard.tsx`, `blackScholesEngine.ts`)**: Theoretical call/put option valuation, real-time Options Greeks ($\Delta, \Gamma, \Theta, \nu, \rho$), Newton-Raphson IV solver, institutional option chain matrix, multi-leg payoff diagrams (Straddles, Iron Condors, Spreads), and 2D Implied Volatility (IV) surface heatmaps.
     *   **Machine Learning Price Forecasting & Chart Overlays (`mlForecastingService.ts`, `ml_service.py`, `TradingViewChart.tsx`)**: FastAPI Python backend microservice delivering PyTorch/LSTM price horizon predictions with 80%/95% confidence corridor bands overlaid directly on TradingView charts.
     *   **High-Fidelity Granular Backtest Engine (`backtestEngine.ts`, `AdvancedBacktester.tsx`)**: VIP Maker/Taker fee structure tiers, dynamic order-size liquidity impact slippage, network execution latency drift (ms), and intra-bar tick synthesis mode for high-frequency stop loss / take profit verification.

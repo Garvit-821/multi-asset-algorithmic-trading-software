@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Sparkles, X, Send, Zap, ChevronDown, Minimize2, ArrowUpRight } from 'lucide-react';
+import { Bot, Sparkles, X, Send, ChevronDown, Minimize2 } from 'lucide-react';
 import { aiCopilotService, CopilotMessage, getGeminiApiKey } from '../services/aiCopilotService';
 
 export function FloatingAICopilotDrawer() {
