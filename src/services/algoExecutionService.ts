@@ -36,7 +36,7 @@ export interface AlgoOrderConfig {
   limitPrice?: number; // Optional limit price threshold
   
   sliceLogs: SliceLog[];
-  timerId?: any;
+  timerId?: ReturnType<typeof setInterval>;
 }
 
 type Listener = (orders: AlgoOrderConfig[]) => void;

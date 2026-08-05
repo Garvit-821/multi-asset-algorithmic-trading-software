@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Bot,
   BrainCircuit,
@@ -59,11 +59,32 @@ export function AIMarketIntelligence() {
   const [optSummary, setOptSummary] = useState<GridOptimizationSummary | null>(null);
   const [optLoading, setOptLoading] = useState(false);
 
-  // Initial load
-  useEffect(() => {
-    setCorrelationData(generateCrossAssetCorrelationMatrix());
-    handleRunOptimizer('rsi', 'BTC/USDT');
-  }, []);
+  // Run Grid Search Optimization
+  const handleRunOptimizer = useCallback(async (stratType = optStrategy, sym = optSymbol) => {
+    setOptLoading(true);
+    try {
+      const res = await runGridSearchOptimization({
+        symbol: sym,
+        assetType: 'crypto',
+        strategyType: stratType,
+        initialCapital: 10000,
+        paramRanges: stratType === 'rsi'
+          ? [
+              { name: 'RSI Period', key: 'period', min: 8, max: 24, step: 2 },
+              { name: 'Oversold Level', key: 'oversold', min: 20, max: 40, step: 5 }
+            ]
+          : [
+              { name: 'Fast EMA', key: 'fast', min: 5, max: 15, step: 2 },
+              { name: 'Slow EMA', key: 'slow', min: 20, max: 40, step: 5 }
+            ]
+      });
+      setOptSummary(res);
+    } catch (err) {
+      console.error('Optimizer error:', err);
+    } finally {
+      setOptLoading(false);
+    }
+  }, [optStrategy, optSymbol]);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,7 +109,7 @@ export function AIMarketIntelligence() {
     try {
       const response = await aiCopilotService.processQuery(q);
       setMessages(prev => [...prev, response]);
-    } catch (e) {
+    } catch (_err) {
       setMessages(prev => [...prev, {
         id: `err-${Date.now()}`,
         sender: 'assistant',
@@ -105,32 +126,11 @@ export function AIMarketIntelligence() {
     setCorrelationData(generateCrossAssetCorrelationMatrix());
   };
 
-  // Run Grid Search Optimization
-  const handleRunOptimizer = async (stratType = optStrategy, sym = optSymbol) => {
-    setOptLoading(true);
-    try {
-      const res = await runGridSearchOptimization({
-        symbol: sym,
-        assetType: 'crypto',
-        strategyType: stratType,
-        initialCapital: 10000,
-        paramRanges: stratType === 'rsi'
-          ? [
-              { name: 'RSI Period', key: 'period', min: 8, max: 24, step: 2 },
-              { name: 'Oversold Level', key: 'oversold', min: 20, max: 40, step: 5 }
-            ]
-          : [
-              { name: 'Fast EMA', key: 'fast', min: 5, max: 15, step: 2 },
-              { name: 'Slow EMA', key: 'slow', min: 20, max: 40, step: 5 }
-            ]
-      });
-      setOptSummary(res);
-    } catch (e) {
-      console.error('Optimizer error:', e);
-    } finally {
-      setOptLoading(false);
-    }
-  };
+  // Initial load
+  useEffect(() => {
+    setCorrelationData(generateCrossAssetCorrelationMatrix());
+    handleRunOptimizer('rsi', 'BTC/USDT');
+  }, [handleRunOptimizer]);
 
   return (
     <div className="p-3 sm:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 overflow-x-hidden">

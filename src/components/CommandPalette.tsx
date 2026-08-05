@@ -23,7 +23,7 @@ export interface CommandItem {
   title: string;
   subtitle?: string;
   category: 'Navigation' | 'Assets' | 'Quick Actions' | 'Settings';
-  icon: any;
+  icon: React.ElementType;
   action: () => void;
 }
 

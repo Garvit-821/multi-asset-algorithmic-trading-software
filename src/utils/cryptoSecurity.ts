@@ -77,7 +77,7 @@ export async function decryptData<T>(encryptedBase64: string, passphrase: string
 
     const dec = new TextDecoder();
     return JSON.parse(dec.decode(decryptedContent)) as T;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Invalid passphrase or corrupted encrypted credentials');
   }
 }
@@ -97,12 +97,8 @@ export async function loadDecryptedCredentials<T>(passphrase: string): Promise<T
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
 
-  try {
-    const record: SavedExchangeCredentials = JSON.parse(raw);
-    return await decryptData<T>(record.encrypted, passphrase);
-  } catch (error) {
-    throw error;
-  }
+  const record: SavedExchangeCredentials = JSON.parse(raw);
+  return await decryptData<T>(record.encrypted, passphrase);
 }
 
 // Check if encrypted credentials exist in storage

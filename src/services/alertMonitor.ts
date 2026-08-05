@@ -45,8 +45,7 @@ export async function checkAndTriggerAlerts(): Promise<void> {
       // Fetch current price
       const latestCandle = await fetchLatestCandle(
         alert.symbol,
-        alert.asset_type,
-        alert.exchange
+        alert.asset_type
       );
 
       if (!latestCandle || !latestCandle.close) {

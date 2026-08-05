@@ -68,11 +68,7 @@ async function fetchBinanceCandles(
 }
 
 // Fetch real candlestick data from alternative sources for non-crypto assets
-async function fetchAlternativeCandles(
-  _symbol: string,
-  _assetType: AssetType,
-  _count: number
-): Promise<CandleData[]> {
+async function fetchAlternativeCandles(): Promise<CandleData[]> {
   // For now, return empty array for non-crypto
   // These would require specific APIs (e.g., forex.com for forex, etc.)
   return [];
@@ -159,7 +155,7 @@ export async function fetchChartData(
       }
     } else {
       // For non-crypto assets, use alternative APIs (implement as needed)
-      candles = await fetchAlternativeCandles(symbol, assetType, 200);
+      candles = await fetchAlternativeCandles();
       // If no alternative API available, generate minimal mock data as fallback
       if (candles.length === 0) {
         console.warn(`No API available for ${assetType}, using fallback`);
@@ -210,8 +206,7 @@ export async function fetchChartData(
 // Fetch latest candle for real-time updates
 export async function fetchLatestCandle(
   symbol: string,
-  assetType: AssetType,
-  _exchange?: string
+  assetType: AssetType
 ): Promise<CandleData | null> {
   try {
     if (assetType === 'crypto') {

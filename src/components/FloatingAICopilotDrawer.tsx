@@ -44,7 +44,7 @@ export function FloatingAICopilotDrawer() {
     try {
       const res = await aiCopilotService.processQuery(q);
       setMessages(prev => [...prev, res]);
-    } catch (e) {
+    } catch (_e) {
       setMessages(prev => [...prev, {
         id: `err-${Date.now()}`,
         sender: 'assistant',

@@ -59,7 +59,7 @@ export async function getMLPriceForecast(
         source: 'python_fastapi'
       };
     }
-  } catch (_err) {
+  } catch {
     // Silent fallback to client-side ML engine
   }
 

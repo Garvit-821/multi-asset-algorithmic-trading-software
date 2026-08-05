@@ -275,7 +275,7 @@ export function TradingViewChart({
   const updateChartData = async () => {
     try {
       const { fetchLatestCandle } = await import('../services/dataFeed');
-      const latestCandle = await fetchLatestCandle(symbol, assetType, exchange);
+      const latestCandle = await fetchLatestCandle(symbol, assetType);
 
       if (seriesRef.current && latestCandle) {
         seriesRef.current.update(latestCandle);

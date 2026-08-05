@@ -137,8 +137,8 @@ async function callGeminiAPI(
   });
 
   if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    const msg = (err as any)?.error?.message || `HTTP ${response.status}`;
+    const err = await response.json().catch(() => ({})) as { error?: { message?: string } };
+    const msg = err?.error?.message || `HTTP ${response.status}`;
     throw new Error(msg);
   }
 
@@ -179,8 +179,9 @@ class AICopilotService {
           text: aiText,
           isLiveAI: true,
         };
-      } catch (err: any) {
-        if (err.message === 'NO_API_KEY') {
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (errMsg === 'NO_API_KEY') {
           // Should not reach here, but fall through to rule-based
         } else {
           // Return the error as a chat message
@@ -188,7 +189,7 @@ class AICopilotService {
             id: `err-${Date.now()}`,
             sender: 'assistant',
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            text: `⚠️ **Gemini API Error**: ${err.message}\n\nPlease check your API key in Settings or try again.`,
+            text: `⚠️ **Gemini API Error**: ${errMsg}\n\nPlease check your API key in Settings or try again.`,
             isLiveAI: false,
           };
         }

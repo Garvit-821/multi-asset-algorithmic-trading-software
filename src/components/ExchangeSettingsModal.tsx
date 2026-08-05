@@ -55,7 +55,7 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
       }
       setIsUnlocked(true);
       setSuccessMessage('Vault unlocked successfully. Credentials loaded in memory.');
-    } catch (err: any) {
+    } catch (_err) {
       setErrorMessage('Invalid passphrase or failed to decrypt credentials.');
     } finally {
       setLoading(false);
@@ -75,7 +75,7 @@ export function ExchangeSettingsModal({ isOpen, onClose }: ExchangeSettingsModal
       setIsUnlocked(true);
       setHasEncrypted(true);
       setSuccessMessage('API Keys securely encrypted (AES-GCM 256-bit) and stored.');
-    } catch (err: any) {
+    } catch (_err) {
       setErrorMessage('Failed to encrypt and save credentials.');
     } finally {
       setLoading(false);
