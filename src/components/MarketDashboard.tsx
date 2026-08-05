@@ -10,9 +10,19 @@ import { ExchangeSettingsModal } from './ExchangeSettingsModal';
 
 type TerminalViewTab = 'standard' | 'dom' | 'algo';
 
-export function MarketDashboard() {
+interface MarketDashboardProps {
+  initialSymbol?: string;
+}
+
+export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
   const [activeMarket, setActiveMarket] = useState<AssetType>('crypto');
-  const [selectedSymbol, setSelectedSymbol] = useState('BTC/USDT');
+  const [selectedSymbol, setSelectedSymbol] = useState(initialSymbol || 'BTC/USDT');
+
+  useEffect(() => {
+    if (initialSymbol) {
+      setSelectedSymbol(initialSymbol);
+    }
+  }, [initialSymbol]);
   const [selectedExchange, setSelectedExchange] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string; exchange?: string }>>([]);
