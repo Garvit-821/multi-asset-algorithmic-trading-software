@@ -25,7 +25,8 @@ import {
   YAxis,
   CartesianGrid
 } from 'recharts';
-import { aiCopilotService, CopilotMessage } from '../services/aiCopilotService';
+import { aiCopilotService, CopilotMessage, getGeminiApiKey } from '../services/aiCopilotService';
+
 import { generateCrossAssetCorrelationMatrix, CorrelationMatrixData } from '../services/correlationService';
 import { runGridSearchOptimization, GridOptimizationSummary } from '../services/gridSearchOptimizer';
 
@@ -45,7 +46,9 @@ export function AIMarketIntelligence() {
   ]);
   const [inputQuery, setInputQuery] = useState('');
   const [copilotLoading, setCopilotLoading] = useState(false);
+  const [hasLiveAI, setHasLiveAI] = useState(!!getGeminiApiKey());
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
 
   // Tab 2: Correlation Matrix State
   const [correlationData, setCorrelationData] = useState<CorrelationMatrixData | null>(null);
@@ -227,16 +230,34 @@ export function AIMarketIntelligence() {
               </div>
             </div>
 
-            {/* AI Assistant Status */}
-            <div className="bg-blue-50/60 border border-blue-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-3">
-              <div className="flex items-center space-x-2 text-blue-700 font-bold text-xs">
-                <Zap className="w-4 h-4 shrink-0" />
-                <span>Live Portfolio Integration Active</span>
+            {/* AI Status / Setup Banner */}
+            {!hasLiveAI ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-3">
+                <div className="flex items-center space-x-2 text-amber-700 font-bold text-xs">
+                  <Zap className="w-4 h-4 shrink-0" />
+                  <span>Rule-Based Mode Active</span>
+                </div>
+                <p className="text-xs text-amber-900/80 leading-relaxed">
+                  Add your <strong>Google Gemini API key</strong> in <strong>Settings → AI Copilot Configuration</strong> to unlock real-time intelligent analysis powered by Gemini 2.0 Flash.
+                </p>
+                <button
+                  onClick={() => { setHasLiveAI(!!getGeminiApiKey()); }}
+                  className="text-xs font-bold text-amber-700 underline"
+                >
+                  Check again
+                </button>
               </div>
-              <p className="text-xs text-blue-900/80 leading-relaxed">
-                The AI Copilot evaluates position balances, average entry costs, order execution logs, and live tick prices to generate actionable insights.
-              </p>
-            </div>
+            ) : (
+              <div className="bg-purple-50/60 border border-purple-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-3">
+                <div className="flex items-center space-x-2 text-purple-700 font-bold text-xs">
+                  <Zap className="w-4 h-4 shrink-0" />
+                  <span>Gemini 2.0 Flash Connected</span>
+                </div>
+                <p className="text-xs text-purple-900/80 leading-relaxed">
+                  Real AI analysis is active. The copilot has full visibility of your live portfolio positions, cash balance, and order history.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Conversational Chat Window */}
@@ -249,12 +270,22 @@ export function AIMarketIntelligence() {
                 </div>
                 <div>
                   <h3 className="text-xs sm:text-sm font-bold text-gray-900">Stratrade AI Copilot</h3>
-                  <span className="text-[10px] text-green-600 font-bold flex items-center space-x-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
-                    <span>Connected to Portfolio Engine</span>
-                  </span>
+                  {hasLiveAI ? (
+                    <span className="text-[10px] text-purple-600 font-bold flex items-center space-x-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse inline-block" />
+                      <span>Powered by Gemini 2.0 Flash</span>
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-green-600 font-bold flex items-center space-x-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
+                      <span>Connected to Portfolio Engine</span>
+                    </span>
+                  )}
                 </div>
               </div>
+              {hasLiveAI && (
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded-full border border-purple-200">✨ Live AI</span>
+              )}
             </div>
 
             {/* Chat Stream Messages */}
@@ -275,7 +306,12 @@ export function AIMarketIntelligence() {
                       <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
                         {msg.sender === 'user' ? 'You' : 'AI Copilot'}
                       </span>
-                      <span className="text-[10px] opacity-60 font-mono">{msg.timestamp}</span>
+                      <div className="flex items-center space-x-2">
+                        {msg.isLiveAI && (
+                          <span className="text-[9px] font-bold text-purple-500 bg-purple-100 px-1.5 py-0.5 rounded-full">Gemini</span>
+                        )}
+                        <span className="text-[10px] opacity-60 font-mono">{msg.timestamp}</span>
+                      </div>
                     </div>
 
                     <div className="text-xs leading-relaxed whitespace-pre-line font-sans">

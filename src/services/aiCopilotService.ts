@@ -53,7 +53,7 @@ function buildSystemPrompt(portfolio: Portfolio): string {
 
   const orders = portfolio.orders
     .slice(0, 10)
-    .map(o => `  - ${o.type} ${o.quantity} ${o.symbol} @ $${o.price} on ${new Date(o.timestamp).toLocaleDateString()}`)
+    .map(o => `  - ${o.type} ${o.quantity} ${o.symbol} @ $${o.price} on ${new Date(o.date).toLocaleDateString()}`)
     .join('\n');
 
   const totalPositionValue = portfolio.positions.reduce((sum, p) => {
