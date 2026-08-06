@@ -35,18 +35,7 @@ export const PaperTrading: React.FC = () => {
   const [mcDays, setMcDays] = useState<number>(30);
   const [mcThreshold, setMcThreshold] = useState<number>(75000); // 25% drawdown threshold
 
-  useEffect(() => {
-    updatePrices();
-    
-    // Periodically update live prices of assets in our positions
-    const priceInterval = setInterval(() => {
-      updatePrices();
-    }, 15000);
-
-    return () => clearInterval(priceInterval);
-  }, [portfolio.positions]);
-
-  const updatePrices = async () => {
+  const updatePrices = useCallback(async () => {
     if (portfolio.positions.length === 0) return;
     setUpdating(true);
 
@@ -72,7 +61,7 @@ export const PaperTrading: React.FC = () => {
 
     setLivePrices(prev => ({ ...prev, ...priceUpdates }));
     setUpdating(false);
-  };
+  }, [portfolio.positions]);
 
 
 
@@ -212,9 +201,9 @@ export const PaperTrading: React.FC = () => {
     );
 
     // Format results for recharts (graph first 3 individual paths alongside percentiles)
-    const formattedData = [];
+    const formattedData: Record<string, number | string>[] = [];
     for (let d = 0; d <= mcDays; d++) {
-      const point: any = { day: `Day ${d}` };
+      const point: Record<string, number | string> = { day: `Day ${d}` };
       point['P95 (Upside)'] = Math.round(results.percentiles.p95[d]);
       point['P50 (Median)'] = Math.round(results.percentiles.p50[d]);
       point['P5 (Downside)'] = Math.round(results.percentiles.p5[d]);

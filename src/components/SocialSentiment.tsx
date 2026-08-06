@@ -38,7 +38,7 @@ const MOCK_AUTHORS = ['CryptoWhale', 'AlphaTrader', 'QuantGod', 'BlockChaser', '
 export function SocialSentiment() {
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [fearGreedIndex, setFearGreedIndex] = useState<number>(55);
-  const [rollingSentiment, setRollingSentiment] = useState<any[]>([]);
+  const [rollingSentiment, setRollingSentiment] = useState<{ tick: number; score: number }[]>([]);
   
   // Alert settings
   const [alertRules, setAlertRules] = useState<SentimentAlertRule[]>([]);
@@ -47,6 +47,39 @@ export function SocialSentiment() {
   const [telegramChatId, setTelegramChatId] = useState<string>('');
   
   const [triggerLog, setTriggerLog] = useState<string[]>([]);
+
+  const evaluateAlerts = useCallback(async (_post: SocialPost, currentAvg: number) => {
+    for (const rule of alertRules) {
+      if (!rule.active) continue;
+
+      let triggered = false;
+      if (rule.direction === 'below' && currentAvg < rule.threshold) {
+        triggered = true;
+      } else if (rule.direction === 'above' && currentAvg > rule.threshold) {
+        triggered = true;
+      }
+
+      if (triggered) {
+        const msg = `⚠️ SENTIMENT ALERT: Social Sentiment Score crossed ${rule.direction} ${rule.threshold}! Current score: ${currentAvg.toFixed(2)}`;
+        setTriggerLog(prev => [msg, ...prev.slice(0, 10)]);
+
+        // Dispatch alert to Telegram
+        if (rule.telegramChatId) {
+          try {
+            await sendTelegramAlert(rule.telegramChatId, {
+              symbol: 'SENTIMENT',
+              assetType: 'crypto',
+              alertType: 'sentiment',
+              currentPrice: currentAvg,
+              message: msg
+            });
+          } catch (e) {
+            console.error('Telegram sentiment dispatch failed', e);
+          }
+        }
+      }
+    }
+  }, [alertRules]);
 
   // Initialize and run polling feed
   useEffect(() => {
@@ -92,7 +125,7 @@ export function SocialSentiment() {
     }, 4000);
 
     return () => clearInterval(feedInterval);
-  }, [alertRules]);
+  }, [evaluateAlerts]);
 
   const generateRandomPost = (): SocialPost => {
     const templateIdx = Math.floor(Math.random() * SAMPLE_POST_TEMPLATES.length);
@@ -131,38 +164,7 @@ export function SocialSentiment() {
     setAlertRules(alertRules.filter(r => r.id !== id));
   };
 
-  const evaluateAlerts = async (_post: SocialPost, currentAvg: number) => {
-    for (const rule of alertRules) {
-      if (!rule.active) continue;
 
-      let triggered = false;
-      if (rule.direction === 'below' && currentAvg < rule.threshold) {
-        triggered = true;
-      } else if (rule.direction === 'above' && currentAvg > rule.threshold) {
-        triggered = true;
-      }
-
-      if (triggered) {
-        const msg = `⚠️ SENTIMENT ALERT: Social Sentiment Score crossed ${rule.direction} ${rule.threshold}! Current score: ${currentAvg.toFixed(2)}`;
-        setTriggerLog(prev => [msg, ...prev.slice(0, 10)]);
-
-        // Dispatch alert to Telegram
-        if (rule.telegramChatId) {
-          try {
-            await sendTelegramAlert(rule.telegramChatId, {
-              symbol: 'SENTIMENT',
-              assetType: 'crypto',
-              alertType: 'sentiment',
-              currentPrice: currentAvg,
-              message: msg
-            });
-          } catch (e) {
-            console.error('Telegram sentiment dispatch failed', e);
-          }
-        }
-      }
-    }
-  };
 
   const getFearGreedText = (idx: number) => {
     if (idx < 25) return { label: 'EXTREME FEAR', color: 'text-red-600 bg-red-50 border-red-200' };

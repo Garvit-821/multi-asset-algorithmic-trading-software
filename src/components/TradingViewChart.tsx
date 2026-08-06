@@ -169,48 +169,28 @@ export function TradingViewChart({
     };
   }, [symbol, assetType, exchange]);
 
-  // Load and apply ML forecast whenever showMlForecast changes
-  useEffect(() => {
-    if (showMlForecast) {
-      applyMlForecastOverlay();
-    } else {
-      removeMlForecastOverlay();
+  const removeMlForecastOverlay = useCallback(() => {
+    if (!chartRef.current) return;
+    if (mlTrendSeriesRef.current) {
+      chartRef.current.removeSeries(mlTrendSeriesRef.current);
+      mlTrendSeriesRef.current = null;
     }
-  }, [showMlForecast, forecastHorizon, symbol]);
-
-  const loadChartData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { fetchChartData } = await import('../services/dataFeed');
-      const data = await fetchChartData(symbol, assetType, exchange);
-
-      if (seriesRef.current && data.length > 0) {
-        seriesRef.current.setData(data);
-        
-        if (onPriceUpdate && data.length > 0) {
-          const latestPrice = data[data.length - 1].close;
-          onPriceUpdate(latestPrice);
-        }
-
-        if (showMlForecast) {
-          applyMlForecastOverlay(data);
-        }
-      }
-
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load chart data');
-      setLoading(false);
+    if (mlUpperSeriesRef.current) {
+      chartRef.current.removeSeries(mlUpperSeriesRef.current);
+      mlUpperSeriesRef.current = null;
     }
-  };
+    if (mlLowerSeriesRef.current) {
+      chartRef.current.removeSeries(mlLowerSeriesRef.current);
+      mlLowerSeriesRef.current = null;
+    }
+    setMlData(null);
+  }, []);
 
-  const applyMlForecastOverlay = async (historicalData?: any[]) => {
+  const applyMlForecastOverlay = useCallback(async (historicalData?: unknown[]) => {
     if (!chartRef.current) return;
 
     const { fetchChartData } = await import('../services/dataFeed');
-    const data = historicalData || await fetchChartData(symbol, assetType, exchange);
+    const data = (historicalData as any[]) || await fetchChartData(symbol, assetType, exchange);
 
     const fcResult = await getMLPriceForecast(symbol, data, forecastHorizon);
     setMlData(fcResult);
@@ -219,30 +199,28 @@ export function TradingViewChart({
 
     if (fcResult.forecastPoints.length === 0) return;
 
-    // Last historical candle point for seamless connecting line
     const lastHistorical = data[data.length - 1];
     const connectTime = lastHistorical.time as Time;
     const connectPrice = lastHistorical.close;
 
-    // Forecast Mean Trend Line
     const trendLine = chartRef.current.addLineSeries({
       color: '#3b82f6',
       lineWidth: 2,
-      lineStyle: 2, // Dashed
+      lineStyle: 2,
       title: 'ML Projected Trend',
     });
 
     const upperLine = chartRef.current.addLineSeries({
       color: '#10b981',
       lineWidth: 1,
-      lineStyle: 3, // Dotted
+      lineStyle: 3,
       title: '95% Upper Corridor',
     });
 
     const lowerLine = chartRef.current.addLineSeries({
       color: '#ef4444',
       lineWidth: 1,
-      lineStyle: 3, // Dotted
+      lineStyle: 3,
       title: '95% Lower Corridor',
     });
 
@@ -268,26 +246,38 @@ export function TradingViewChart({
     mlTrendSeriesRef.current = trendLine;
     mlUpperSeriesRef.current = upperLine;
     mlLowerSeriesRef.current = lowerLine;
-  };
+  }, [symbol, assetType, exchange, forecastHorizon, removeMlForecastOverlay]);
 
-  const removeMlForecastOverlay = () => {
-    if (!chartRef.current) return;
-    if (mlTrendSeriesRef.current) {
-      chartRef.current.removeSeries(mlTrendSeriesRef.current);
-      mlTrendSeriesRef.current = null;
-    }
-    if (mlUpperSeriesRef.current) {
-      chartRef.current.removeSeries(mlUpperSeriesRef.current);
-      mlUpperSeriesRef.current = null;
-    }
-    if (mlLowerSeriesRef.current) {
-      chartRef.current.removeSeries(mlLowerSeriesRef.current);
-      mlLowerSeriesRef.current = null;
-    }
-    setMlData(null);
-  };
+  const loadChartData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const updateChartData = async () => {
+      const { fetchChartData } = await import('../services/dataFeed');
+      const data = await fetchChartData(symbol, assetType, exchange);
+
+      if (seriesRef.current && data.length > 0) {
+        seriesRef.current.setData(data);
+        
+        if (onPriceUpdate && data.length > 0) {
+          const latestPrice = data[data.length - 1].close;
+          onPriceUpdate(latestPrice);
+        }
+
+        if (showMlForecast) {
+          applyMlForecastOverlay(data);
+        }
+      }
+
+      setLoading(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load chart data';
+      setError(message);
+      setLoading(false);
+    }
+  }, [symbol, assetType, exchange, onPriceUpdate, showMlForecast, applyMlForecastOverlay]);
+
+  const updateChartData = useCallback(async () => {
     try {
       const { fetchLatestCandle } = await import('../services/dataFeed');
       const latestCandle = await fetchLatestCandle(symbol, assetType);
@@ -301,7 +291,20 @@ export function TradingViewChart({
     } catch (err) {
       console.error('Failed to update chart:', err);
     }
-  };
+  }, [symbol, assetType, onPriceUpdate]);
+
+  useEffect(() => {
+    loadChartData();
+  }, [loadChartData]);
+
+  // Load and apply ML forecast whenever showMlForecast changes
+  useEffect(() => {
+    if (showMlForecast) {
+      applyMlForecastOverlay();
+    } else {
+      removeMlForecastOverlay();
+    }
+  }, [showMlForecast, applyMlForecastOverlay, removeMlForecastOverlay]);
 
   if (error) {
     return (

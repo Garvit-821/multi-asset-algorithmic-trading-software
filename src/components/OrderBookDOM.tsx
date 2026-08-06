@@ -25,82 +25,8 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
   const [sellWall, setSellWall] = useState<OrderBookLevel | null>(null);
   const [buyWall, setBuyWall] = useState<OrderBookLevel | null>(null);
 
-  useEffect(() => {
-    let ws: WebSocket | null = null;
-    let fallbackInterval: NodeJS.Timeout | null = null;
-
-    if (assetType === 'crypto') {
-      const cleanSymbol = symbol.replace('/', '').toLowerCase();
-      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cleanSymbol}@depth10@100ms`);
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.bids && data.asks) {
-            processBinanceDepth(data.bids, data.asks);
-          }
-        } catch (err) {
-          console.error('Error parsing Binance L2 depth frame:', err);
-        }
-      };
-
-      ws.onerror = () => {
-        setupSimulationFallback();
-      };
-    } else {
-      setupSimulationFallback();
-    }
-
-    function setupSimulationFallback() {
-      if (fallbackInterval) clearInterval(fallbackInterval);
-      fallbackInterval = setInterval(() => {
-        generateSimulatedDOM();
-      }, 800);
-      generateSimulatedDOM();
-    }
-
-    return () => {
-      if (ws) ws.close();
-      if (fallbackInterval) clearInterval(fallbackInterval);
-    };
-  }, [symbol, assetType, currentPrice]);
-
-  // Process Binance Depth Stream
-  const processBinanceDepth = (rawBids: string[][], rawAsks: string[][]) => {
-    const parsedBids = rawBids.slice(0, 10).map(([p, s]) => ({ price: parseFloat(p), size: parseFloat(s) }));
-    const parsedAsks = rawAsks.slice(0, 10).map(([p, s]) => ({ price: parseFloat(p), size: parseFloat(s) }));
-
-    computeOrderBookLevels(parsedBids, parsedAsks);
-  };
-
-  // Generate simulated DOM for non-crypto or fallback assets
-  const generateSimulatedDOM = () => {
-    const basePrice = currentPrice || 50000;
-    const tick = basePrice * 0.0005;
-
-    const parsedBids: { price: number; size: number }[] = [];
-    const parsedAsks: { price: number; size: number }[] = [];
-
-    for (let i = 1; i <= 10; i++) {
-      const bidPrice = Number((basePrice - i * tick).toFixed(2));
-      const askPrice = Number((basePrice + i * tick).toFixed(2));
-
-      // Random sizes with occasional wall spikes
-      const isBidSpike = i === 4;
-      const isAskSpike = i === 6;
-
-      const bidSize = isBidSpike ? Number((Math.random() * 8 + 15).toFixed(3)) : Number((Math.random() * 2 + 0.1).toFixed(3));
-      const askSize = isAskSpike ? Number((Math.random() * 8 + 15).toFixed(3)) : Number((Math.random() * 2 + 0.1).toFixed(3));
-
-      parsedBids.push({ price: bidPrice, size: bidSize });
-      parsedAsks.push({ price: askPrice, size: askSize });
-    }
-
-    computeOrderBookLevels(parsedBids, parsedAsks);
-  };
-
   // Compute cumulative depth, wall density, and liquidity imbalance
-  const computeOrderBookLevels = (
+  const computeOrderBookLevels = useCallback((
     parsedBids: { price: number; size: number }[],
     parsedAsks: { price: number; size: number }[]
   ) => {
@@ -134,7 +60,6 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
       };
     });
 
-    // Determine max cumulative for depth bars
     const maxTotal = Math.max(cumulativeBidTotal, cumulativeAskTotal) || 1;
 
     calculatedBids.forEach((b) => {
@@ -158,7 +83,6 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
     setBuyWall(detectedBuyWall);
     setSellWall(detectedSellWall);
 
-    // Calculate spread
     if (calculatedAsks.length > 0 && calculatedBids.length > 0) {
       const bestAsk = calculatedAsks[0].price;
       const bestBid = calculatedBids[0].price;
@@ -167,12 +91,86 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
       setSpread({ amount: Number(spreadAmt.toFixed(4)), percentage: Number(spreadPct.toFixed(3)) });
     }
 
-    // Order Imbalance calculation (% Bids vs Asks)
     const grandTotal = cumulativeBidTotal + cumulativeAskTotal;
     if (grandTotal > 0) {
       setImbalancePct(Math.round((cumulativeBidTotal / grandTotal) * 100));
     }
-  };
+  }, []);
+
+  // Process Binance Depth Stream
+  const processBinanceDepth = useCallback((rawBids: string[][], rawAsks: string[][]) => {
+    const parsedBids = rawBids.slice(0, 10).map(([p, s]) => ({ price: parseFloat(p), size: parseFloat(s) }));
+    const parsedAsks = rawAsks.slice(0, 10).map(([p, s]) => ({ price: parseFloat(p), size: parseFloat(s) }));
+
+    computeOrderBookLevels(parsedBids, parsedAsks);
+  }, [computeOrderBookLevels]);
+
+  // Generate simulated DOM for non-crypto or fallback assets
+  const generateSimulatedDOM = useCallback(() => {
+    const basePrice = currentPrice || 50000;
+    const tick = basePrice * 0.0005;
+
+    const parsedBids: { price: number; size: number }[] = [];
+    const parsedAsks: { price: number; size: number }[] = [];
+
+    for (let i = 1; i <= 10; i++) {
+      const bidPrice = Number((basePrice - i * tick).toFixed(2));
+      const askPrice = Number((basePrice + i * tick).toFixed(2));
+
+      const isBidSpike = i === 4;
+      const isAskSpike = i === 6;
+
+      const bidSize = isBidSpike ? Number((Math.random() * 8 + 15).toFixed(3)) : Number((Math.random() * 2 + 0.1).toFixed(3));
+      const askSize = isAskSpike ? Number((Math.random() * 8 + 15).toFixed(3)) : Number((Math.random() * 2 + 0.1).toFixed(3));
+
+      parsedBids.push({ price: bidPrice, size: bidSize });
+      parsedAsks.push({ price: askPrice, size: askSize });
+    }
+
+    computeOrderBookLevels(parsedBids, parsedAsks);
+  }, [currentPrice, computeOrderBookLevels]);
+
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    let fallbackInterval: NodeJS.Timeout | null = null;
+
+    function setupSimulationFallback() {
+      if (fallbackInterval) clearInterval(fallbackInterval);
+      fallbackInterval = setInterval(() => {
+        generateSimulatedDOM();
+      }, 800);
+      generateSimulatedDOM();
+    }
+
+    if (assetType === 'crypto') {
+      const cleanSymbol = symbol.replace('/', '').toLowerCase();
+      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cleanSymbol}@depth10@100ms`);
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.bids && data.asks) {
+            processBinanceDepth(data.bids, data.asks);
+          }
+        } catch (err) {
+          console.error('Error parsing Binance L2 depth frame:', err);
+        }
+      };
+
+      ws.onerror = () => {
+        setupSimulationFallback();
+      };
+    } else {
+      setupSimulationFallback();
+    }
+
+    return () => {
+      if (ws) ws.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
+  }, [symbol, assetType, currentPrice, generateSimulatedDOM, processBinanceDepth]);
+
+
 
   return (
     <div className="flex flex-col h-[480px] sm:h-[550px] lg:h-full bg-slate-900 text-slate-100 rounded-xl overflow-hidden border border-slate-800 shadow-lg font-mono text-[11px] sm:text-xs select-none">
