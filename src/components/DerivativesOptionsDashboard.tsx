@@ -99,8 +99,6 @@ export function DerivativesOptionsDashboard() {
 
         {/* Asset Selector — dropdown on mobile, pills on sm+ */}
         <div className="self-start md:self-auto">
-        {/* Asset Selector — dropdown on mobile, pills on sm+ */}
-        <div className="self-start md:self-auto">
           {/* Mobile dropdown */}
           <div className="sm:hidden">
             <select
