@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, TrendingUp, Star, Bell, Plus, Minus, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Layers, Zap, Key, LayoutGrid, BrainCircuit } from 'lucide-react';
 import { TradingViewChart, AssetType } from './TradingViewChart';
 import { searchSymbols } from '../services/dataFeed';
