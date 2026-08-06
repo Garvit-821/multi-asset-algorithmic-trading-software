@@ -54,14 +54,14 @@ function useViewSkeleton(view: string, delayMs = 600) {
 /** Pick the right skeleton for the current view */
 function ViewSkeleton({ view }: { view: string }) {
   switch (view) {
-    case 'userfeed':      return <UserDashboardSkeleton />;
-    case 'trading':       return <MarketDashboardSkeleton />;
-    case 'dashboard':     return <DashboardSkeleton />;
-    case 'sentiment':     return <SocialSentimentSkeleton />;
-    case 'replay':        return <MarketReplaySkeleton />;
-    case 'backtest':      return <BacktesterSkeleton />;
-    case 'intelligence':  return <AIMarketIntelligenceSkeleton />;
-    default:              return <div className="p-4 sm:p-8"><GenericPageSkeleton /></div>;
+    case 'userfeed': return <UserDashboardSkeleton />;
+    case 'trading': return <MarketDashboardSkeleton />;
+    case 'dashboard': return <DashboardSkeleton />;
+    case 'sentiment': return <SocialSentimentSkeleton />;
+    case 'replay': return <MarketReplaySkeleton />;
+    case 'backtest': return <BacktesterSkeleton />;
+    case 'intelligence': return <AIMarketIntelligenceSkeleton />;
+    default: return <div className="p-4 sm:p-8"><GenericPageSkeleton /></div>;
   }
 }
 
@@ -131,11 +131,10 @@ function GeminiApiKeySettings() {
         <div className="flex items-center space-x-3 pt-1">
           <button
             onClick={handleSave}
-            className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              saved
+            className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${saved
                 ? 'bg-green-600 text-white'
                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/10'
-            }`}
+              }`}
           >
             {saved ? '✓ Saved!' : 'Save API Key'}
           </button>
@@ -316,8 +315,8 @@ function App() {
                         setMobileMenuOpen(false);
                       }}
                       className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                        ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                         }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -343,8 +342,8 @@ function App() {
                         setMobileMenuOpen(false);
                       }}
                       className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                        ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                         }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -371,8 +370,8 @@ function App() {
                           setMobileMenuOpen(false);
                         }}
                         className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                            ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
                           }`}
                       >
                         <Icon className="w-4 h-4 shrink-0" />
@@ -587,9 +586,8 @@ function App() {
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-2 py-1.5 flex items-center justify-around md:hidden shadow-lg select-none">
         <button
           onClick={() => setCurrentView('userfeed')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
-            currentView === 'userfeed' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
-          }`}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${currentView === 'userfeed' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+            }`}
         >
           <Zap className="w-5 h-5" />
           <span className="text-[10px] mt-0.5 font-medium">Feed</span>
@@ -597,9 +595,8 @@ function App() {
 
         <button
           onClick={() => setCurrentView('trading')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
-            currentView === 'trading' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
-          }`}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${currentView === 'trading' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+            }`}
         >
           <TrendingUp className="w-5 h-5" />
           <span className="text-[10px] mt-0.5 font-medium">Trading</span>
@@ -607,9 +604,8 @@ function App() {
 
         <button
           onClick={() => setCurrentView('paper')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
-            currentView === 'paper' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
-          }`}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${currentView === 'paper' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+            }`}
         >
           <Wallet className="w-5 h-5" />
           <span className="text-[10px] mt-0.5 font-medium">Paper</span>
@@ -617,9 +613,8 @@ function App() {
 
         <button
           onClick={() => setCurrentView('intelligence')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
-            currentView === 'intelligence' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
-          }`}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${currentView === 'intelligence' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+            }`}
         >
           <BrainCircuit className="w-5 h-5" />
           <span className="text-[10px] mt-0.5 font-medium">AI Hub</span>
@@ -627,9 +622,8 @@ function App() {
 
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
-            mobileMenuOpen ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
-          }`}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${mobileMenuOpen ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+            }`}
         >
           <Menu className="w-5 h-5" />
           <span className="text-[10px] mt-0.5 font-medium">Menu</span>

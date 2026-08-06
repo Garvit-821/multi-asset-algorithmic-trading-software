@@ -117,11 +117,10 @@ export function DerivativesOptionsDashboard() {
               <button
                 key={sym}
                 onClick={() => handleSymbolChange(sym)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                  symbol === sym
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${symbol === sym
                     ? 'bg-white text-blue-600 shadow-xs border border-gray-200'
                     : 'text-gray-600 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 {sym}
               </button>
@@ -160,11 +159,10 @@ export function DerivativesOptionsDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${
-                  isActive
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${isActive
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -418,9 +416,8 @@ export function DerivativesOptionsDashboard() {
                   return (
                     <tr
                       key={item.strike}
-                      className={`hover:bg-gray-50/80 transition-colors ${
-                        isAtm ? 'bg-amber-50/60 font-bold' : ''
-                      }`}
+                      className={`hover:bg-gray-50/80 transition-colors ${isAtm ? 'bg-amber-50/60 font-bold' : ''
+                        }`}
                     >
                       {/* Call Bid/Ask */}
                       <td className="py-2.5 px-3 text-emerald-600 font-semibold">${item.callBid}</td>
@@ -566,8 +563,8 @@ export function DerivativesOptionsDashboard() {
                           iv > 70
                             ? 'bg-rose-100 text-rose-900 font-bold'
                             : iv > 55
-                            ? 'bg-amber-100 text-amber-900 font-semibold'
-                            : 'bg-emerald-50 text-emerald-800';
+                              ? 'bg-amber-100 text-amber-900 font-semibold'
+                              : 'bg-emerald-50 text-emerald-800';
 
                         return (
                           <td key={dteVal} className={`py-2 px-2 rounded ${bgClass}`}>
