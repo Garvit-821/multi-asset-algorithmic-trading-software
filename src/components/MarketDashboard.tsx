@@ -41,8 +41,31 @@ export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
   const [availableCash, setAvailableCash] = useState<number>(100000);
   const [tradeFeedback, setTradeFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  const loadWatchlist = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('watchlists')
+      .select('symbol')
+      .eq('user_id', user.id)
+      .eq('asset_type', activeMarket);
+
+    if (data) {
+      setWatchlist((data as Array<{ symbol: string }>).map((item) => item.symbol));
+    }
+  }, [activeMarket]);
+
+  const performSearch = useCallback(async () => {
+    const results = await searchSymbols(searchQuery, activeMarket);
+    setSearchResults(results);
+  }, [searchQuery, activeMarket]);
+
   useEffect(() => {
     loadWatchlist();
+  }, [loadWatchlist]);
+
+  useEffect(() => {
     // Set default symbol based on market
     const defaults: Record<AssetType, string> = {
       crypto: 'BTC/USDT',
@@ -84,27 +107,7 @@ export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
     } else {
       setSearchResults([]);
     }
-  }, [searchQuery, activeMarket]);
-
-  const loadWatchlist = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from('watchlists')
-      .select('symbol')
-      .eq('user_id', user.id)
-      .eq('asset_type', activeMarket);
-
-    if (data) {
-      setWatchlist((data as any[]).map((item: any) => item.symbol));
-    }
-  };
-
-  const performSearch = async () => {
-    const results = await searchSymbols(searchQuery, activeMarket);
-    setSearchResults(results);
-  };
+  }, [searchQuery, performSearch]);
 
   const handleSymbolSelect = (symbol: string, exchange?: string) => {
     setSelectedSymbol(symbol);
