@@ -99,11 +99,13 @@ export function DerivativesOptionsDashboard() {
 
         {/* Asset Selector — dropdown on mobile, pills on sm+ */}
         <div className="self-start md:self-auto">
+        {/* Asset Selector — dropdown on mobile, pills on sm+ */}
+        <div className="self-start md:self-auto">
           {/* Mobile dropdown */}
           <div className="sm:hidden">
             <select
               value={symbol}
-              onChange={(e) => handleSymbolChange(e.target.value as any)}
+              onChange={(e) => handleSymbolChange(e.target.value as 'BTC/USDT' | 'ETH/USDT' | 'SOL/USDT' | 'AAPL')}
               className="w-full px-3 py-2 text-sm font-semibold bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {(['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'AAPL'] as const).map((sym) => (
@@ -135,7 +137,7 @@ export function DerivativesOptionsDashboard() {
         <div className="sm:hidden">
           <select
             value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value as any)}
+            onChange={(e) => setActiveTab(e.target.value as 'calculator' | 'chain' | 'payoff' | 'surface')}
             className="w-full px-3 py-2.5 text-sm font-semibold bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
           >
             <option value="calculator">🧮 Black-Scholes Calculator</option>
@@ -158,7 +160,7 @@ export function DerivativesOptionsDashboard() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'calculator' | 'chain' | 'payoff' | 'surface')}
                 className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${isActive
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -458,7 +460,7 @@ export function DerivativesOptionsDashboard() {
               {/* Strategy Selector */}
               <select
                 value={strategyType}
-                onChange={(e) => setStrategyType(e.target.value as any)}
+                onChange={(e) => setStrategyType(e.target.value as OptionStrategy)}
                 className="px-3.5 py-2 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 focus:bg-white"
               >
                 <option value="long_call">Long Call</option>
@@ -507,7 +509,7 @@ export function DerivativesOptionsDashboard() {
                     tick={{ fontSize: 11, fill: '#6b7280' }}
                   />
                   <Tooltip
-                    formatter={(value: any) => [`$${value}`, 'Net PnL at Expiry']}
+                    formatter={(value: unknown) => [`$${value}`, 'Net PnL at Expiry']}
                     labelFormatter={(label) => `Underlying: $${label}`}
                     contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }}
                   />
