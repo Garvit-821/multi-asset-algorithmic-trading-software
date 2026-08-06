@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, BookOpen, PieChart as PieIcon, ShieldAlert, BarChart3, LineChart as LineIcon, Activity, HelpCircle } from 'lucide-react';
 import { 
   PieChart, 
@@ -62,6 +62,16 @@ export const PaperTrading: React.FC = () => {
     setLivePrices(prev => ({ ...prev, ...priceUpdates }));
     setUpdating(false);
   }, [portfolio.positions]);
+
+  useEffect(() => {
+    updatePrices();
+
+    const priceInterval = setInterval(() => {
+      updatePrices();
+    }, 15000);
+
+    return () => clearInterval(priceInterval);
+  }, [updatePrices]);
 
 
 

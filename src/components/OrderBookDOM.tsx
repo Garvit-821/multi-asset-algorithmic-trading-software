@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layers, TrendingUp, TrendingDown, AlertOctagon } from 'lucide-react';
 import type { AssetType } from './TradingViewChart';
 
