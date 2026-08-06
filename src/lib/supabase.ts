@@ -174,9 +174,37 @@ class MockSupabaseQueryBuilder {
     return this;
   }
 
+  neq(column: string, value: any) {
+    if (value !== undefined && value !== null) {
+      this.filters.push((item) => item[column] !== value);
+    }
+    return this;
+  }
+
   gt(column: string, value: any) {
     if (value !== undefined && value !== null) {
       this.filters.push((item) => item[column] > value);
+    }
+    return this;
+  }
+
+  gte(column: string, value: any) {
+    if (value !== undefined && value !== null) {
+      this.filters.push((item) => item[column] >= value);
+    }
+    return this;
+  }
+
+  lte(column: string, value: any) {
+    if (value !== undefined && value !== null) {
+      this.filters.push((item) => item[column] <= value);
+    }
+    return this;
+  }
+
+  in(column: string, values: any[]) {
+    if (Array.isArray(values)) {
+      this.filters.push((item) => values.includes(item[column]));
     }
     return this;
   }
@@ -193,6 +221,11 @@ class MockSupabaseQueryBuilder {
   }
 
   single() {
+    this.isSingle = true;
+    return this;
+  }
+
+  maybeSingle() {
     this.isSingle = true;
     return this;
   }
