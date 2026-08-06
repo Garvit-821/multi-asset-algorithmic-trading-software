@@ -58,28 +58,33 @@ export function FloatingAICopilotDrawer() {
 
   return (
     <>
-      {/* Floating Action Trigger Button (Bottom Right) */}
+      {/* Floating Action Trigger Button (Bottom Right, adjusted for mobile bottom nav) */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transition-all flex items-center space-x-2.5 font-bold text-xs sm:text-sm group border border-white/20"
+          className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transition-all flex items-center space-x-2 sm:space-x-2.5 font-bold text-xs sm:text-sm group border border-white/20"
         >
           <div className="relative">
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-200 animate-pulse" />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping" />
           </div>
           <span>AI Copilot</span>
-          {hasLiveAI && <span className="text-[10px] bg-purple-400/30 px-1.5 py-0.5 rounded-md font-extrabold">GEMINI</span>}
+          {hasLiveAI && <span className="text-[9px] sm:text-[10px] bg-purple-400/30 px-1.5 py-0.5 rounded-md font-extrabold">GEMINI</span>}
         </button>
       )}
 
-      {/* Slide-over Drawer Panel */}
+      {/* Slide-over Drawer / Mobile Bottom Sheet Panel */}
       {isOpen && (
         <div className={`fixed z-50 transition-all duration-300 ${
           isMinimized
-            ? 'bottom-6 right-6 w-72 sm:w-80 h-14 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 flex items-center justify-between px-4 text-white'
-            : 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-[92vw] sm:w-[420px] h-[580px] max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideUp'
+            ? 'bottom-20 right-4 sm:bottom-6 sm:right-6 w-72 sm:w-80 h-14 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 flex items-center justify-between px-4 text-white'
+            : 'left-2 right-2 bottom-20 sm:left-auto sm:right-6 sm:bottom-6 w-auto sm:w-[420px] h-[520px] sm:h-[580px] max-h-[75vh] sm:max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideUp'
         }`}>
+          {/* Mobile Sheet Pull Indicator (Visible on small screens) */}
+          <div className="w-full bg-slate-950 flex justify-center py-1 sm:hidden">
+            <div className="w-10 h-1 bg-slate-700 rounded-full" />
+          </div>
+
           {/* Header */}
           <div className="p-3.5 sm:p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-2.5">

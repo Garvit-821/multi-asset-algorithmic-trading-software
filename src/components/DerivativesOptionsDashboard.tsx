@@ -393,8 +393,12 @@ export function DerivativesOptionsDashboard() {
             </div>
           </div>
 
-          <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full text-left text-xs font-mono">
+          <div className="overflow-x-auto scrollbar-none no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="text-[10px] text-gray-500 sm:hidden mb-2 flex items-center justify-between font-mono bg-gray-50 px-2 py-1 rounded">
+              <span>← Swipe left/right for Call/Put Greeks →</span>
+              <span className="font-bold text-blue-600">Matrix</span>
+            </div>
+            <table className="w-full text-left text-xs font-mono min-w-[720px]">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px]">
                   <th className="py-2.5 px-3 text-emerald-700">Call Bid</th>

@@ -133,15 +133,25 @@ export function AdvancedBacktester() {
 
       {/* Configuration Panel */}
       <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs space-y-5 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
           <div className="flex items-center space-x-2">
             <Settings2 className="w-5 h-5 text-blue-600" />
             <h2 className="text-sm sm:text-base font-bold text-gray-900">Strategy & Execution Parameters</h2>
           </div>
-          <span className="text-xs text-gray-500 font-mono">Live Candle Engine Active</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-xs text-gray-500 font-mono hidden sm:inline">Live Candle Engine Active</span>
+            <button
+              onClick={() => setShowConfig(!showConfig)}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg transition-all"
+            >
+              {showConfig ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {showConfig && (
+          <div className="space-y-5 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Target Asset */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
@@ -320,7 +330,7 @@ export function AdvancedBacktester() {
               </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {error && (

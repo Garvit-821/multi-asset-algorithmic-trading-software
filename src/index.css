@@ -185,3 +185,40 @@
 .skeleton-content-in {
   animation: skeleton-fade-in 0.35s ease-out forwards;
 }
+
+/* ── Mobile Utilities & Touch Optimizations ────────────────────────────── */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Hide scrollbars while allowing touch drag/scroll */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Smooth tap highlight behavior for mobile browsers */
+button, 
+a, 
+input, 
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+

@@ -280,16 +280,16 @@ export function UserDashboard() {
 
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50 text-gray-900">
+    <div className="space-y-6 p-3 sm:p-6 bg-gray-50 text-gray-900">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Trading Feed</h2>
-          <p className="text-gray-600 mt-1">Real-time alerts and signals</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Trading Feed</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Real-time alerts and signals</p>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
+      <div className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg p-1 overflow-x-auto whitespace-nowrap no-scrollbar">
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${

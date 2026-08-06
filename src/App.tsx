@@ -437,7 +437,7 @@ function App() {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-hidden bg-gray-50 h-full relative">
+        <main className="flex-1 overflow-hidden bg-gray-50 h-full relative pb-16 md:pb-0">
           {/* ── Skeleton overlay: shown immediately on view change ── */}
           {showSkeleton ? (
             <div key={`skeleton-${currentView}`} className="h-full overflow-y-auto">
@@ -454,14 +454,14 @@ function App() {
               {currentView === 'trading' && <MarketDashboard initialSymbol={selectedSymbol} />}
               {currentView === 'paper' && (
                 <div className="h-full overflow-y-auto">
-                  <div className="p-4 sm:p-8">
+                  <div className="p-3 sm:p-8">
                     <PaperTrading />
                   </div>
                 </div>
               )}
               {currentView === 'dashboard' && (
                 <div className="h-full overflow-y-auto">
-                  <div className="p-4 sm:p-8">
+                  <div className="p-3 sm:p-8">
                     <Dashboard />
                   </div>
                 </div>
@@ -472,7 +472,7 @@ function App() {
                 </div>
               )}
               {currentView === 'derivatives' && (
-                <div className="h-full overflow-y-auto p-4 sm:p-8">
+                <div className="h-full overflow-y-auto p-3 sm:p-8">
                   <DerivativesOptionsDashboard />
                 </div>
               )}
@@ -504,14 +504,14 @@ function App() {
               {currentView === 'alerts' && isAdmin && <AlertsManager />}
               {currentView === 'manual' && isAdmin && (
                 <div className="h-full overflow-y-auto">
-                  <div className="p-4 sm:p-8">
+                  <div className="p-3 sm:p-8">
                     <ManualTrades />
                   </div>
                 </div>
               )}
               {currentView === 'ai' && isAdmin && (
                 <div className="h-full overflow-y-auto">
-                  <div className="p-4 sm:p-8">
+                  <div className="p-3 sm:p-8">
                     <AIStrategyBuilder />
                   </div>
                 </div>
@@ -535,7 +535,7 @@ function App() {
 
               {currentView === 'settings' && (
                 <div className="h-full overflow-y-auto">
-                  <div className="p-4 sm:p-8">
+                  <div className="p-3 sm:p-8">
                     <div className="max-w-3xl space-y-6">
                       <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
 
@@ -582,6 +582,59 @@ function App() {
           )}
         </main>
       </div>
+
+      {/* Global Mobile Bottom Navigation Bar (Hidden on md+ screens) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-2 py-1.5 flex items-center justify-around md:hidden shadow-lg select-none">
+        <button
+          onClick={() => setCurrentView('userfeed')}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
+            currentView === 'userfeed' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Zap className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5 font-medium">Feed</span>
+        </button>
+
+        <button
+          onClick={() => setCurrentView('trading')}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
+            currentView === 'trading' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <TrendingUp className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5 font-medium">Trading</span>
+        </button>
+
+        <button
+          onClick={() => setCurrentView('paper')}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
+            currentView === 'paper' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Wallet className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5 font-medium">Paper</span>
+        </button>
+
+        <button
+          onClick={() => setCurrentView('intelligence')}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
+            currentView === 'intelligence' ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <BrainCircuit className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5 font-medium">AI Hub</span>
+        </button>
+
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all ${
+            mobileMenuOpen ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Menu className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5 font-medium">Menu</span>
+        </button>
+      </nav>
 
       {/* Global Command Palette (Ctrl+K / Cmd+K) */}
       <CommandPalette

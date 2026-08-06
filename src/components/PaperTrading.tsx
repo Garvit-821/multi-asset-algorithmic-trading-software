@@ -327,14 +327,14 @@ export const PaperTrading: React.FC = () => {
           {/* Positions and Allocations */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Positions Table */}
-            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
                 <BookOpen className="w-5 h-5 text-blue-600" />
                 <span>Active Open Positions</span>
               </h3>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full text-left border-collapse min-w-[580px]">
                   <thead>
                     <tr className="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
                       <th className="py-3 pr-4">Asset</th>

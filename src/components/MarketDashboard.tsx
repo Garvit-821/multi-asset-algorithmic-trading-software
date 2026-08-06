@@ -304,26 +304,26 @@ export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
         </div>
 
         {/* Selected Symbol Info */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div>
-              <h2 className="text-2xl font-bold">{selectedSymbol}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{selectedSymbol}</h2>
               {selectedExchange && (
-                <span className="text-sm text-gray-500">{selectedExchange}</span>
+                <span className="text-xs sm:text-sm text-gray-500">{selectedExchange}</span>
               )}
             </div>
             {currentPrice !== null && (
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-mono text-gray-900">${currentPrice.toFixed(4)}</span>
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="flex items-center space-x-1.5 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
+                <span className="text-base sm:text-xl font-mono font-bold text-gray-900">${currentPrice.toFixed(4)}</span>
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
               </div>
             )}
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 self-end sm:self-auto shrink-0">
             <button
               onClick={() => setShowMlForecast(!showMlForecast)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shadow-xs ${
+              className={`px-2.5 py-1.5 sm:px-3 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shadow-xs ${
                 showMlForecast
                   ? 'bg-blue-600 text-white shadow-blue-500/20'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -331,7 +331,8 @@ export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
               title="Toggle AI LSTM Price Forecast Overlay"
             >
               <BrainCircuit className={`w-3.5 h-3.5 ${showMlForecast ? 'animate-pulse' : ''}`} />
-              <span>{showMlForecast ? 'ML Forecast: ON' : 'ML Forecast'}</span>
+              <span className="hidden xs:inline">{showMlForecast ? 'ML Forecast: ON' : 'ML Forecast'}</span>
+              <span className="xs:hidden">{showMlForecast ? 'ML: ON' : 'ML'}</span>
             </button>
 
             <button
@@ -343,13 +344,13 @@ export function MarketDashboard({ initialSymbol }: MarketDashboardProps = {}) {
               }`}
               title={watchlist.includes(selectedSymbol) ? 'Remove from watchlist' : 'Add to watchlist'}
             >
-              <Star className={`w-5 h-5 ${watchlist.includes(selectedSymbol) ? 'fill-current' : ''}`} />
+              <Star className={`w-4 h-4 sm:w-5 sm:h-5 ${watchlist.includes(selectedSymbol) ? 'fill-current' : ''}`} />
             </button>
             <button
               className="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 rounded-lg transition-colors"
               title="Create Alert"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
