@@ -43,7 +43,7 @@ export function UserDashboard() {
   const [filter, setFilter] = useState<'all' | 'strategy' | 'manual' | 'price_alert'>('all');
 
   useEffect(() => {
-    loadFeedItems();
+    loadFeedItems(true);
 
     // Set up real-time subscriptions
     const strategyChannel = supabase
@@ -56,7 +56,7 @@ export function UserDashboard() {
           table: 'strategy_alerts',
         },
         () => {
-          loadFeedItems();
+          loadFeedItems(false);
         }
       )
       .subscribe();
@@ -71,7 +71,7 @@ export function UserDashboard() {
           table: 'manual_trades',
         },
         () => {
-          loadFeedItems();
+          loadFeedItems(false);
         }
       )
       .subscribe();
@@ -86,14 +86,14 @@ export function UserDashboard() {
           table: 'price_alerts',
         },
         () => {
-          loadFeedItems();
+          loadFeedItems(false);
         }
       )
       .subscribe();
 
     // Refresh prices every 10 seconds
     const priceInterval = setInterval(() => {
-      loadFeedItems();
+      loadFeedItems(false);
     }, 10000);
 
     return () => {
@@ -104,8 +104,10 @@ export function UserDashboard() {
     };
   }, []);
 
-  const loadFeedItems = async () => {
-    setLoading(true);
+  const loadFeedItems = async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
 
     const [strategyData, manualData, priceAlertData] = await Promise.all([
       supabase
