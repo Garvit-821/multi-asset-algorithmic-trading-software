@@ -450,7 +450,11 @@ function App() {
                   <UserDashboard />
                 </div>
               )}
-              {currentView === 'trading' && <MarketDashboard initialSymbol={selectedSymbol} />}
+              {currentView === 'trading' && (
+                <div className="h-full overflow-y-auto lg:overflow-hidden">
+                  <MarketDashboard initialSymbol={selectedSymbol} />
+                </div>
+              )}
               {currentView === 'paper' && (
                 <div className="h-full overflow-y-auto">
                   <div className="p-3 sm:p-8">

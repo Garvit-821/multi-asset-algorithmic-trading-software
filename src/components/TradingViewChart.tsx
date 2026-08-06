@@ -85,19 +85,33 @@ export function TradingViewChart({
     // Fetch initial data
     loadChartData();
 
-    // Handle resize
+    // Handle resize with ResizeObserver for tab switches and viewport changes
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
-        const currentHeight = getResponsiveHeight();
-        chartContainerRef.current.style.height = `${currentHeight}px`;
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-          height: currentHeight,
-        });
+        const width = chartContainerRef.current.clientWidth;
+        if (width > 0) {
+          const currentHeight = getResponsiveHeight();
+          chartContainerRef.current.style.height = `${currentHeight}px`;
+          chartRef.current.applyOptions({
+            width: width,
+            height: currentHeight,
+          });
+        }
       }
     };
 
     window.addEventListener('resize', handleResize);
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    if (chartContainerRef.current) {
+      resizeObserver.observe(chartContainerRef.current);
+    }
+
+    // Trigger initial resize frame in case container was 0px during initial render
+    requestAnimationFrame(() => handleResize());
 
     // Real-time updates
     let ws: WebSocket | null = null;
@@ -144,6 +158,7 @@ export function TradingViewChart({
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       if (ws) {
         ws.close();
       }
