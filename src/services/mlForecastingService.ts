@@ -102,6 +102,7 @@ function runClientMLEngine(
   }
 
   const meanReturn = returns.length > 0 ? returns.reduce((a, b) => a + b, 0) / returns.length : 0.0005;
+
   const variance = returns.length > 0
     ? returns.reduce((acc, r) => acc + Math.pow(r - meanReturn, 2), 0) / returns.length
     : 0.0004;
