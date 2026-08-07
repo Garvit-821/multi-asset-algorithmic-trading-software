@@ -23,7 +23,8 @@ import {
   generateStrategyPayoff,
   generateVolatilitySurface,
   OptionChainItem,
-  VolatilitySurfacePoint
+  VolatilitySurfacePoint,
+  OptionStrategy
 } from '../services/blackScholesEngine';
 
 export function DerivativesOptionsDashboard() {
@@ -118,8 +119,8 @@ export function DerivativesOptionsDashboard() {
                 key={sym}
                 onClick={() => handleSymbolChange(sym)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${symbol === sym
-                    ? 'bg-white text-blue-600 shadow-xs border border-gray-200'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-xs border border-gray-200'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 {sym}
@@ -160,8 +161,8 @@ export function DerivativesOptionsDashboard() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as 'calculator' | 'chain' | 'payoff' | 'surface')}
                 className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${isActive
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 <Icon className="w-4 h-4" />

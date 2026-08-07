@@ -60,6 +60,8 @@ export interface VolatilitySurfacePoint {
   ivPct: number;
 }
 
+export type OptionStrategy = 'long_call' | 'long_put' | 'bull_call_spread' | 'bear_put_spread' | 'straddle' | 'iron_condor';
+
 /**
  * Standard Normal Probability Density Function phi(x)
  */
@@ -275,7 +277,7 @@ export function generateOptionChain(
  * Generate Multi-Leg Option Strategy Payoff Points
  */
 export function generateStrategyPayoff(
-  strategyType: 'long_call' | 'long_put' | 'bull_call_spread' | 'bear_put_spread' | 'straddle' | 'iron_condor',
+  strategyType: OptionStrategy,
   spotPrice: number,
   baseIvPct = 45,
   dte = 30
