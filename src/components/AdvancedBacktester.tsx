@@ -69,6 +69,7 @@ export function AdvancedBacktester() {
   });
 
   const [activeTab, setActiveTab] = useState<'equity' | 'montecarlo' | 'heatmap' | 'trades'>('equity');
+  const [showConfig, setShowConfig] = useState<boolean>(true);
   const [result, setResult] = useState<BacktestFullResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

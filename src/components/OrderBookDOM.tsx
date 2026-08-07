@@ -165,7 +165,15 @@ export function OrderBookDOM({ symbol, assetType, currentPrice, onSelectPrice }:
     }
 
     return () => {
-      if (ws) ws.close();
+      if (ws) {
+        ws.onopen = null;
+        ws.onmessage = null;
+        ws.onerror = null;
+        ws.onclose = null;
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
+      }
       if (fallbackInterval) clearInterval(fallbackInterval);
     };
   }, [symbol, assetType, currentPrice, generateSimulatedDOM, processBinanceDepth]);

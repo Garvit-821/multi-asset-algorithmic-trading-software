@@ -147,8 +147,8 @@ export function TradingViewChart({
         }
       };
 
-      ws.onerror = (err) => {
-        console.error('Binance WebSocket error:', err);
+      ws.onerror = () => {
+        // Fallback gracefully without console error spam
       };
     } else {
       updateInterval = setInterval(() => {
@@ -160,7 +160,13 @@ export function TradingViewChart({
       window.removeEventListener('resize', handleResize);
       resizeObserver.disconnect();
       if (ws) {
-        ws.close();
+        ws.onopen = null;
+        ws.onmessage = null;
+        ws.onerror = null;
+        ws.onclose = null;
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
       }
       if (updateInterval) {
         clearInterval(updateInterval);
