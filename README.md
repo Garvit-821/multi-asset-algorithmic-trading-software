@@ -1,6 +1,6 @@
-# CryptoAgent - Multi-Asset Algorithmic Trading Platform 
+# Stratrade - Multi-Asset Algorithmic Trading Platform 
 
-**CryptoAgent** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, real-world exchange execution, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Depth of Market (DOM L2) liquidity visualization, institutional execution algorithms (TWAP, VWAP, Iceberg), and real-time conditional alert notifications dispatched directly to Telegram.
+**Stratrade** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, real-world exchange execution, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Depth of Market (DOM L2) liquidity visualization, institutional execution algorithms (TWAP, VWAP, Iceberg), and real-time conditional alert notifications dispatched directly to Telegram.
 
 > [!TIP]
 > 🎥 **[Watch the Platform Demo Video](https://drive.google.com/file/d/1CitbQAg6HIxaCRUKjIXe-MtDhnwnZMbV/view?usp=sharing)** to see the live charts, paper trading, and strategy builder in action.
