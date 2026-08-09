@@ -198,6 +198,8 @@ export const PaperTrading: React.FC = () => {
 
   // Monte Carlo forward simulation
   const mcResults = useMemo(() => {
+    if (activeTab !== 'risk') return null;
+
     const dailyVol = calculateVolatility(returns) || 0.015;
     const drift = returns.reduce((a, b) => a + b, 0) / Math.max(1, returns.length);
     
@@ -230,7 +232,7 @@ export const PaperTrading: React.FC = () => {
       riskOfRuin: results.riskOfRuin,
       medianEndingValue: results.medianEndingValue
     };
-  }, [totalValue, returns, mcDays, mcThreshold]);
+  }, [totalValue, returns, mcDays, mcThreshold, activeTab]);
 
   // Pie chart data for overview
   const pieData = [
