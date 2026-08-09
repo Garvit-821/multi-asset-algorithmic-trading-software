@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Lock, Sparkles, X, Check, ShieldCheck, ArrowRight, Zap, RefreshCw, AlertCircle } from 'lucide-react';
+import { CreditCard, Lock, Sparkles, X, ShieldCheck, ArrowRight, Zap, RefreshCw, AlertCircle, Wifi, CheckCircle2 } from 'lucide-react';
 import {
   PlanId,
   BillingInterval,
@@ -18,11 +18,12 @@ interface CheckoutModalProps {
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
-  selectedPlanId,
+  selectedPlanId: initialPlanId,
   initialInterval = 'annual',
   onClose,
   onSuccess,
 }) => {
+  const [activePlanId, setActivePlanId] = useState<PlanId>(initialPlanId === 'free' ? 'pro' : initialPlanId);
   const [interval, setInterval] = useState<BillingInterval>(initialInterval);
   const [cardHolder, setCardHolder] = useState('Alex Vance');
   const [cardNumber, setCardNumber] = useState('');
@@ -36,10 +37,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const plan = PLANS[selectedPlanId] || PLANS.pro;
+  const plan = PLANS[activePlanId] || PLANS.pro;
   const isAnnual = interval === 'annual';
   const monthlyRate = isAnnual ? plan.annualPrice : plan.monthlyPrice;
   const totalAmount = isAnnual ? monthlyRate * 12 : monthlyRate;
+  const annualSavings = (plan.monthlyPrice - plan.annualPrice) * 12;
 
   // Format Card Number (adds spaces every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,15 +94,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setErrorMsg(null);
 
     setProcessingStep('Encrypting demo payment payload...');
-    await new Promise((res) => setTimeout(res, 400));
+    await new Promise((res) => setTimeout(res, 350));
 
     setProcessingStep('Connecting to mock payment gateway...');
-    await new Promise((res) => setTimeout(res, 500));
+    await new Promise((res) => setTimeout(res, 450));
 
     setProcessingStep('Confirming quantitative plan activation...');
 
     const receipt = await subscriptionService.processMockPayment({
-      planId: selectedPlanId,
+      planId: activePlanId,
       billingInterval: interval,
       cardHolder,
       cardNumber,
@@ -119,23 +121,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white border border-[#dee1e6] rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white border border-[#dee1e6] rounded-3xl max-w-3xl w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-4 sm:my-8 text-[#0a0b0d]">
 
-        {/* Top Title Bar */}
-        <div className="bg-[#0a0b0d] text-white px-6 py-5 flex items-center justify-between border-b border-[#26282c]">
+        {/* Top Header Bar */}
+        <div className="bg-[#0a0b0d] text-white px-6 py-4 flex items-center justify-between border-b border-[#26282c]">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#0052ff] rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#0052ff] to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 ring-2 ring-blue-500/20">
               <CreditCard className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-lg font-extrabold text-white">Stratrade Checkout</h2>
-                <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold font-mono px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase">
-                  Demo Payment
+                <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight">Stratrade Secure Checkout</h2>
+                <span className="bg-emerald-500/15 text-emerald-400 text-[10px] font-extrabold font-mono px-2.5 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wide">
+                  DEMO CHECKOUT
                 </span>
               </div>
-              <p className="text-xs text-[#a8acb3]">Mock card workflow • Immediate feature unlocking</p>
+              <p className="text-xs text-[#a8acb3] hidden sm:block">Instant Sandbox Access • Zero Real Financial Risk</p>
             </div>
           </div>
           <button
@@ -150,192 +152,272 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-12">
 
           {/* Left Column: Order Summary & Plan Features */}
-          <div className="md:col-span-5 bg-[#f7f7f7] p-6 border-b md:border-b-0 md:border-r border-[#dee1e6] space-y-6">
+          <div className="md:col-span-5 bg-[#f7f7f7] p-5 sm:p-6 border-b md:border-b-0 md:border-r border-[#dee1e6] space-y-5 flex flex-col justify-between">
 
-            {/* Selected Plan Badge */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0052ff]">Selected Quantitative Plan</span>
-              <div className="bg-white border border-[#dee1e6] rounded-2xl p-4 space-y-2 shadow-2xs">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-extrabold text-[#0a0b0d] text-base">{plan.name}</h3>
-                  <span className="text-[10px] font-mono font-bold bg-blue-50 text-[#0052ff] px-2.5 py-0.5 rounded-full border border-blue-200">
+            <div className="space-y-4">
+              {/* Plan Switcher Tabs */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0052ff] block">
+                  Select Subscription Plan
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-white border border-[#dee1e6] rounded-xl text-xs font-bold shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActivePlanId('pro')}
+                    className={`py-2 px-2 rounded-lg transition-all text-center ${activePlanId === 'pro'
+                      ? 'bg-[#0052ff] text-white shadow-xs'
+                      : 'text-[#5b616e] hover:text-[#0a0b0d] hover:bg-[#f7f7f7]'
+                    }`}
+                  >
+                    Pro Quant
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActivePlanId('institutional')}
+                    className={`py-2 px-2 rounded-lg transition-all text-center ${activePlanId === 'institutional'
+                      ? 'bg-[#0a0b0d] text-white shadow-xs'
+                      : 'text-[#5b616e] hover:text-[#0a0b0d] hover:bg-[#f7f7f7]'
+                    }`}
+                  >
+                    Institutional
+                  </button>
+                </div>
+              </div>
+
+              {/* Selected Plan Summary Card */}
+              <div className="bg-white border border-[#dee1e6] rounded-2xl p-4 space-y-2 shadow-xs relative overflow-hidden">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-extrabold text-[#0a0b0d] text-base">{plan.name}</h3>
+                    <p className="text-[11px] text-[#5b616e] mt-0.5">{plan.tagline}</p>
+                  </div>
+                  <span className={`text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full border ${activePlanId === 'institutional'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-blue-50 text-[#0052ff] border-blue-200'
+                  }`}>
                     {plan.badge}
                   </span>
                 </div>
-                <p className="text-xs text-[#5b616e] leading-snug">{plan.tagline}</p>
               </div>
-            </div>
 
-            {/* Billing Interval Selection */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#0a0b0d]">Billing Interval</label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-white border border-[#dee1e6] rounded-xl font-semibold text-xs">
-                <button
-                  type="button"
-                  onClick={() => setInterval('monthly')}
-                  className={`py-2 px-3 rounded-lg transition-all text-center ${interval === 'monthly' ? 'bg-[#0a0b0d] text-white font-bold shadow-xs' : 'text-[#5b616e] hover:text-[#0a0b0d]'
+              {/* Billing Interval Toggle */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-[#0a0b0d]">Billing Cycle</label>
+                <div className="grid grid-cols-2 gap-2 p-1 bg-white border border-[#dee1e6] rounded-xl font-bold text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setInterval('monthly')}
+                    className={`py-2 px-3 rounded-lg transition-all text-center ${interval === 'monthly'
+                      ? 'bg-[#0a0b0d] text-white shadow-xs'
+                      : 'text-[#5b616e] hover:text-[#0a0b0d]'
                     }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInterval('annual')}
-                  className={`py-2 px-3 rounded-lg transition-all text-center flex items-center justify-center space-x-1 ${interval === 'annual' ? 'bg-[#0052ff] text-white font-bold shadow-xs' : 'text-[#5b616e] hover:text-[#0a0b0d]'
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInterval('annual')}
+                    className={`py-2 px-3 rounded-lg transition-all text-center flex items-center justify-center space-x-1 ${interval === 'annual'
+                      ? 'bg-[#0052ff] text-white shadow-xs'
+                      : 'text-[#5b616e] hover:text-[#0a0b0d]'
                     }`}
-                >
-                  <span>Annual</span>
-                  <span className="text-[9px] bg-emerald-400 text-[#0a0b0d] font-extrabold px-1 rounded">20% OFF</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Pricing Calculation Breakdown */}
-            <div className="bg-white border border-[#dee1e6] rounded-2xl p-4 space-y-2 font-mono text-xs shadow-2xs">
-              <div className="flex justify-between text-[#5b616e]">
-                <span>Base Plan ({interval}):</span>
-                <span>${monthlyRate}/mo</span>
-              </div>
-              {isAnnual && (
-                <div className="flex justify-between text-[#05b169]">
-                  <span>Annual Discount (20%):</span>
-                  <span>-${(plan.monthlyPrice - plan.annualPrice) * 12}/yr</span>
+                  >
+                    <span>Annual</span>
+                    <span className="text-[9px] bg-emerald-400 text-[#0a0b0d] font-extrabold px-1.5 py-0.5 rounded-full">
+                      SAVE 20%
+                    </span>
+                  </button>
                 </div>
-              )}
-              <div className="flex justify-between text-[#5b616e]">
-                <span>Demo Tax & Fees:</span>
-                <span className="text-[#05b169]">$0.00</span>
               </div>
-              <hr className="border-[#dee1e6] my-1" />
-              <div className="flex justify-between text-[#0a0b0d] font-extrabold text-sm pt-1">
-                <span>Total Billed Today:</span>
-                <span className="text-[#0052ff]">${totalAmount}.00</span>
+
+              {/* Dynamic Price Breakdown */}
+              <div className="bg-white border border-[#dee1e6] rounded-2xl p-4 space-y-2.5 font-mono text-xs shadow-xs">
+                <div className="flex justify-between text-[#5b616e]">
+                  <span>Base Rate ({interval}):</span>
+                  <span className="text-[#0a0b0d] font-semibold">${monthlyRate}/mo</span>
+                </div>
+                {isAnnual && (
+                  <div className="flex justify-between text-[#05b169] font-bold">
+                    <span>Annual Savings (20%):</span>
+                    <span>-${annualSavings}/yr</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-[#5b616e]">
+                  <span>Platform Fees & Tax:</span>
+                  <span className="text-[#05b169] font-bold">$0.00 (Demo)</span>
+                </div>
+                <div className="border-t border-[#dee1e6] pt-2 flex justify-between items-center text-[#0a0b0d]">
+                  <span className="font-sans font-extrabold text-xs">Total Amount:</span>
+                  <span className="text-base font-extrabold text-[#0052ff]">${totalAmount}.00 USD</span>
+                </div>
+              </div>
+
+              {/* Included Features Checklist */}
+              <div className="space-y-2 pt-1">
+                <span className="text-xs font-extrabold text-[#0a0b0d] flex items-center">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 mr-1.5" /> Features Unlocked Today:
+                </span>
+                <div className="space-y-1.5 text-[11px] text-[#0a0b0d]">
+                  {plan.features.slice(0, 4).map((feat, idx) => (
+                    <div key={idx} className="flex items-start space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#05b169] shrink-0 mt-0.5" />
+                      <span className="font-medium text-[#5b616e] leading-snug">{feat}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Quick Unlocked Feature Preview */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-[#0a0b0d] flex items-center">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 mr-1" /> Unlocked Features Included:
-              </span>
-              <ul className="space-y-1.5 text-[11px] text-[#5b616e]">
-                {plan.features.slice(0, 4).map((feat, idx) => (
-                  <li key={idx} className="flex items-start space-x-2">
-                    <Check className="w-3.5 h-3.5 text-[#05b169] shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{feat}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="pt-2 border-t border-[#dee1e6] text-[10px] text-[#7c828a] font-mono text-center">
+              SECURE CLIENT-SIDE SIMULATION
             </div>
-
           </div>
 
-          {/* Right Column: Card Input & Payment Execution */}
-          <div className="md:col-span-7 p-6 space-y-5 flex flex-col justify-between">
+          {/* Right Column: Interactive Visual Credit Card & Input Form */}
+          <div className="md:col-span-7 p-5 sm:p-6 space-y-5 flex flex-col justify-between">
 
             <form onSubmit={handleSubmit} className="space-y-4">
 
-              {/* Demo Auto-Fill Action Header */}
+              {/* Demo Auto-Fill Action Banner */}
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-extrabold text-[#0a0b0d]">Payment Details</h4>
+                <div>
+                  <h4 className="text-sm font-extrabold text-[#0a0b0d]">Payment Details</h4>
+                  <p className="text-[11px] text-[#7c828a]">Enter card info or click auto-fill demo credentials.</p>
+                </div>
                 <button
                   type="button"
                   onClick={handleFillDemoCard}
-                  className="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-[#0052ff] border border-blue-200 rounded-full font-bold text-xs transition-all flex items-center space-x-1 shadow-2xs"
+                  className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#0052ff] border border-blue-200 rounded-full font-extrabold text-xs transition-all flex items-center space-x-1.5 shadow-2xs hover:scale-105 active:scale-95"
                 >
-                  <Zap className="w-3.5 h-3.5" />
+                  <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                   <span>Fill Demo Card</span>
                 </button>
               </div>
 
-              {/* Error Banner */}
+              {/* Ultra-Slick Interactive Visual Credit Card Graphic */}
+              <div className="bg-gradient-to-tr from-[#0a0b0d] via-[#111827] to-[#0052ff] text-white rounded-2xl p-4 shadow-xl border border-white/10 space-y-4 relative overflow-hidden group select-none">
+                {/* Decorative Background Pattern */}
+                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -left-10 -top-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+
+                <div className="flex justify-between items-center relative z-10">
+                  <div className="flex items-center space-x-2">
+                    {/* Simulated EMV Chip */}
+                    <div className="w-9 h-6 bg-gradient-to-br from-amber-200 to-amber-400 rounded-md border border-amber-500/40 shadow-xs flex items-center justify-center">
+                      <div className="w-7 h-4 border-t border-b border-amber-600/40" />
+                    </div>
+                    <Wifi className="w-4 h-4 text-white/60 rotate-90" />
+                  </div>
+                  <span className="font-mono font-extrabold text-xs tracking-wider text-white/90 bg-white/10 px-2.5 py-1 rounded-md border border-white/15">
+                    {detectedBrand}
+                  </span>
+                </div>
+
+                {/* Live Card Number Preview */}
+                <div className="font-mono text-base sm:text-lg font-bold tracking-widest text-white/95 text-shadow-sm py-1">
+                  {cardNumber || '•••• •••• •••• ••••'}
+                </div>
+
+                {/* Live Cardholder Name & Expiry Preview */}
+                <div className="flex justify-between items-end text-xs font-mono uppercase text-white/80 relative z-10 pt-1">
+                  <div>
+                    <div className="text-[9px] text-white/50 tracking-wider">CARDHOLDER</div>
+                    <div className="font-bold truncate max-w-[180px]">{cardHolder || 'VALUED TRADER'}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[9px] text-white/50 tracking-wider">EXPIRES</div>
+                    <div className="font-bold">{expiryDate || 'MM/YY'}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Error Alert */}
               {errorMsg && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center space-x-2">
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center space-x-2 animate-in fade-in duration-200">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
-              {/* Cardholder Name */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#0a0b0d]">Cardholder Name</label>
-                <input
-                  type="text"
-                  required
-                  value={cardHolder}
-                  onChange={(e) => setCardHolder(e.target.value)}
-                  placeholder="e.g. Alex Vance"
-                  className="w-full px-3.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs text-[#0a0b0d] font-medium focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all"
-                />
-              </div>
-
-              {/* Card Number & Detected Brand */}
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="block text-xs font-bold text-[#0a0b0d]">Card Number</label>
-                  {cardNumber && (
-                    <span className="text-[10px] font-mono font-bold text-[#0052ff] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                      {detectedBrand}
-                    </span>
-                  )}
-                </div>
-                <div className="relative">
+              {/* Form Input Fields */}
+              <div className="space-y-3">
+                {/* Cardholder Name */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-extrabold text-[#0a0b0d]">Cardholder Name</label>
                   <input
                     type="text"
                     required
-                    value={cardNumber}
-                    onChange={handleCardNumberChange}
-                    placeholder="4242 4242 4242 4242"
-                    maxLength={19}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-[#0a0b0d] tracking-wider focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all pr-10"
+                    value={cardHolder}
+                    onChange={(e) => setCardHolder(e.target.value)}
+                    placeholder="e.g. Alex Vance"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs text-[#0a0b0d] font-semibold focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all"
                   />
-                  <CreditCard className="w-4 h-4 text-[#7c828a] absolute right-3 top-1/2 -translate-y-1/2" />
+                </div>
+
+                {/* Card Number */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <label className="block text-xs font-extrabold text-[#0a0b0d]">Card Number</label>
+                    <span className="text-[10px] font-mono text-[#5b616e]">Mock 16-Digit Card</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={cardNumber}
+                      onChange={handleCardNumberChange}
+                      placeholder="4242 4242 4242 4242"
+                      maxLength={19}
+                      className="w-full px-3.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-[#0a0b0d] tracking-wider focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all pr-10"
+                    />
+                    <CreditCard className="w-4 h-4 text-[#7c828a] absolute right-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                </div>
+
+                {/* Expiry, CVV & Postal Code Grid */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-extrabold text-[#0a0b0d]">Expires</label>
+                    <input
+                      type="text"
+                      required
+                      value={expiryDate}
+                      onChange={handleExpiryChange}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      className="w-full px-2.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-semibold"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-extrabold text-[#0a0b0d]">CVV / CVC</label>
+                    <input
+                      type="password"
+                      required
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="888"
+                      maxLength={4}
+                      className="w-full px-2.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-semibold"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-extrabold text-[#0a0b0d]">Postal Code</label>
+                    <input
+                      type="text"
+                      required
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value.slice(0, 10))}
+                      placeholder="10001"
+                      className="w-full px-2.5 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-semibold"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Expiry, CVV & Zip Code */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-bold text-[#0a0b0d]">Expires</label>
-                  <input
-                    type="text"
-                    required
-                    value={expiryDate}
-                    onChange={handleExpiryChange}
-                    placeholder="MM/YY"
-                    maxLength={5}
-                    className="w-full px-3 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-bold text-[#0a0b0d]">CVV / CVC</label>
-                  <input
-                    type="password"
-                    required
-                    value={cvv}
-                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="888"
-                    maxLength={4}
-                    className="w-full px-3 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-bold text-[#0a0b0d]">Postal Code</label>
-                  <input
-                    type="text"
-                    required
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.slice(0, 10))}
-                    placeholder="10001"
-                    className="w-full px-3 py-2.5 bg-white border border-[#dee1e6] rounded-xl text-xs font-mono text-center text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Security Banner */}
-              <div className="pt-1 flex items-center justify-between text-[11px] text-[#7c828a] font-sans">
+              {/* Security Badges */}
+              <div className="pt-1 flex items-center justify-between text-[11px] text-[#7c828a] font-medium">
                 <span className="flex items-center space-x-1">
                   <Lock className="w-3.5 h-3.5 text-[#05b169]" />
                   <span>256-bit Encrypted SSL</span>
@@ -351,7 +433,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full py-4 bg-[#0052ff] hover:bg-[#003ecc] disabled:bg-blue-400 text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2"
+                  className="w-full py-4 bg-[#0052ff] hover:bg-[#003ecc] disabled:bg-blue-400 text-white rounded-2xl font-extrabold text-sm transition-all shadow-xl shadow-blue-500/30 flex items-center justify-center space-x-2 hover:scale-[1.01] active:scale-[0.99]"
                 >
                   {isProcessing ? (
                     <div className="flex items-center space-x-2">
