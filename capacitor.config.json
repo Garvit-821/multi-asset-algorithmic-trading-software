@@ -1,6 +1,6 @@
 {
-  "appId": "com.cryptoagent.app",
-  "appName": "CryptoAgent",
+  "appId": "com.stratrade.app",
+  "appName": "Stratrade",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
