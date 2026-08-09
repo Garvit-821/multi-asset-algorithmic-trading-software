@@ -14,30 +14,30 @@
 ## 📑 Table of Contents
 
 1. [Key Features](#key-features)
-2. [Newly Implemented Features (Phase 1 Real-World Execution)](#-newly-implemented-features-phase-1-real-world-execution)
+2. [Newly Implemented Features (Phase 1 Real-World Execution)](#newly-implemented-features-phase-1-real-world-execution)
 3. [Tech Stack](#tech-stack)
 4. [Prerequisites](#prerequisites)
 5. [Getting Started](#getting-started)
-   - [1. Clone the Repository](#1-clone-the-repository)
-   - [2. Install Dependencies](#2-install-dependencies)
-   - [3. Environment Setup](#3-environment-setup)
-   - [4. Database Migration Setup](#4-database-migration-setup)
-   - [5. Start the Development Server](#5-start-the-development-server)
+    - [Clone the Repository](#1-clone-the-repository)
+    - [Install Dependencies](#2-install-dependencies)
+    - [Environment Setup](#3-environment-setup)
+    - [Database Migration Setup](#4-database-migration-setup)
+    - [Start the Development Server](#5-start-the-development-server)
 6. [Architecture Overview](#architecture-overview)
-   - [Directory Structure](#directory-structure)
-   - [Data Flow & Request Lifecycle](#data-flow--request-lifecycle)
-   - [Key Components](#key-components)
-   - [Database Schema](#database-schema)
+    - [Directory Structure](#directory-structure)
+    - [Data Flow & Request Lifecycle](#data-flow--request-lifecycle)
+    - [Key Components](#key-components)
+    - [Database Schema](#database-schema)
 7. [Mathematical Foundations & Core Algorithms](#mathematical-foundations--core-algorithms)
 8. [Environment Variables](#environment-variables)
 9. [Available Scripts](#available-scripts)
 10. [Testing & Verification](#testing--verification)
 11. [Deployment](#deployment)
-   - [Vite Static Frontend (Vercel/Netlify)](#vite-static-frontend-vercelnetlify)
-   - [Docker Deployment](#docker-deployment)
-   - [Android Mobile App (Capacitor APK)](#android-mobile-app-capacitor-apk)
+    - [Vite Static Frontend (Vercel/Netlify)](#vite-static-frontend-vercelnetlify)
+    - [Docker Deployment](#docker-deployment)
+    - [Android Mobile App (Capacitor APK)](#android-mobile-app-capacitor-apk)
 12. [Troubleshooting](#troubleshooting)
-13. [Payment Workflow & Feature Gating System](#-payment-workflow--feature-gating-system)
+13. [Payment Workflow & Feature Gating System](#payment-workflow--feature-gating-system)
 14. [License](#license)
 
 ---
@@ -66,7 +66,7 @@
 
 ---
 
-##  Newly Implemented Features (Phase 1 Real-World Execution)
+## Newly Implemented Features (Phase 1 Real-World Execution)
 
 This section provides a detailed technical breakdown of the newly added institutional trading modules, their functionality, architecture, and underlying mechanisms.
 
