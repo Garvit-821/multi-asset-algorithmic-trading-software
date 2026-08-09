@@ -28,7 +28,11 @@ import {
   Maximize2,
   ChevronRight,
   Code2,
-  Compass
+  Compass,
+  Check,
+  CreditCard,
+  CheckCircle2,
+  Sparkle
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -43,6 +47,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTab>('derivatives');
   const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategory>('all');
   const [liveSimValue, setLiveSimValue] = useState<number>(64520.40);
+  const [isAnnualBilling, setIsAnnualBilling] = useState<boolean>(true);
+  const [selectedPlanModal, setSelectedPlanModal] = useState<string | null>(null);
 
   // Live simulation tick update (4s interval to avoid main-thread churn)
   useEffect(() => {
@@ -127,6 +133,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
     ? assetList
     : assetList.filter(a => a.category === selectedAssetCategory);
 
+  const handleSelectPlan = (planName: string) => {
+    setSelectedPlanModal(planName);
+  };
+
   return (
     <div className="min-h-screen bg-[#ffffff] text-[#5b616e] flex flex-col font-sans overflow-x-hidden selection:bg-[#0052ff] selection:text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>
 
@@ -152,8 +162,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               <span>Terminal Tour</span>
             </a>
             <a href="#features" className="hover:text-[#0052ff] transition-colors">Quant Suite</a>
-            <a href="#risk" className="hover:text-[#0052ff] transition-colors">Math & Models</a>
             <a href="#explore" className="hover:text-[#0052ff] transition-colors">Asset Catalog</a>
+            <a href="#pricing" className="hover:text-[#0052ff] transition-colors font-bold text-[#0052ff]">Pricing Plans</a>
             <a href="#tech" className="hover:text-[#0052ff] transition-colors">Architecture</a>
           </nav>
 
@@ -193,10 +203,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
           <div className="absolute top-16 left-0 right-0 bg-white border-b border-[#dee1e6] p-6 shadow-2xl z-40 lg:hidden flex flex-col space-y-4 font-sans text-sm">
             <a href="#showcase" onClick={() => setMobileMenuOpen(false)} className="text-[#0a0b0d] hover:text-[#0052ff] font-bold">Terminal Tour</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-[#0a0b0d] hover:text-[#0052ff] font-bold">Quant Suite</a>
-            <a href="#risk" onClick={() => setMobileMenuOpen(false)} className="text-[#0a0b0d] hover:text-[#0052ff] font-bold">Math & Models</a>
             <a href="#explore" onClick={() => setMobileMenuOpen(false)} className="text-[#0a0b0d] hover:text-[#0052ff] font-bold">Asset Catalog</a>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-[#0052ff] font-bold">Pricing Plans</a>
             <a href="#tech" onClick={() => setMobileMenuOpen(false)} className="text-[#0a0b0d] hover:text-[#0052ff] font-bold">Architecture</a>
-            <hr className="border-[#hairline-soft]" />
+            <hr className="border-[#dee1e6]" />
             <button
               onClick={() => { setMobileMenuOpen(false); onLaunch(); }}
               className="w-full py-3 bg-[#0052ff] text-white rounded-full font-bold text-sm text-center flex items-center justify-center space-x-2"
@@ -254,14 +264,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               </button>
 
               <a
-                href="https://github.com/Garvit-821/multi-asset-algorithmic-trading-software"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#pricing"
                 className="w-full sm:w-auto h-14 px-7 bg-[#16181c] hover:bg-[#202328] text-white rounded-full font-bold text-sm border border-[#26282c] transition-all flex items-center justify-center space-x-2.5 group"
               >
-                <Github className="w-4 h-4 text-amber-400" />
-                <span>Source Code</span>
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400 group-hover:rotate-12 transition-transform" />
+                <CreditCard className="w-4 h-4 text-blue-400" />
+                <span>View Pricing Plans</span>
               </a>
             </div>
 
@@ -369,7 +376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </div>
 
-      {/* ─── 4. INTERACTIVE TERMINAL SIMULATOR SHOWCASE (DESIGN.md surface-soft) ── */}
+      {/* ─── 4. INTERACTIVE TERMINAL SIMULATOR SHOWCASE ─────────────────────── */}
       <section id="showcase" className="bg-[#f7f7f7] py-20 px-6 border-b border-[#dee1e6]">
         <div className="max-w-[1240px] mx-auto space-y-10">
 
@@ -445,7 +452,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
                       Compute theoretical Call/Put fair values using Abramowitz & Stegun polynomial normal distributions. Analyze real-time risk sensitivities across 5 core Greeks:
                     </p>
 
-                    {/* Greeks Badges (Clean Unicode rendering - NO raw LaTeX strings!) */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs text-slate-300">
                       <span className="bg-[#16181c] border border-[#26282c] p-2 rounded-xl"><strong className="text-[#05b169]">Δ (Delta):</strong> Price Sensitivity</span>
                       <span className="bg-[#16181c] border border-[#26282c] p-2 rounded-xl"><strong className="text-blue-400">Γ (Gamma):</strong> Delta Convexity</span>
@@ -748,7 +754,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
 
                 <div className="flex justify-between items-center text-[11px] font-mono text-[#7c828a] pt-1">
                   <span>24h Vol: {asset.volume}</span>
-                  <span className="text-[#0052ff] font-bold group-hover:translate-x-1 transition-transform flex items-center">
+                  <span className="text-[#0052ff] font-bold group-hover:translate-x-1 transition-transform flex items-center cursor-pointer" onClick={onLaunch}>
                     Trade Asset <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                   </span>
                 </div>
@@ -759,8 +765,158 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </section>
 
-      {/* ─── 6. DEEP DIVE QUANTITATIVE PILLARS GRID (DESIGN.md feature-card) ──── */}
-      <section id="features" className="py-20 px-6 bg-[#f7f7f7] border-b border-[#dee1e6]">
+      {/* ─── 6. INSTITUTIONAL PRICING SECTION (DESIGN.md pricing-tier-card) ──── */}
+      <section id="pricing" className="py-20 px-6 bg-[#f7f7f7] border-b border-[#dee1e6]">
+        <div className="max-w-[1240px] mx-auto space-y-12">
+
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-xs text-[#0052ff] font-extrabold uppercase tracking-widest">Simple Transparent Monetization</span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0a0b0d] tracking-tight" style={{ letterSpacing: '-1.2px' }}>
+              Access Professional Quantitative Alpha.
+            </h2>
+            <p className="text-sm text-[#5b616e]">
+              Start with our full-featured free paper sandbox or unlock institutional AI signals, option greeks engines, and backtesting.
+            </p>
+
+            {/* Monthly / Annual Billing Toggle */}
+            <div className="inline-flex items-center bg-white border border-[#dee1e6] p-1.5 rounded-full shadow-xs text-xs font-semibold">
+              <button
+                onClick={() => setIsAnnualBilling(false)}
+                className={`px-5 py-2 rounded-full transition-all ${!isAnnualBilling ? 'bg-[#0a0b0d] text-white font-bold' : 'text-[#5b616e] hover:text-[#0a0b0d]'}`}
+              >
+                Monthly Billing
+              </button>
+              <button
+                onClick={() => setIsAnnualBilling(true)}
+                className={`px-5 py-2 rounded-full transition-all flex items-center space-x-1.5 ${isAnnualBilling ? 'bg-[#0052ff] text-white font-bold' : 'text-[#5b616e] hover:text-[#0a0b0d]'}`}
+              >
+                <span>Annual Billing</span>
+                <span className="bg-emerald-400 text-[#0a0b0d] text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">SAVE 20%</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Pricing Cards Grid (3-Up) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+
+            {/* TIER 1: DEVELOPER FREE */}
+            <div className="bg-white border border-[#dee1e6] rounded-3xl p-8 flex flex-col justify-between hover:shadow-xl transition-all duration-300 space-y-6">
+              <div className="space-y-4">
+                <div className="inline-block px-3 py-1 bg-[#f7f7f7] text-[#0a0b0d] rounded-full text-xs font-bold border border-[#dee1e6]">
+                  DEVELOPER SANDBOX
+                </div>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-[#0a0b0d]">Free Account</h3>
+                  <p className="text-xs text-[#5b616e] mt-1">Ideal for individual traders learning quantitative concepts.</p>
+                </div>
+                <div className="flex items-baseline space-x-1 font-mono pt-2">
+                  <span className="text-4xl font-extrabold text-[#0a0b0d]">$0</span>
+                  <span className="text-xs text-[#7c828a]">/ forever</span>
+                </div>
+
+                <hr className="border-[#hairline-soft]" />
+
+                <ul className="space-y-3 text-xs text-[#0a0b0d]">
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>$100,000 Virtual Paper Account</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Real-Time Binance Crypto WebSockets</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Black-Scholes Call/Put Fair Values</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Standard Indicators (RSI, MACD, EMA)</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Local Browser Storage & Privacy</span></li>
+                </ul>
+              </div>
+
+              <button
+                onClick={onLaunch}
+                className="w-full py-3.5 bg-[#f7f7f7] hover:bg-[#eef0f3] text-[#0a0b0d] border border-[#dee1e6] rounded-full font-bold text-xs transition-all text-center"
+              >
+                Launch Free Sandbox
+              </button>
+            </div>
+
+            {/* TIER 2: PRO QUANT (FEATURED / HIGHLIGHTED) */}
+            <div className="bg-[#0a0b0d] text-white border-2 border-[#0052ff] rounded-3xl p-8 flex flex-col justify-between shadow-2xl relative transform lg:-translate-y-2 space-y-6">
+              {/* Popular Badge */}
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#0052ff] text-white font-extrabold text-[11px] uppercase tracking-wider px-4 py-1 rounded-full shadow-md flex items-center space-x-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>MOST POPULAR CHOICE</span>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <div className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-mono font-bold border border-blue-500/40">
+                  PRO QUANT TRADER
+                </div>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white">Pro Quant Pass</h3>
+                  <p className="text-xs text-[#a8acb3] mt-1">Full analytical power for active algorithmic & derivatives traders.</p>
+                </div>
+                <div className="flex items-baseline space-x-1 font-mono pt-2">
+                  <span className="text-5xl font-extrabold text-white">{isAnnualBilling ? '$39' : '$49'}</span>
+                  <span className="text-xs text-[#a8acb3]">/ month {isAnnualBilling ? '(billed annually)' : ''}</span>
+                </div>
+
+                <hr className="border-[#26282c]" />
+
+                <ul className="space-y-3 text-xs text-slate-200">
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span><strong>Everything in Free</strong>, plus:</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Option Greeks Matrix (Δ, Γ, Θ, ν, ρ)</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Google Gemini 2.0 AI Market Copilot</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Historical Backtester & Replay Engine</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>No-Code Visual Strategy Builder</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Telegram Signal Notification Bot</span></li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => handleSelectPlan('Pro Quant Pass')}
+                className="w-full py-4 bg-[#0052ff] hover:bg-[#003ecc] text-white rounded-full font-extrabold text-sm transition-all text-center shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2"
+              >
+                <span>Start 14-Day Free Pro Trial</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* TIER 3: INSTITUTIONAL ALPHA */}
+            <div className="bg-white border border-[#dee1e6] rounded-3xl p-8 flex flex-col justify-between hover:shadow-xl transition-all duration-300 space-y-6">
+              <div className="space-y-4">
+                <div className="inline-block px-3 py-1 bg-[#f7f7f7] text-[#0a0b0d] rounded-full text-xs font-bold border border-[#dee1e6]">
+                  FUNDS & DESKS
+                </div>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-[#0a0b0d]">Institutional Alpha</h3>
+                  <p className="text-xs text-[#5b616e] mt-1">For funds, prop trading desks, and quantitative researchers.</p>
+                </div>
+                <div className="flex items-baseline space-x-1 font-mono pt-2">
+                  <span className="text-4xl font-extrabold text-[#0a0b0d]">{isAnnualBilling ? '$159' : '$199'}</span>
+                  <span className="text-xs text-[#7c828a]">/ month</span>
+                </div>
+
+                <hr className="border-[#hairline-soft]" />
+
+                <ul className="space-y-3 text-xs text-[#0a0b0d]">
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span><strong>Everything in Pro Quant</strong>, plus:</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Markowitz & Monte Carlo Risk Engine (1,000+ paths)</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Parametric Value at Risk (VaR 95% & 99%)</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Multi-Asset Catalog (Crypto, Forex, Equities)</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Custom API Webhook Dispatcher</span></li>
+                  <li className="flex items-center space-x-2.5"><Check className="w-4 h-4 text-[#05b169] shrink-0" /><span>Dedicated Quant Support & Strategy Reviews</span></li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => handleSelectPlan('Institutional Alpha')}
+                className="w-full py-3.5 bg-[#0a0b0d] hover:bg-[#16181c] text-white rounded-full font-bold text-xs transition-all text-center"
+              >
+                Contact Institutional Sales
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─── 7. DEEP DIVE QUANTITATIVE PILLARS GRID (DESIGN.md feature-card) ──── */}
+      <section id="features" className="py-20 px-6 bg-[#ffffff] border-b border-[#dee1e6]">
         <div className="max-w-[1240px] mx-auto space-y-12">
 
           <div className="text-center max-w-2xl mx-auto space-y-3">
@@ -879,7 +1035,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </section>
 
-      {/* ─── 7. ARCHITECTURE & SECURITY SPECIFICATION ────────────────────────── */}
+      {/* ─── 8. ARCHITECTURE & SECURITY SPECIFICATION ────────────────────────── */}
       <section id="tech" className="py-20 px-6 bg-[#ffffff]">
         <div className="max-w-[1240px] mx-auto flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1 space-y-6">
@@ -928,7 +1084,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </section>
 
-      {/* ─── 8. PRE-FOOTER CTA (DESIGN.md cta-band-dark) ────────────────────── */}
+      {/* ─── 9. PRE-FOOTER CTA (DESIGN.md cta-band-dark) ────────────────────── */}
       <section className="bg-[#0a0b0d] text-white py-20 px-6 text-center relative overflow-hidden">
         <div className="max-w-2xl mx-auto space-y-6 relative z-10">
           <h2 className="text-3xl sm:text-5xl font-normal tracking-tight" style={{ letterSpacing: '-1.3px' }}>
@@ -950,7 +1106,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </section>
 
-      {/* ─── 9. FOOTER (DESIGN.md footer-light) ─────────────────────────────── */}
+      {/* ─── 10. FOOTER (DESIGN.md footer-light) ─────────────────────────────── */}
       <footer className="bg-[#ffffff] border-t border-[#dee1e6] py-12 px-6">
         <div className="max-w-[1240px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center space-x-3">
@@ -979,6 +1135,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
           © 2026 Stratrade Inc. All rights reserved. Built for institutional multi-asset algorithmic trading.
         </div>
       </footer>
+
+      {/* Plan Selected Confirmation Modal */}
+      {selectedPlanModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-[#dee1e6] rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 bg-blue-50 text-[#0052ff] rounded-full flex items-center justify-center">
+              <Sparkle className="w-6 h-6" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-extrabold text-[#0a0b0d]">Selected: {selectedPlanModal}</h3>
+              <p className="text-xs text-[#5b616e] leading-relaxed">
+                You are about to launch the Stratrade Quantitative Terminal with your selected plan unlocked in full paper sandbox mode.
+              </p>
+            </div>
+            <div className="flex space-x-3 pt-2">
+              <button
+                onClick={() => setSelectedPlanModal(null)}
+                className="flex-1 py-3 bg-[#f7f7f7] hover:bg-[#eef0f3] text-[#0a0b0d] font-bold rounded-full text-xs transition-colors border border-[#dee1e6]"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => { setSelectedPlanModal(null); onLaunch(); }}
+                className="flex-1 py-3 bg-[#0052ff] hover:bg-[#003ecc] text-white font-bold rounded-full text-xs transition-all shadow-md shadow-blue-500/20"
+              >
+                Launch Workstation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
