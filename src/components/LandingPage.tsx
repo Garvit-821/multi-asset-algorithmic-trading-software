@@ -31,24 +31,34 @@ import {
   Compass,
   Check,
   CreditCard,
-  CheckCircle2,
-  Sparkle
+  CheckCircle2
 } from 'lucide-react';
+
+import {
+  PlanId,
+  PaymentReceipt,
+} from '../services/subscriptionService';
+import { CheckoutModal } from './payment/CheckoutModal';
+import { PaymentConfirmationModal } from './payment/PaymentConfirmationModal';
 
 interface LandingPageProps {
   onLaunch: () => void;
+  onOpenCheckout?: (planId: PlanId) => void;
 }
 
 type FeatureTab = 'derivatives' | 'ai' | 'backtest' | 'visual' | 'optimizer' | 'paper';
 type AssetCategory = 'all' | 'crypto' | 'commodities' | 'equities';
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenCheckout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTab>('derivatives');
   const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategory>('all');
   const [liveSimValue, setLiveSimValue] = useState<number>(64520.40);
   const [isAnnualBilling, setIsAnnualBilling] = useState<boolean>(true);
-  const [selectedPlanModal, setSelectedPlanModal] = useState<string | null>(null);
+
+  // Modal checkout state local to LandingPage (if onOpenCheckout not handled externally)
+  const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId | null>(null);
+  const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
 
   // Live simulation tick update (4s interval to avoid main-thread churn)
   useEffect(() => {
@@ -133,8 +143,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
     ? assetList
     : assetList.filter(a => a.category === selectedAssetCategory);
 
-  const handleSelectPlan = (planName: string) => {
-    setSelectedPlanModal(planName);
+  const handleSelectPlan = (planId: PlanId) => {
+    if (onOpenCheckout) {
+      onOpenCheckout(planId);
+    } else {
+      setCheckoutPlanId(planId);
+    }
   };
 
   return (
@@ -867,10 +881,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               </div>
 
               <button
-                onClick={() => handleSelectPlan('Pro Quant Pass')}
+                onClick={() => handleSelectPlan('pro')}
                 className="w-full py-4 bg-[#0052ff] hover:bg-[#003ecc] text-white rounded-full font-extrabold text-sm transition-all text-center shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2"
               >
-                <span>Start 14-Day Free Pro Trial</span>
+                <span>Start Pro Quant Trial</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -903,10 +917,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               </div>
 
               <button
-                onClick={() => handleSelectPlan('Institutional Alpha')}
+                onClick={() => handleSelectPlan('institutional')}
                 className="w-full py-3.5 bg-[#0a0b0d] hover:bg-[#16181c] text-white rounded-full font-bold text-xs transition-all text-center"
               >
-                Contact Institutional Sales
+                Upgrade to Institutional
               </button>
             </div>
 
@@ -1047,7 +1061,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
               Stratrade runs all complex mathematical calculations, Black-Scholes option pricing models, and backtesting routines client-side directly inside your browser.
             </p>
 
-            <div className="space-y-4 pt-2">
+            <div className="space-[#dee1e6] space-y-4 pt-2">
               <div className="flex items-start space-x-3">
                 <Lock className="w-5 h-5 text-[#0052ff] shrink-0 mt-0.5" />
                 <div>
@@ -1136,35 +1150,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
         </div>
       </footer>
 
-      {/* Plan Selected Confirmation Modal */}
-      {selectedPlanModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#dee1e6] rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 bg-blue-50 text-[#0052ff] rounded-full flex items-center justify-center">
-              <Sparkle className="w-6 h-6" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-extrabold text-[#0a0b0d]">Selected: {selectedPlanModal}</h3>
-              <p className="text-xs text-[#5b616e] leading-relaxed">
-                You are about to launch the Stratrade Quantitative Terminal with your selected plan unlocked in full paper sandbox mode.
-              </p>
-            </div>
-            <div className="flex space-x-3 pt-2">
-              <button
-                onClick={() => setSelectedPlanModal(null)}
-                className="flex-1 py-3 bg-[#f7f7f7] hover:bg-[#eef0f3] text-[#0a0b0d] font-bold rounded-full text-xs transition-colors border border-[#dee1e6]"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => { setSelectedPlanModal(null); onLaunch(); }}
-                className="flex-1 py-3 bg-[#0052ff] hover:bg-[#003ecc] text-white font-bold rounded-full text-xs transition-all shadow-md shadow-blue-500/20"
-              >
-                Launch Workstation
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Local Checkout & Receipt Modals (when launched directly from Landing Page) */}
+      {checkoutPlanId && (
+        <CheckoutModal
+          isOpen={true}
+          selectedPlanId={checkoutPlanId}
+          onClose={() => setCheckoutPlanId(null)}
+          onSuccess={(res) => {
+            setCheckoutPlanId(null);
+            setReceipt(res);
+          }}
+        />
+      )}
+
+      {receipt && (
+        <PaymentConfirmationModal
+          isOpen={true}
+          receipt={receipt}
+          onClose={() => setReceipt(null)}
+          onLaunchWorkstation={() => {
+            setReceipt(null);
+            onLaunch();
+          }}
+        />
       )}
 
     </div>

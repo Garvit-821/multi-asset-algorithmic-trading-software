@@ -20,6 +20,16 @@ import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
 import { HeaderTickerBar } from './components/HeaderTickerBar';
 import { paperTradingService } from './services/paperTradingService';
 import { getGeminiApiKey, setGeminiApiKey } from './services/aiCopilotService';
+import {
+  subscriptionService,
+  SubscriptionState,
+  PlanId,
+  PaymentReceipt,
+} from './services/subscriptionService';
+import { CheckoutModal } from './components/payment/CheckoutModal';
+import { PaymentConfirmationModal } from './components/payment/PaymentConfirmationModal';
+import { LockedFeatureGuard } from './components/payment/LockedFeatureGuard';
+import { Lock, CreditCard } from 'lucide-react';
 
 
 import {
@@ -173,6 +183,12 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [selectedSymbol, setSelectedSymbol] = useState<string>('BTC/USDT');
+
+  // Subscription & Payment Workflow State
+  const [subscription, setSubscription] = useState<SubscriptionState>(() => subscriptionService.getSubscription());
+  const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId | null>(null);
+  const [paymentReceipt, setPaymentReceipt] = useState<PaymentReceipt | null>(null);
+
   const showSkeleton = useViewSkeleton(currentView);
 
   // Global hotkeys for Search Command Palette (Ctrl+K / Cmd+K and Esc)
@@ -229,7 +245,12 @@ function App() {
 
   // If the view is the Landing Page, render full width outside the dashboard shell
   if (currentView === 'landing') {
-    return <LandingPage onLaunch={() => setCurrentView('userfeed')} />;
+    return (
+      <LandingPage
+        onLaunch={() => setCurrentView('userfeed')}
+        onOpenCheckout={(planId) => setCheckoutPlanId(planId)}
+      />
+    );
   }
 
   return (
@@ -323,6 +344,7 @@ function App() {
                 {coreMenuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentView === item.id;
+                  const isUnlocked = subscriptionService.isFeatureUnlocked(item.id, subscription.planId);
                   return (
                     <button
                       key={item.id}
@@ -330,13 +352,17 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                        ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
-                        }`}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                        isActive
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                      }`}
                     >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                      </div>
+                      {!isUnlocked && <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />}
                     </button>
                   );
                 })}
@@ -350,6 +376,7 @@ function App() {
                 {labMenuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentView === item.id;
+                  const isUnlocked = subscriptionService.isFeatureUnlocked(item.id, subscription.planId);
                   return (
                     <button
                       key={item.id}
@@ -357,13 +384,17 @@ function App() {
                         setCurrentView(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                        ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
-                        }`}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                        isActive
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                      }`}
                     >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                      </div>
+                      {!isUnlocked && <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />}
                     </button>
                   );
                 })}
@@ -378,6 +409,7 @@ function App() {
                   {adminMenuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = currentView === item.id;
+                    const isUnlocked = subscriptionService.isFeatureUnlocked(item.id, subscription.planId);
                     return (
                       <button
                         key={item.id}
@@ -385,13 +417,17 @@ function App() {
                           setCurrentView(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all ${isActive
-                          ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
-                          }`}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                          isActive
+                            ? 'bg-blue-50 text-blue-600 border border-blue-200 font-bold'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+                        }`}
                       >
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                        <div className="flex items-center space-x-2.5 min-w-0">
+                          <Icon className="w-4 h-4 shrink-0" />
+                          <span className="truncate text-xs sm:text-[13px]">{item.label}</span>
+                        </div>
+                        {!isUnlocked && <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />}
                       </button>
                     );
                   })}
@@ -399,6 +435,29 @@ function App() {
               </div>
             )}
           </nav>
+
+          {/* Subscription Tier Status Badge Card */}
+          <div className="px-4 py-2 border-t border-gray-200 bg-white">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-3 flex items-center justify-between shadow-2xs">
+              <div className="flex items-center space-x-2">
+                <CreditCard className="w-4 h-4 text-[#0052ff]" />
+                <div>
+                  <div className="text-[10px] font-extrabold text-[#0052ff] uppercase tracking-wider">
+                    {subscription.planName}
+                  </div>
+                  <div className="text-[10px] text-gray-500 font-mono">
+                    {subscription.planId === 'free' ? 'Basic Sandbox' : 'Unlocked Active'}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setCheckoutPlanId(subscription.planId === 'pro' ? 'institutional' : 'pro')}
+                className="px-2.5 py-1 bg-[#0052ff] hover:bg-[#003ecc] text-white text-[10px] font-extrabold rounded-lg shadow-xs transition-colors"
+              >
+                {subscription.planId === 'free' ? 'Upgrade' : 'Manage'}
+              </button>
+            </div>
+          </div>
 
           {/* User & Settings Panel */}
           <div className="p-4 border-t border-gray-200 space-y-2 bg-white">
@@ -461,141 +520,209 @@ function App() {
           ) : (
             /* ── Real content: fades in after skeleton delay ── */
             <div key={`content-${currentView}`} className="h-full overflow-hidden skeleton-content-in">
-              {currentView === 'userfeed' && (
-                <div className="h-full overflow-y-auto">
-                  <UserDashboard />
-                </div>
-              )}
-              {currentView === 'trading' && (
-                <div className="h-full overflow-y-auto lg:overflow-hidden">
-                  <MarketDashboard initialSymbol={selectedSymbol} />
-                </div>
-              )}
-              {currentView === 'paper' && (
-                <div className="h-full overflow-y-auto">
-                  <div className="p-3 sm:p-8">
-                    <PaperTrading />
-                  </div>
-                </div>
-              )}
-              {currentView === 'dashboard' && (
-                <div className="h-full overflow-y-auto">
-                  <div className="p-3 sm:p-8">
-                    <Dashboard />
-                  </div>
-                </div>
-              )}
-              {currentView === 'intelligence' && (
-                <div className="h-full overflow-y-auto">
-                  <AIMarketIntelligence />
-                </div>
-              )}
-              {currentView === 'derivatives' && (
-                <div className="h-full overflow-y-auto p-3 sm:p-8">
-                  <DerivativesOptionsDashboard />
-                </div>
-              )}
-              {currentView === 'backtest' && (
-                <div className="h-full overflow-y-auto">
-                  <AdvancedBacktester />
-                </div>
-              )}
-              {currentView === 'optimizer' && (
-                <div className="h-full overflow-y-auto">
-                  <PortfolioOptimizer />
-                </div>
-              )}
-              {currentView === 'replay' && (
-                <div className="h-full overflow-y-auto">
-                  <MarketReplay />
-                </div>
-              )}
-              {currentView === 'sentiment' && (
-                <div className="h-full overflow-y-auto">
-                  <SocialSentiment />
-                </div>
-              )}
-              {currentView === 'visualbuilder' && isAdmin && (
-                <div className="h-full overflow-y-auto">
-                  <VisualStrategyBuilder />
-                </div>
-              )}
-              {currentView === 'alerts' && isAdmin && <AlertsManager />}
-              {currentView === 'manual' && isAdmin && (
-                <div className="h-full overflow-y-auto">
-                  <div className="p-3 sm:p-8">
-                    <ManualTrades />
-                  </div>
-                </div>
-              )}
-              {currentView === 'ai' && isAdmin && (
-                <div className="h-full overflow-y-auto">
-                  <div className="p-3 sm:p-8">
-                    <AIStrategyBuilder />
-                  </div>
-                </div>
-              )}
-
-              {/* Redirect unauthorized requests */}
-              {!isAdmin && (currentView === 'alerts' || currentView === 'manual' || currentView === 'ai' || currentView === 'visualbuilder') && (
-                <div className="h-full overflow-y-auto flex items-center justify-center p-6">
-                  <div className="text-center max-w-sm">
-                    <p className="text-red-500 text-lg font-bold">Access Denied</p>
-                    <p className="text-gray-500 mt-2 text-sm">You don't have permission to access administrator components.</p>
-                    <button
-                      onClick={() => setCurrentView('userfeed')}
-                      className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm"
-                    >
-                      Return to Dashboard
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {currentView === 'settings' && (
-                <div className="h-full overflow-y-auto">
-                  <div className="p-3 sm:p-8">
-                    <div className="max-w-3xl space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-
-                      {/* Account Configuration */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Configuration</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Primary Email Address</label>
-                            <input type="email" value={user.email || ''} disabled className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Telegram Chat ID (Alert Notifications)</label>
-                            <input type="text" placeholder="e.g. 582910482" className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none" />
-                            <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-                              Enter your Telegram chat identifier to receive background price crossing and strategy signals. Get your ID instantly by messaging <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">@userinfobot</span>.
-                            </p>
-                          </div>
-                          <div className="pt-2">
-                            <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">Save Configurations</button>
-                          </div>
-                        </div>
+              {!subscriptionService.isFeatureUnlocked(currentView, subscription.planId) ? (
+                <LockedFeatureGuard
+                  viewName={currentView}
+                  requiredPlanId={subscriptionService.getRequiredPlan(currentView)}
+                  currentPlanId={subscription.planId}
+                  onOpenCheckout={(planId) => setCheckoutPlanId(planId)}
+                  onNavigateHome={() => setCurrentView('userfeed')}
+                />
+              ) : (
+                <>
+                  {currentView === 'userfeed' && (
+                    <div className="h-full overflow-y-auto">
+                      <UserDashboard />
+                    </div>
+                  )}
+                  {currentView === 'trading' && (
+                    <div className="h-full overflow-y-auto lg:overflow-hidden">
+                      <MarketDashboard initialSymbol={selectedSymbol} />
+                    </div>
+                  )}
+                  {currentView === 'paper' && (
+                    <div className="h-full overflow-y-auto">
+                      <div className="p-3 sm:p-8">
+                        <PaperTrading />
                       </div>
+                    </div>
+                  )}
+                  {currentView === 'dashboard' && (
+                    <div className="h-full overflow-y-auto">
+                      <div className="p-3 sm:p-8">
+                        <Dashboard />
+                      </div>
+                    </div>
+                  )}
+                  {currentView === 'intelligence' && (
+                    <div className="h-full overflow-y-auto">
+                      <AIMarketIntelligence />
+                    </div>
+                  )}
+                  {currentView === 'derivatives' && (
+                    <div className="h-full overflow-y-auto p-3 sm:p-8">
+                      <DerivativesOptionsDashboard />
+                    </div>
+                  )}
+                  {currentView === 'backtest' && (
+                    <div className="h-full overflow-y-auto">
+                      <AdvancedBacktester />
+                    </div>
+                  )}
+                  {currentView === 'optimizer' && (
+                    <div className="h-full overflow-y-auto">
+                      <PortfolioOptimizer />
+                    </div>
+                  )}
+                  {currentView === 'replay' && (
+                    <div className="h-full overflow-y-auto">
+                      <MarketReplay />
+                    </div>
+                  )}
+                  {currentView === 'sentiment' && (
+                    <div className="h-full overflow-y-auto">
+                      <SocialSentiment />
+                    </div>
+                  )}
+                  {currentView === 'visualbuilder' && isAdmin && (
+                    <div className="h-full overflow-y-auto">
+                      <VisualStrategyBuilder />
+                    </div>
+                  )}
+                  {currentView === 'alerts' && isAdmin && <AlertsManager />}
+                  {currentView === 'manual' && isAdmin && (
+                    <div className="h-full overflow-y-auto">
+                      <div className="p-3 sm:p-8">
+                        <ManualTrades />
+                      </div>
+                    </div>
+                  )}
+                  {currentView === 'ai' && isAdmin && (
+                    <div className="h-full overflow-y-auto">
+                      <div className="p-3 sm:p-8">
+                        <AIStrategyBuilder />
+                      </div>
+                    </div>
+                  )}
 
-                      {/* AI Copilot Configuration */}
-                      <GeminiApiKeySettings />
-
-                      {/* Reset Paper Portfolio */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                        <h3 className="text-lg font-semibold mb-2 text-red-600">Reset Paper Portfolio</h3>
-                        <p className="text-sm text-gray-500 mb-4">
-                          This will permanently clear all simulated positions, order histories, and reset your available virtual paper balance back to $100,000 USD.
-                        </p>
-                        <button onClick={handleResetAccount} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm">
-                          <Trash2 className="w-4 h-4" />
-                          <span>Reset Portfolio Account</span>
+                  {/* Redirect unauthorized requests */}
+                  {!isAdmin && (currentView === 'alerts' || currentView === 'manual' || currentView === 'ai' || currentView === 'visualbuilder') && (
+                    <div className="h-full overflow-y-auto flex items-center justify-center p-6">
+                      <div className="text-center max-w-sm">
+                        <p className="text-red-500 text-lg font-bold">Access Denied</p>
+                        <p className="text-gray-500 mt-2 text-sm">You don't have permission to access administrator components.</p>
+                        <button
+                          onClick={() => setCurrentView('userfeed')}
+                          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm"
+                        >
+                          Return to Dashboard
                         </button>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+
+                  {currentView === 'settings' && (
+                    <div className="h-full overflow-y-auto">
+                      <div className="p-3 sm:p-8">
+                        <div className="max-w-3xl space-y-6">
+                          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+
+                          {/* Subscription & Billing Management */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                  <CreditCard className="w-5 h-5 text-[#0052ff]" />
+                                  <span>Subscription & Monetization</span>
+                                </h3>
+                                <p className="text-xs text-gray-500 mt-1">Manage active plan tier, unlock features, and review billing receipts.</p>
+                              </div>
+                              <span className={`px-3 py-1 text-xs font-bold font-mono rounded-full border ${
+                                subscription.planId === 'institutional'
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : subscription.planId === 'pro'
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                  : 'bg-gray-100 text-gray-700 border-gray-200'
+                              }`}>
+                                {subscription.planName.toUpperCase()}
+                              </span>
+                            </div>
+
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2 font-mono text-xs mb-4">
+                              <div className="flex justify-between text-gray-600"><span>Current Tier:</span><span className="text-gray-900 font-bold">{subscription.planName}</span></div>
+                              <div className="flex justify-between text-gray-600"><span>Status:</span><span className="text-green-600 font-bold capitalize">{subscription.status}</span></div>
+                              <div className="flex justify-between text-gray-600"><span>Amount Billed:</span><span className="text-gray-900 font-bold">${subscription.amountPaid}.00 USD ({subscription.billingInterval})</span></div>
+                              <div className="flex justify-between text-gray-600"><span>Next Renewal Date:</span><span className="text-gray-900 font-bold">{subscription.nextBillingDate}</span></div>
+                              {subscription.cardLast4 !== '0000' && (
+                                <div className="flex justify-between text-gray-600"><span>Payment Method:</span><span className="text-gray-900 font-bold">{subscription.cardBrand} •••• {subscription.cardLast4}</span></div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-3">
+                              <button
+                                onClick={() => setCheckoutPlanId(subscription.planId === 'pro' ? 'institutional' : 'pro')}
+                                className="px-5 py-2.5 bg-[#0052ff] hover:bg-[#003ecc] text-white rounded-lg font-semibold text-sm transition-all shadow-md shadow-blue-500/10 flex items-center space-x-2"
+                              >
+                                <Sparkles className="w-4 h-4" />
+                                <span>{subscription.planId === 'free' ? 'Upgrade Plan' : 'Change Plan'}</span>
+                              </button>
+
+                              {subscription.planId !== 'free' && (
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm('Reset subscription to Free Sandbox tier?')) {
+                                      const freeState = subscriptionService.resetToFree();
+                                      setSubscription(freeState);
+                                    }
+                                  }}
+                                  className="px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-lg transition-all"
+                                >
+                                  Downgrade to Free
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Account Configuration */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Configuration</h3>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Primary Email Address</label>
+                                <input type="email" value={user.email || ''} disabled className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none" />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Telegram Chat ID (Alert Notifications)</label>
+                                <input type="text" placeholder="e.g. 582910482" className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none" />
+                                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                                  Enter your Telegram chat identifier to receive background price crossing and strategy signals. Get your ID instantly by messaging <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">@userinfobot</span>.
+                                </p>
+                              </div>
+                              <div className="pt-2">
+                                <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">Save Configurations</button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* AI Copilot Configuration */}
+                          <GeminiApiKeySettings />
+
+                          {/* Reset Paper Portfolio */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                            <h3 className="text-lg font-semibold mb-2 text-red-600">Reset Paper Portfolio</h3>
+                            <p className="text-sm text-gray-500 mb-4">
+                              This will permanently clear all simulated positions, order histories, and reset your available virtual paper balance back to $100,000 USD.
+                            </p>
+                            <button onClick={handleResetAccount} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm">
+                              <Trash2 className="w-4 h-4" />
+                              <span>Reset Portfolio Account</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -661,6 +788,38 @@ function App() {
 
       {/* Global Floating AI Copilot Drawer (Bottom Right) */}
       <FloatingAICopilotDrawer />
+
+      {/* Demo Checkout Modal */}
+      {checkoutPlanId && (
+        <CheckoutModal
+          isOpen={true}
+          selectedPlanId={checkoutPlanId}
+          onClose={() => setCheckoutPlanId(null)}
+          onSuccess={(receipt) => {
+            setCheckoutPlanId(null);
+            setPaymentReceipt(receipt);
+            setSubscription(subscriptionService.getSubscription());
+          }}
+        />
+      )}
+
+      {/* Payment Confirmation & Receipt Modal */}
+      {paymentReceipt && (
+        <PaymentConfirmationModal
+          isOpen={true}
+          receipt={paymentReceipt}
+          onClose={() => setPaymentReceipt(null)}
+          onLaunchWorkstation={() => {
+            const planId = paymentReceipt.planId;
+            setPaymentReceipt(null);
+            if (planId === 'institutional') {
+              setCurrentView('optimizer');
+            } else if (planId === 'pro') {
+              setCurrentView('intelligence');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

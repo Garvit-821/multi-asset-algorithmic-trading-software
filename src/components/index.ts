@@ -22,3 +22,6 @@ export * from './SocialSentiment';
 export * from './StrategyAlerts';
 export * from './TradingViewChart';
 export * from './UserDashboard';
+export * from './payment/CheckoutModal';
+export * from './payment/PaymentConfirmationModal';
+export * from './payment/LockedFeatureGuard';
