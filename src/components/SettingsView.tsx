@@ -16,6 +16,8 @@ import {
   DollarSign,
   AlertTriangle,
   ArrowUpRight,
+  X,
+  RotateCcw,
 } from 'lucide-react';
 import {
   SubscriptionState,
@@ -43,6 +45,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('subscription');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // In-App Confirmation Modals
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   // Account Profile States
   const [displayName, setDisplayName] = useState(user.name || 'Quant Trader');
@@ -103,16 +109,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     showToast(`Test payload dispatched to Telegram ID: ${telegramChatId}`);
   };
 
-  const handleDowngrade = () => {
-    if (window.confirm('Reset subscription to Free Sandbox tier? Unlocked quantitative features will revert to basic view.')) {
-      const freeState = subscriptionService.resetToFree();
-      onUpdateSubscription(freeState);
-      showToast('Subscription downgraded to Free Sandbox');
-    }
+  const confirmDowngrade = () => {
+    const freeState = subscriptionService.resetToFree();
+    onUpdateSubscription(freeState);
+    setShowDowngradeModal(false);
+    showToast('Subscription downgraded to Free Sandbox tier');
+  };
+
+  const confirmResetPortfolio = () => {
+    onResetAccount();
+    setShowResetModal(false);
+    showToast('Virtual paper portfolio successfully reset to $100,000.00 USD');
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[#f8f9fa] text-[#0a0b0d] p-4 sm:p-8">
+    <div className="h-full overflow-y-auto bg-[#f8f9fa] text-[#0a0b0d] p-4 sm:p-8 relative">
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Global Toast Notification */}
@@ -120,6 +131,88 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="fixed bottom-6 right-6 z-50 bg-[#0a0b0d] text-white px-4 py-3 rounded-2xl shadow-2xl border border-white/10 text-xs font-semibold flex items-center space-x-2 animate-in slide-in-from-bottom-5 duration-200">
             <CheckCircle2 className="w-4 h-4 text-[#05b169]" />
             <span>{toastMsg}</span>
+          </div>
+        )}
+
+        {/* Custom Confirmation Modal: Subscription Downgrade */}
+        {showDowngradeModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-[#dee1e6] rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200 text-[#0a0b0d]">
+              <div className="flex justify-between items-start">
+                <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <button
+                  onClick={() => setShowDowngradeModal(false)}
+                  className="p-1 rounded-full text-gray-400 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-extrabold text-[#0a0b0d]">Downgrade to Free Sandbox?</h3>
+                <p className="text-xs text-[#5b616e] mt-1 leading-relaxed">
+                  Your plan will revert to the <strong>Developer Sandbox</strong> tier. Premium quantitative modules like Options Greeks, Gemini AI Copilot, and Backtester will require an upgrade to access.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3 pt-2">
+                <button
+                  onClick={confirmDowngrade}
+                  className="flex-1 py-3 bg-[#0a0b0d] hover:bg-black text-white rounded-2xl font-extrabold text-xs transition-all shadow-md"
+                >
+                  Confirm Downgrade
+                </button>
+                <button
+                  onClick={() => setShowDowngradeModal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold text-xs transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Confirmation Modal: Reset Paper Account */}
+        {showResetModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-rose-200 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200 text-[#0a0b0d]">
+              <div className="flex justify-between items-start">
+                <div className="w-12 h-12 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-center text-rose-600">
+                  <RotateCcw className="w-6 h-6" />
+                </div>
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="p-1 rounded-full text-gray-400 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-extrabold text-rose-700">Reset Paper Portfolio Account?</h3>
+                <p className="text-xs text-[#5b616e] mt-1 leading-relaxed">
+                  This action will permanently purge all open simulated positions, trade order histories, and reset your available virtual equity back to <strong>$100,000.00 USD</strong>.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3 pt-2">
+                <button
+                  onClick={confirmResetPortfolio}
+                  className="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-extrabold text-xs transition-all shadow-md shadow-rose-600/20"
+                >
+                  Reset to $100,000 USD
+                </button>
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold text-xs transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -258,7 +351,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
                 {subscription.planId !== 'free' && (
                   <button
-                    onClick={handleDowngrade}
+                    onClick={() => setShowDowngradeModal(true)}
                     className="px-5 py-3.5 bg-white hover:bg-gray-100 text-gray-700 border border-[#dee1e6] rounded-2xl font-bold text-xs transition-colors"
                   >
                     Downgrade to Free Sandbox
@@ -604,7 +697,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 Permanently purge all paper trading positions, order execution logs, and restore virtual equity back to $100,000 USD.
               </p>
               <button
-                onClick={onResetAccount}
+                onClick={() => setShowResetModal(true)}
                 className="px-5 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-extrabold text-xs transition-all shadow-md shadow-rose-600/20 flex items-center space-x-2"
               >
                 <Trash2 className="w-4 h-4" />

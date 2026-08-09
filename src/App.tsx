@@ -128,10 +128,7 @@ function App() {
 
 
   const handleResetAccount = () => {
-    if (window.confirm('Are you sure you want to reset your paper portfolio to $100,000 USD? All trade history and positions will be cleared.')) {
-      paperTradingService.resetPortfolio();
-      alert('Portfolio successfully reset to $100,000 USD.');
-    }
+    paperTradingService.resetPortfolio();
   };
 
   // Login is removed as a whole; user is always authenticated as the administrator
