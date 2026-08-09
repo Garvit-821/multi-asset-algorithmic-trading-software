@@ -23,6 +23,8 @@ export interface ManualTrade {
   target_price: number;
   message: string;
   created_at: string;
+  side?: 'LONG' | 'SHORT';
+  status?: 'ACTIVE' | 'TP_HIT' | 'SL_HIT' | 'CLOSED';
 }
 
 export interface AIStrategy {
@@ -98,19 +100,23 @@ class MockSupabaseQueryBuilder {
         {
           id: '1',
           coin_name: 'BTC/USDT',
+          side: 'LONG',
           entry_price: 62500.00,
           stop_loss: 61500.00,
           target_price: 64500.00,
           message: 'VIP Signal: Strong bullish divergence on daily support.',
+          status: 'ACTIVE',
           created_at: new Date(Date.now() - 2 * 3600000).toISOString(),
         },
         {
           id: '2',
           coin_name: 'SOL/USDT',
+          side: 'LONG',
           entry_price: 138.50,
           stop_loss: 132.00,
           target_price: 150.00,
           message: 'Solana breaks out of descending channel. Target 150.',
+          status: 'TP_HIT',
           created_at: new Date(Date.now() - 8 * 3600000).toISOString(),
         }
       ],

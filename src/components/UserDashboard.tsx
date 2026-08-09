@@ -32,6 +32,7 @@ interface FeedItem {
   target_price?: number;
   message?: string;
   status?: string;
+  side?: 'LONG' | 'SHORT';
   created_at: string;
   triggered_at?: string;
   currentPrice?: number;
@@ -162,6 +163,8 @@ export function UserDashboard() {
           stop_loss: trade.stop_loss,
           target_price: trade.target_price,
           message: trade.message,
+          side: trade.side || 'LONG',
+          status: trade.status || 'ACTIVE',
           created_at: trade.created_at,
         });
       });
@@ -240,9 +243,18 @@ export function UserDashboard() {
         );
       case 'manual':
         return (
-          <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full border border-purple-200">
-            MANUAL
-          </span>
+          <div className="flex items-center space-x-1.5">
+            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border font-mono ${
+              (item.side || 'LONG') === 'LONG'
+                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                : 'bg-rose-100 text-rose-800 border-rose-300'
+            }`}>
+              {item.side === 'SHORT' ? 'SHORT / SELL' : 'BUY / LONG'}
+            </span>
+            <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-purple-200">
+              {item.status ? item.status.replace('_', ' ') : 'MANUAL'}
+            </span>
+          </div>
         );
       case 'price_alert':
         return (
