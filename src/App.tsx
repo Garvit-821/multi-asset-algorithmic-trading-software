@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Github, Star, BrainCircuit, BarChart2, Calculator, Trash2 } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bell, Settings, User, Zap, Wallet, Menu, X, Home, Sparkles, Target, History, MessageSquare, Github, Star, BrainCircuit, BarChart2, Calculator } from 'lucide-react';
 import { MarketDashboard } from './components/MarketDashboard';
 import { AlertsManager } from './components/AlertsManager';
 import { Dashboard } from './components/Dashboard';
@@ -19,7 +19,6 @@ import { CommandPalette } from './components/CommandPalette';
 import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
 import { HeaderTickerBar } from './components/HeaderTickerBar';
 import { paperTradingService } from './services/paperTradingService';
-import { getGeminiApiKey, setGeminiApiKey } from './services/aiCopilotService';
 import {
   subscriptionService,
   SubscriptionState,
@@ -29,6 +28,7 @@ import {
 import { CheckoutModal } from './components/payment/CheckoutModal';
 import { PaymentConfirmationModal } from './components/payment/PaymentConfirmationModal';
 import { LockedFeatureGuard } from './components/payment/LockedFeatureGuard';
+import { SettingsView } from './components/SettingsView';
 import { Lock, CreditCard } from 'lucide-react';
 
 
@@ -76,88 +76,7 @@ function ViewSkeleton({ view }: { view: string }) {
 }
 
 
-// ─── Gemini API Key Settings Card ────────────────────────────────────────────
-function GeminiApiKeySettings() {
-  const [apiKey, setApiKey] = useState(getGeminiApiKey);
-  const [showKey, setShowKey] = useState(false);
-  const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
-    setGeminiApiKey(apiKey);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
-  };
-
-  const handleClear = () => {
-    setApiKey('');
-    setGeminiApiKey('');
-  };
-
-  const isConfigured = !!apiKey;
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-            <BrainCircuit className="w-5 h-5 text-blue-600" />
-            <span>AI Copilot Configuration</span>
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">Connect Google Gemini AI to power the AI Trading Copilot with real intelligent analysis.</p>
-        </div>
-        {isConfigured && (
-          <span className="flex items-center space-x-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
-            <span>Live AI Active</span>
-          </span>
-        )}
-      </div>
-
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Google Gemini API Key</label>
-          <div className="relative">
-            <input
-              type={showKey ? 'text' : 'password'}
-              value={apiKey}
-              onChange={(e) => { setApiKey(e.target.value); setSaved(false); }}
-              placeholder="AIza..."
-              className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none pr-20"
-            />
-            <button
-              onClick={() => setShowKey(!showKey)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 font-semibold"
-            >
-              {showKey ? 'Hide' : 'Show'}
-            </button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-            Get a free API key at{' '}
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">aistudio.google.com</a>.
-            {' '}The key is stored only in your browser's localStorage — never sent to any server.
-          </p>
-        </div>
-
-        <div className="flex items-center space-x-3 pt-1">
-          <button
-            onClick={handleSave}
-            className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all ${saved
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/10'
-              }`}
-          >
-            {saved ? '✓ Saved!' : 'Save API Key'}
-          </button>
-          {apiKey && (
-            <button onClick={handleClear} className="px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-all">
-              Clear Key
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 type View =
@@ -622,105 +541,13 @@ function App() {
                   )}
 
                   {currentView === 'settings' && (
-                    <div className="h-full overflow-y-auto">
-                      <div className="p-3 sm:p-8">
-                        <div className="max-w-3xl space-y-6">
-                          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-
-                          {/* Subscription & Billing Management */}
-                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                              <div>
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                                  <CreditCard className="w-5 h-5 text-[#0052ff]" />
-                                  <span>Subscription & Monetization</span>
-                                </h3>
-                                <p className="text-xs text-gray-500 mt-1">Manage active plan tier, unlock features, and review billing receipts.</p>
-                              </div>
-                              <span className={`px-3 py-1 text-xs font-bold font-mono rounded-full border ${
-                                subscription.planId === 'institutional'
-                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                  : subscription.planId === 'pro'
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                  : 'bg-gray-100 text-gray-700 border-gray-200'
-                              }`}>
-                                {subscription.planName.toUpperCase()}
-                              </span>
-                            </div>
-
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2 font-mono text-xs mb-4">
-                              <div className="flex justify-between text-gray-600"><span>Current Tier:</span><span className="text-gray-900 font-bold">{subscription.planName}</span></div>
-                              <div className="flex justify-between text-gray-600"><span>Status:</span><span className="text-green-600 font-bold capitalize">{subscription.status}</span></div>
-                              <div className="flex justify-between text-gray-600"><span>Amount Billed:</span><span className="text-gray-900 font-bold">${subscription.amountPaid}.00 USD ({subscription.billingInterval})</span></div>
-                              <div className="flex justify-between text-gray-600"><span>Next Renewal Date:</span><span className="text-gray-900 font-bold">{subscription.nextBillingDate}</span></div>
-                              {subscription.cardLast4 !== '0000' && (
-                                <div className="flex justify-between text-gray-600"><span>Payment Method:</span><span className="text-gray-900 font-bold">{subscription.cardBrand} •••• {subscription.cardLast4}</span></div>
-                              )}
-                            </div>
-
-                            <div className="flex items-center space-x-3">
-                              <button
-                                onClick={() => setCheckoutPlanId(subscription.planId === 'pro' ? 'institutional' : 'pro')}
-                                className="px-5 py-2.5 bg-[#0052ff] hover:bg-[#003ecc] text-white rounded-lg font-semibold text-sm transition-all shadow-md shadow-blue-500/10 flex items-center space-x-2"
-                              >
-                                <Sparkles className="w-4 h-4" />
-                                <span>{subscription.planId === 'free' ? 'Upgrade Plan' : 'Change Plan'}</span>
-                              </button>
-
-                              {subscription.planId !== 'free' && (
-                                <button
-                                  onClick={() => {
-                                    if (window.confirm('Reset subscription to Free Sandbox tier?')) {
-                                      const freeState = subscriptionService.resetToFree();
-                                      setSubscription(freeState);
-                                    }
-                                  }}
-                                  className="px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-lg transition-all"
-                                >
-                                  Downgrade to Free
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Account Configuration */}
-                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Account Configuration</h3>
-                            <div className="space-y-4">
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Primary Email Address</label>
-                                <input type="email" value={user.email || ''} disabled className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono text-sm focus:outline-none" />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Telegram Chat ID (Alert Notifications)</label>
-                                <input type="text" placeholder="e.g. 582910482" className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none" />
-                                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-                                  Enter your Telegram chat identifier to receive background price crossing and strategy signals. Get your ID instantly by messaging <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">@userinfobot</span>.
-                                </p>
-                              </div>
-                              <div className="pt-2">
-                                <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm shadow-md shadow-blue-500/10">Save Configurations</button>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* AI Copilot Configuration */}
-                          <GeminiApiKeySettings />
-
-                          {/* Reset Paper Portfolio */}
-                          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-2 text-red-600">Reset Paper Portfolio</h3>
-                            <p className="text-sm text-gray-500 mb-4">
-                              This will permanently clear all simulated positions, order histories, and reset your available virtual paper balance back to $100,000 USD.
-                            </p>
-                            <button onClick={handleResetAccount} className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold transition-all flex items-center space-x-2 text-sm">
-                              <Trash2 className="w-4 h-4" />
-                              <span>Reset Portfolio Account</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <SettingsView
+                      user={user}
+                      subscription={subscription}
+                      onOpenCheckout={(planId) => setCheckoutPlanId(planId)}
+                      onUpdateSubscription={(newState) => setSubscription(newState)}
+                      onResetAccount={handleResetAccount}
+                    />
                   )}
                 </>
               )}
