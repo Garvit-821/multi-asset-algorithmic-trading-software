@@ -175,6 +175,22 @@ function App() {
   const [selectedSymbol, setSelectedSymbol] = useState<string>('BTC/USDT');
   const showSkeleton = useViewSkeleton(currentView);
 
+  // Global hotkeys for Search Command Palette (Ctrl+K / Cmd+K and Esc)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K' || e.code === 'KeyK')) {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      } else if ((e.key === 'Escape' || e.key === 'Esc') && commandPaletteOpen) {
+        e.preventDefault();
+        setCommandPaletteOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [commandPaletteOpen]);
+
 
   const handleResetAccount = () => {
     if (window.confirm('Are you sure you want to reset your paper portfolio to $100,000 USD? All trade history and positions will be cleared.')) {
@@ -638,6 +654,7 @@ function App() {
       <CommandPalette
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
+        onToggle={() => setCommandPaletteOpen((prev) => !prev)}
         onNavigate={(v) => setCurrentView(v as View)}
         onSelectAsset={(sym) => setSelectedSymbol(sym)}
       />

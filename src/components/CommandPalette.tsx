@@ -30,37 +30,44 @@ export interface CommandItem {
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
+  onToggle?: () => void;
   onNavigate: (view: string) => void;
   onSelectAsset?: (symbol: string) => void;
 }
 
-export function CommandPalette({ isOpen, onClose, onNavigate, onSelectAsset }: CommandPaletteProps) {
+export function CommandPalette({ isOpen, onClose, onToggle, onNavigate, onSelectAsset }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
-      setSelectedIndex(0);
-    }
-  }, [isOpen]);
-
-  // Global key listener for Ctrl+K / Cmd+K
+  // Global key listener for Ctrl+K / Cmd+K and Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K' || e.code === 'KeyK')) {
         e.preventDefault();
-        if (isOpen) onClose();
-        else {
-          // Open handled by parent, but if standalone can toggle
+        if (isOpen) {
+          onClose();
+        } else if (onToggle) {
+          onToggle();
         }
+      } else if ((e.key === 'Escape' || e.key === 'Esc') && isOpen) {
+        e.preventDefault();
+        onClose();
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, onToggle]);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => inputRef.current?.focus(), 50);
+      setQuery('');
+      setSelectedIndex(0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -115,8 +122,12 @@ export function CommandPalette({ isOpen, onClose, onNavigate, onSelectAsset }: C
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn"
+    >
       <div
+        onClick={(e) => e.stopPropagation()}
         className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] divide-y divide-slate-100"
         onKeyDown={handleKeyDown}
       >
