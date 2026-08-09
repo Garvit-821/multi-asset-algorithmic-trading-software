@@ -33,7 +33,7 @@ export function Dashboard() {
     ]);
 
     const avgAcc = strategies.data
-      ? (strategies.data as any[]).reduce((acc: number, s: any) => acc + s.accuracy, 0) / strategies.data.length
+      ? (strategies.data as Array<{ accuracy: number }>).reduce((acc: number, s: { accuracy: number }) => acc + s.accuracy, 0) / strategies.data.length
       : 0;
 
     setStats({

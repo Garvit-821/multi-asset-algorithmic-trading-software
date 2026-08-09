@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Activity, Clock } from 'lucide-react';
 import { supabase, StrategyAlert } from '../lib/supabase';
-import { marketSimulator } from '../services/marketSimulation';
+import { marketSimulator, AlertTrigger } from '../services/marketSimulation';
 
 export function StrategyAlerts() {
   const [alerts, setAlerts] = useState<StrategyAlert[]>([]);
@@ -39,10 +39,14 @@ export function StrategyAlerts() {
     }
   };
 
-  const createAlert = async (alertData: any) => {
+  const createAlert = async (alertData: AlertTrigger) => {
+    const payload = {
+      ...alertData,
+      status: alertData.status || 'active',
+    };
     const { data, error } = await supabase
       .from('strategy_alerts')
-      .insert([alertData])
+      .insert([payload])
       .select()
       .single();
 

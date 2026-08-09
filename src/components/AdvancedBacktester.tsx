@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   TrendingUp,
   Dices,
@@ -75,22 +75,23 @@ export function AdvancedBacktester() {
   const [error, setError] = useState<string | null>(null);
 
   // Run backtest on initial mount or when requested
-  const handleExecuteBacktest = async () => {
+  const handleExecuteBacktest = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await runAdvancedBacktest(config);
       setResult(res);
-    } catch (err: any) {
-      setError(err.message || 'Backtest failed to execute.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Backtest failed to execute.';
+      setError(message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
   useEffect(() => {
     handleExecuteBacktest();
-  }, []);
+  }, [handleExecuteBacktest]);
 
   return (
     <div className="p-3 sm:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 overflow-x-hidden">
@@ -181,7 +182,7 @@ export function AdvancedBacktester() {
             </label>
             <select
               value={config.strategyPreset}
-              onChange={(e) => setConfig({ ...config, strategyPreset: e.target.value as any })}
+              onChange={(e) => setConfig({ ...config, strategyPreset: e.target.value as BacktestConfig['strategyPreset'] })}
               className="w-full px-3 sm:px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {STRATEGY_PRESETS.map(s => (
@@ -210,7 +211,7 @@ export function AdvancedBacktester() {
             </label>
             <select
               value={config.timeframe}
-              onChange={(e) => setConfig({ ...config, timeframe: e.target.value as any })}
+              onChange={(e) => setConfig({ ...config, timeframe: e.target.value as BacktestConfig['timeframe'] })}
               className="w-full px-3 sm:px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="1m">1 Minute Candles</option>
@@ -281,7 +282,7 @@ export function AdvancedBacktester() {
               <label className="block text-[10px] font-bold text-gray-600 mb-1">Fee Structure Tier</label>
               <select
                 value={config.feeTier || 'standard'}
-                onChange={(e) => setConfig({ ...config, feeTier: e.target.value as any })}
+                onChange={(e) => setConfig({ ...config, feeTier: e.target.value as NonNullable<BacktestConfig['feeTier']> })}
                 className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900"
               >
                 <option value="standard">Standard (0.075% / 0.10%)</option>
@@ -508,7 +509,7 @@ export function AdvancedBacktester() {
                     <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} domain={['auto', 'auto']} tickFormatter={(v) => `$${v}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                      formatter={(val: any) => [`$${Number(val).toLocaleString()}`, '']}
+                      formatter={(val: unknown) => [`$${Number(val).toLocaleString()}`, '']}
                     />
                     <Area type="monotone" dataKey="strategyEquity" name="Strategy" stroke="#2563eb" strokeWidth={3} fill="url(#stratGrad)" />
                     <Line type="monotone" dataKey="benchmarkEquity" name="Asset Buy & Hold" stroke="#10b981" strokeWidth={2} dot={false} strokeDasharray="4 4" />
@@ -604,7 +605,7 @@ export function AdvancedBacktester() {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                       <XAxis dataKey="step" stroke="#94a3b8" fontSize={10} tickLine={false} label={{ value: 'Execution Step', position: 'insideBottom', offset: -5, fontSize: 9 }} />
                       <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} tickFormatter={(v) => `$${v}`} />
-                      <Tooltip formatter={(val: any) => [`$${Number(val).toLocaleString()}`, '']} />
+                      <Tooltip formatter={(val: unknown) => [`$${Number(val).toLocaleString()}`, '']} />
                       <Line type="monotone" dataKey="p95" name="95th Percentile" stroke="#10b981" strokeWidth={2} dot={false} />
                       <Line type="monotone" dataKey="p75" name="75th Percentile" stroke="#3b82f6" strokeWidth={1.5} dot={false} />
                       <Line type="monotone" dataKey="median" name="50th Percentile" stroke="#6366f1" strokeWidth={2.5} dot={false} />

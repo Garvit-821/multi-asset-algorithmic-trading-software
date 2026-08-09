@@ -149,12 +149,18 @@ class MultiExchangeConnector {
         status: 'disconnected',
         errorMessage: 'Unsupported exchange connector',
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      let errorMessage = 'Authentication error';
+      if (axios.isAxiosError(err)) {
+        errorMessage = err.response?.data?.msg || err.message || 'Authentication error';
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
       return {
         exchangeId,
         name: this.getExchangeName(exchangeId),
         status: 'auth_failed',
-        errorMessage: err?.response?.data?.msg || err.message || 'Authentication error',
+        errorMessage,
       };
     }
   }
@@ -206,7 +212,7 @@ class MultiExchangeConnector {
             timestamp: res.data.transactTime || Date.now(),
           };
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn(`[ExchangeConnector] Live execution error on ${payload.exchangeId}, falling back to simulated execution:`, err);
       }
     }

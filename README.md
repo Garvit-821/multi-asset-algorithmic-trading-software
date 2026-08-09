@@ -37,7 +37,8 @@
    - [Docker Deployment](#docker-deployment)
    - [Android Mobile App (Capacitor APK)](#android-mobile-app-capacitor-apk)
 12. [Troubleshooting](#troubleshooting)
-13. [License](#license)
+13. [Payment Workflow & Feature Gating System](#-payment-workflow--feature-gating-system)
+14. [License](#license)
 
 ---
 
@@ -753,6 +754,24 @@ Below is the chronological history of the recent updates and modifications made 
     *   Overhauled the landing page and navigation styles.
     *   Integrated paper trading simulation modules, local storage persistence, and live price feeds.
     *   Bypassed mandatory logins to establish immediate administrator access for local sandboxing.
+
+---
+
+## 💳 Payment Workflow & Feature Gating System
+
+CryptoAgent includes an institutional subscription management and tier-based feature gating system designed for commercial scaling and feature monetisation.
+
+### 1. Subscription Tiers & Feature Gating Architecture
+The platform enforces tier-based access control (`LockedFeatureGuard.tsx` & `useFeatureGate.ts`) to lock advanced quantitative tools based on active user subscription entitlements:
+- **Free / Standard Tier**: Access to real-time price charts, standard paper trading simulation, basic indicator setups, and manual trade signal feeds.
+- **Pro Tier**: Unlocks institutional TWAP, VWAP, and Iceberg execution algorithms, L2 Depth of Market visualizers, and visual strategy backtesting tools.
+- **Enterprise / VIP Tier**: Unlocks Google Gemini 2.0 Flash AI Copilot, 1,000-run Monte Carlo risk simulations, PyTorch ML price forecasting overlays, and multi-asset Pearson correlation matrices.
+
+### 2. Payment & Entitlement Integration Workflow
+1. **Tier Upgrade Selection**: Users choose subscription plans via the pricing modal or interactive feature lock upgrade overlays.
+2. **Payment Gateway Checkout**: Connects with payment processors (Stripe / Web3 Crypto Payments) via webhook event callbacks.
+3. **Entitlement State Persistence**: Upon payment verification, user entitlement claims (`subscription_tier: 'pro' | 'enterprise'`) are updated in the Supabase `profiles` table.
+4. **Reactive Feature Unlocking**: The client-side feature guard context updates reactively, enabling immediate access to premium features across all dashboard views without page reloads.
 
 ---
 

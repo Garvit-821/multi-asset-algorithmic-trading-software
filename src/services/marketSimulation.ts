@@ -93,6 +93,7 @@ export interface AlertTrigger {
   entry_price: number;
   stop_loss: number;
   target_price: number;
+  status?: string;
 }
 
 export class MarketSimulator {

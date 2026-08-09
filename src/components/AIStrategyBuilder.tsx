@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 import { STRATEGY_METRICS } from '../utils/mockData';
 import type { StrategyMetric } from '../utils/mockData';
-import { fetchChartData } from '../services/dataFeed';
+import { CandleData, fetchChartData } from '../services/dataFeed';
 
 interface ChartData {
   date: string;
@@ -144,7 +144,7 @@ function calculateBollingerBands(prices: number[], period: number = 20, multipli
 }
 
 // Backtesting Simulation Function
-function runBacktest(strategyName: string, candles: any[], startingBalance: number = 10000): BacktestResults {
+function runBacktest(strategyName: string, candles: CandleData[], startingBalance: number = 10000): BacktestResults {
   if (candles.length === 0) {
     return {
       accuracy: 0,
@@ -287,7 +287,7 @@ function runBacktest(strategyName: string, candles: any[], startingBalance: numb
 
 export const AIStrategyBuilder: React.FC = () => {
   const [selectedAsset, setSelectedAsset] = useState(AVAILABLE_ASSETS[0]);
-  const [candles, setCandles] = useState<any[]>([]);
+  const [candles, setCandles] = useState<CandleData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -335,9 +335,10 @@ export const AIStrategyBuilder: React.FC = () => {
         } else {
           setError('Failed to fetch historical candlestick data');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching candles for backtest:', err);
-        setError(err.message || 'Error fetching historical data');
+        const message = err instanceof Error ? err.message : 'Error fetching historical data';
+        setError(message);
       } finally {
         setLoading(false);
       }

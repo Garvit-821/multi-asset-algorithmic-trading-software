@@ -89,7 +89,7 @@ export function ManualTrades() {
   const handleQuickSelectSymbol = async (symbol: string, assetType: string = 'crypto') => {
     setFetchingPrice(true);
     try {
-      const livePrice = await fetchRealtimePrice(symbol, assetType as any);
+      const livePrice = await fetchRealtimePrice(symbol, assetType as Parameters<typeof fetchRealtimePrice>[1]);
       const price = livePrice || (symbol === 'BTC/USDT' ? 64500 : symbol === 'ETH/USDT' ? 3450 : 150);
       
       const slMultiplier = side === 'LONG' ? 0.98 : 1.02;
@@ -196,8 +196,9 @@ export function ManualTrades() {
       }));
 
       showToast(`Signal for ${newTrade.coin_name} broadcasted successfully!`, 'success');
-    } catch (err: any) {
-      showToast(`Published locally: ${err.message || 'Signal saved'}`, 'info');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Signal saved';
+      showToast(`Published locally: ${message}`, 'info');
     } finally {
       setSending(false);
     }

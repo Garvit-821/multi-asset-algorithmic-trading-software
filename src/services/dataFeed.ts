@@ -205,13 +205,17 @@ export async function fetchChartData(
       cache.set(cacheKey, { data: candles, timestamp: Date.now() });
 
       // Store in Supabase cache asynchronously
-      supabase.from('market_data_cache').upsert({
-        symbol,
-        asset_type: assetType,
-        exchange: exchange || 'default',
-        data: candles,
-        expires_at: new Date(Date.now() + CACHE_DURATION * 1000).toISOString(),
-      }).then(() => {}).catch(() => {});
+      try {
+        await supabase.from('market_data_cache').upsert({
+          symbol,
+          asset_type: assetType,
+          exchange: exchange || 'default',
+          data: candles,
+          expires_at: new Date(Date.now() + CACHE_DURATION * 1000).toISOString(),
+        });
+      } catch {
+        // ignore cache save failures
+      }
     }
   } catch (error) {
     console.error('Error fetching fresh chart data:', error);

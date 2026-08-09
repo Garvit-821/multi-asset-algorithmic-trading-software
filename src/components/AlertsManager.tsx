@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Bell, Trash2, CheckCircle, XCircle, Send, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { AssetType } from './TradingViewChart';
+import { sendTelegramAlert as sendTelegram } from '../services/telegramService';
 
 interface PriceAlert {
   id: string;
@@ -144,8 +145,6 @@ export function AlertsManager() {
   };
 
   const sendTelegramAlert = async (priceAlert: PriceAlert) => {
-    const { sendTelegramAlert: sendTelegram } = await import('../services/telegramService');
-    
     // Get user's Telegram chat ID from settings (stored in user metadata or separate table)
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !priceAlert.telegram_chat_id) {

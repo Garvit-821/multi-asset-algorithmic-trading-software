@@ -46,15 +46,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Format Card Number (adds spaces every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value.replace(/\D/g, '').slice(0, 16);
-    let formatted = raw.match(/.{1,4}/g)?.join(' ') || raw;
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
+    const formatted = raw.match(/.{1,4}/g)?.join(' ') || raw;
     setCardNumber(formatted);
     setErrorMsg(null);
   };
 
   // Format Expiry Date MM/YY
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value.replace(/\D/g, '').slice(0, 4);
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 4);
     if (raw.length >= 3) {
       setExpiryDate(`${raw.slice(0, 2)}/${raw.slice(2)}`);
     } else {

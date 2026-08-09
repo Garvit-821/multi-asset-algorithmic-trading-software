@@ -22,7 +22,7 @@ export function PortfolioOptimizer() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [simulatedPortfolios, setSimulatedPortfolios] = useState<any[]>([]);
+  const [simulatedPortfolios, setSimulatedPortfolios] = useState<Array<{ x: number; y: number; sharpe: number }>>([]);
   const [tangencyPortfolio, setTangencyPortfolio] = useState<OptimizedPortfolio | null>(null);
   const [gmvPortfolio, setGmvPortfolio] = useState<OptimizedPortfolio | null>(null);
 
@@ -162,8 +162,9 @@ export function PortfolioOptimizer() {
 
       setTangencyPortfolio(bestSharpe);
       setGmvPortfolio(minVolatility);
-    } catch (err: any) {
-      setError(err.message || 'Portfolio optimization execution failed.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Portfolio optimization execution failed.';
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -213,8 +213,9 @@ export function VisualStrategyBuilder() {
         totalTrades,
         equityCurve
       });
-    } catch (err: any) {
-      setError(err.message || 'Backtest compilation failed.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Backtest compilation failed.';
+      setError(message);
     } finally {
       setLoading(false);
     }

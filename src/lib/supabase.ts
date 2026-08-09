@@ -47,20 +47,20 @@ const isSupabaseConfigured =
 
 class MockSupabaseQueryBuilder {
   private tableName: string;
-  private filters: Array<(item: any) => boolean> = [];
+  private filters: Array<(item: Record<string, unknown>) => boolean> = [];
   private orderField?: string;
   private orderAscending = true;
   private limitCount?: number;
   private isSingle = false;
   private operation: 'select' | 'insert' | 'update' | 'delete' | 'upsert' = 'select';
-  private operationValues: any = null;
+  private operationValues: unknown = null;
 
   constructor(tableName: string) {
     this.tableName = tableName;
   }
 
-  private getData(): any[] {
-    const defaultData: Record<string, any[]> = {
+  private getData(): Array<Record<string, unknown>> {
+    const defaultData: Record<string, Array<Record<string, unknown>>> = {
       strategy_alerts: [
         {
           id: '1',
@@ -164,7 +164,7 @@ class MockSupabaseQueryBuilder {
     return defaultList;
   }
 
-  private saveData(data: any[]) {
+  private saveData(data: Array<Record<string, unknown>>) {
     localStorage.setItem(`mock_supabase_${this.tableName}`, JSON.stringify(data));
   }
 
@@ -173,42 +173,42 @@ class MockSupabaseQueryBuilder {
     return this;
   }
 
-  eq(column: string, value: any) {
+  eq(column: string, value: unknown) {
     if (value !== undefined && value !== null) {
       this.filters.push((item) => item[column] === value);
     }
     return this;
   }
 
-  neq(column: string, value: any) {
+  neq(column: string, value: unknown) {
     if (value !== undefined && value !== null) {
       this.filters.push((item) => item[column] !== value);
     }
     return this;
   }
 
-  gt(column: string, value: any) {
+  gt(column: string, value: unknown) {
     if (value !== undefined && value !== null) {
-      this.filters.push((item) => item[column] > value);
+      this.filters.push((item) => itemVal(item[column]) > itemVal(value));
     }
     return this;
   }
 
-  gte(column: string, value: any) {
+  gte(column: string, value: unknown) {
     if (value !== undefined && value !== null) {
-      this.filters.push((item) => item[column] >= value);
+      this.filters.push((item) => itemVal(item[column]) >= itemVal(value));
     }
     return this;
   }
 
-  lte(column: string, value: any) {
+  lte(column: string, value: unknown) {
     if (value !== undefined && value !== null) {
-      this.filters.push((item) => item[column] <= value);
+      this.filters.push((item) => itemVal(item[column]) <= itemVal(value));
     }
     return this;
   }
 
-  in(column: string, values: any[]) {
+  in(column: string, values: unknown[]) {
     if (Array.isArray(values)) {
       this.filters.push((item) => values.includes(item[column]));
     }
@@ -237,13 +237,13 @@ class MockSupabaseQueryBuilder {
   }
 
   // Handle standard promise chaining `.then`
-  async then(resolve: any) {
+  async then(resolve: (result: { data: unknown; error: unknown }) => void) {
     try {
       let data = this.getData();
 
       if (this.operation === 'insert') {
         const newItems = Array.isArray(this.operationValues) ? this.operationValues : [this.operationValues];
-        const createdItems = newItems.map((item) => ({
+        const createdItems = newItems.map((item: Record<string, unknown>) => ({
           id: Math.random().toString(36).substr(2, 9),
           created_at: new Date().toISOString(),
           ...item,
@@ -255,7 +255,7 @@ class MockSupabaseQueryBuilder {
       }
 
       if (this.operation === 'update') {
-        const updatedItems: any[] = [];
+        const updatedItems: Array<Record<string, unknown>> = [];
         const updatedData = data.map((item) => {
           let matches = true;
           for (const filter of this.filters) {
@@ -265,7 +265,7 @@ class MockSupabaseQueryBuilder {
             }
           }
           if (matches) {
-            const updated = { ...item, ...this.operationValues };
+            const updated = { ...item, ...(this.operationValues as Record<string, unknown>) };
             updatedItems.push(updated);
             return updated;
           }
@@ -277,7 +277,7 @@ class MockSupabaseQueryBuilder {
       }
 
       if (this.operation === 'delete') {
-        const deletedItems: any[] = [];
+        const deletedItems: Array<Record<string, unknown>> = [];
         const remainingData = data.filter((item) => {
           let matches = true;
           for (const filter of this.filters) {
@@ -299,7 +299,7 @@ class MockSupabaseQueryBuilder {
       if (this.operation === 'upsert') {
         const items = Array.isArray(this.operationValues) ? this.operationValues : [this.operationValues];
         const updatedData = [...data];
-        const upsertedItems: any[] = [];
+        const upsertedItems: Array<Record<string, unknown>> = [];
 
         for (const item of items) {
           const index = updatedData.findIndex(
@@ -337,8 +337,8 @@ class MockSupabaseQueryBuilder {
         const field = this.orderField;
         const asc = this.orderAscending;
         data.sort((a, b) => {
-          const valA = a[field];
-          const valB = b[field];
+          const valA = itemVal(a[field]);
+          const valB = itemVal(b[field]);
           if (valA < valB) return asc ? -1 : 1;
           if (valA > valB) return asc ? 1 : -1;
           return 0;
@@ -352,18 +352,18 @@ class MockSupabaseQueryBuilder {
 
       const resultData = this.isSingle ? (data[0] || null) : data;
       resolve({ data: resultData, error: null });
-    } catch (err: any) {
+    } catch (err: unknown) {
       resolve({ data: null, error: err });
     }
   }
 
-  insert(values: any | any[]) {
+  insert(values: unknown) {
     this.operation = 'insert';
     this.operationValues = values;
     return this;
   }
 
-  update(values: any) {
+  update(values: unknown) {
     this.operation = 'update';
     this.operationValues = values;
     return this;
@@ -374,11 +374,16 @@ class MockSupabaseQueryBuilder {
     return this;
   }
 
-  upsert(values: any) {
+  upsert(values: unknown) {
     this.operation = 'upsert';
     this.operationValues = values;
     return this;
   }
+}
+
+function itemVal(val: unknown): number | string {
+  if (typeof val === 'number' || typeof val === 'string') return val;
+  return String(val ?? '');
 }
 
 class MockSupabaseClient {
@@ -389,7 +394,7 @@ class MockSupabaseClient {
     async getUser() {
       return { data: { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } } };
     },
-    onAuthStateChange(callback: any) {
+    onAuthStateChange(callback: (event: string, session: { user: { email: string; id: string } } | null) => void) {
       callback('SIGNED_IN', { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } });
       return { data: { subscription: { unsubscribe: () => {} } } };
     },
@@ -410,7 +415,7 @@ class MockSupabaseClient {
 
   channel(_name: string) {
     return {
-      on(_event: string, _filter: any, _callback: any) {
+      on(_event: string, _filter: unknown, _callback: unknown) {
         return this;
       },
       subscribe() {
@@ -419,11 +424,11 @@ class MockSupabaseClient {
     };
   }
 
-  removeChannel(_channel: any) {
+  removeChannel(_channel: unknown) {
     return;
   }
 }
 
 export const supabase = isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey)
-  : (new MockSupabaseClient() as any);
+  : (new MockSupabaseClient() as unknown as ReturnType<typeof createClient>);

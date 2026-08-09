@@ -582,9 +582,9 @@ export const PaperTrading: React.FC = () => {
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                       labelStyle={{ color: '#1f2937', fontWeight: 'bold' }}
-                      formatter={(value: any, name: any) => {
-                        if (name === 'Drawdown %') return [`${value}%`, name];
-                        return [`$${Number(value).toLocaleString()}`, name];
+                      formatter={(value: number | string | Array<number | string> | undefined, name: string | number | undefined) => {
+                        if (name === 'Drawdown %') return [`${value}%`, name ?? 'Drawdown %'];
+                        return [`$${Number(value).toLocaleString()}`, name ?? ''];
                       }}
                     />
                     

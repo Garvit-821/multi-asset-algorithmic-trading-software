@@ -68,7 +68,7 @@ export const none: None = { type: 'none' }
 /**
  * Make all properties deeply readonly.
  */
-export type DeepReadonly<T> = T extends (...args: any[]) => any
+export type DeepReadonly<T> = T extends (...args: unknown[]) => unknown
     ? T
     : T extends object
     ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
@@ -175,19 +175,19 @@ export type AtLeast<T, N extends number> = [...Tuple<T, N>, ...T[]]
 /**
  * Get function arguments as tuple.
  */
-export type Arguments<T> = T extends (...args: infer A) => any ? A : never
+export type Arguments<T> = T extends (...args: infer A) => unknown ? A : never
 
 /**
  * Get first argument of function.
  */
-export type FirstArgument<T> = T extends (first: infer F, ...args: any[]) => any
+export type FirstArgument<T> = T extends (first: infer F, ...args: unknown[]) => unknown
     ? F
     : never
 
 /**
  * Async version of function.
  */
-export type AsyncFunction<T extends (...args: any[]) => any> = (
+export type AsyncFunction<T extends (...args: unknown[]) => unknown> = (
     ...args: Parameters<T>
 ) => Promise<Awaited<ReturnType<T>>>
 
@@ -239,7 +239,7 @@ export type PathOf<T, K extends keyof T = keyof T> = K extends string
  * Last element of union.
  */
 export type UnionLast<T> = UnionToIntersection<
-    T extends any ? () => T : never
+    T extends unknown ? () => T : never
 > extends () => infer R
     ? R
     : never
@@ -248,7 +248,7 @@ export type UnionLast<T> = UnionToIntersection<
  * Union to intersection.
  */
 export type UnionToIntersection<U> = (
-    U extends any ? (k: U) => void : never
+    U extends unknown ? (k: U) => void : never
 ) extends (k: infer I) => void
     ? I
     : never
@@ -308,7 +308,7 @@ export type JsonValue = JsonPrimitive | JsonArray | JsonObject
  */
 export type Jsonify<T> = T extends JsonPrimitive
     ? T
-    : T extends undefined | ((...args: any[]) => any) | symbol
+    : T extends undefined | ((...args: unknown[]) => unknown) | symbol
     ? never
     : T extends { toJSON(): infer R }
     ? R

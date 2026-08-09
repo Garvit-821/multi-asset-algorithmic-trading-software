@@ -42,6 +42,21 @@ const HISTORICAL_EVENTS: HistoricalEvent[] = [
   }
 ];
 
+interface Transaction {
+  type: 'BUY' | 'SELL';
+  price: number;
+  size: number;
+  value: number;
+  pnl?: number;
+  time: string;
+}
+
+interface EquityPoint {
+  step: number;
+  price: number;
+  equity: number;
+}
+
 export function MarketReplay() {
   const [selectedEvent, setSelectedEvent] = useState<HistoricalEvent>(HISTORICAL_EVENTS[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -51,8 +66,8 @@ export function MarketReplay() {
   // Game state
   const [balance, setBalance] = useState<number>(10000);
   const [position, setPosition] = useState<{ entryPrice: number; size: number } | null>(null);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [equityHistory, setEquityHistory] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [equityHistory, setEquityHistory] = useState<EquityPoint[]>([]);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -67,7 +82,12 @@ export function MarketReplay() {
   };
 
   useEffect(() => {
-    resetGame();
+    setIsPlaying(false);
+    setCurrentIndex(0);
+    setBalance(10000);
+    setPosition(null);
+    setTransactions([]);
+    setEquityHistory([{ step: 0, price: selectedEvent.prices[0], equity: 10000 }]);
   }, [selectedEvent]);
 
   // Tick interval loop
@@ -100,7 +120,7 @@ export function MarketReplay() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, speed, position, balance]);
+  }, [isPlaying, speed, position, balance, selectedEvent.prices]);
 
   const activePrice = selectedEvent.prices[currentIndex] || selectedEvent.prices[0];
   const unrealizedPnL = position 
@@ -359,7 +379,7 @@ export function MarketReplay() {
                     <td className="py-2.5">${tx.price.toLocaleString()}</td>
                     <td className="py-2.5">{tx.size.toFixed(4)}</td>
                     <td className="py-2.5">${tx.value.toLocaleString()}</td>
-                    <td className={`py-2.5 ${tx.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <td className={`py-2.5 ${(tx.pnl ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {tx.pnl !== undefined ? `${tx.pnl >= 0 ? '+' : ''}$${tx.pnl.toFixed(2)}` : '-'}
                     </td>
                   </tr>

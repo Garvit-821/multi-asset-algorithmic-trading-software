@@ -42,8 +42,9 @@ export function Signup({ onSuccess, onSwitchToLogin }: SignupProps) {
         // Auth state will be handled by App.tsx listener
         onSuccess();
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to sign up';
+      setError(message);
     } finally {
       setLoading(false);
     }
