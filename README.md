@@ -702,6 +702,37 @@ bash setup-android.sh
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
+*   **`229fa99` (HEAD) - Documentation & Table of Contents Anchor Fixes**:
+    *   Fixed README table of contents anchors and standardized list indentation across technical documentation guides.
+*   **`5276a25` - Strict Type Safety & Core Refactoring**:
+    *   Replaced explicit `any` types with specific interfaces, generic bounds, and `unknown` type guards across core services and React components.
+*   **`bdf64ce` - Capacitor Native Android Rebranding**:
+    *   Updated native Android app package ID (`com.stratrade.app`) and application display title to **Stratrade** in `capacitor.config.ts`.
+*   **`7cb40d2` to `90ec511` - Subscription Management, Commercial Feature Gating & Modal System**:
+    *   Implemented complete tier-based subscription workflow (`Free`, `Pro`, `Enterprise`) with feature gating hooks (`useFeatureGate`, `LockedFeatureGuard`).
+    *   Added interactive pricing section with monthly/yearly billing toggles and tier selection capabilities.
+    *   Built responsive `CheckoutModal` featuring plan switching, scrollable plan breakdown, and mobile-optimized collapsible summary drawers.
+    *   Replaced native browser alerts with custom styled confirmation modals (`ConfirmationModal.tsx`) for portfolio reset and subscription plan downgrades.
+*   **`584a7dc` - Component Architecture Modularization (SettingsView Extraction)**:
+    *   Modularized application settings view by extracting `SettingsView.tsx` from `App.tsx`, simplifying routing state and component imports.
+*   **`d610cdf` - Manual Trades Feed Enhancements & Side/Risk Indicators**:
+    *   Added order side (BUY/SELL) badges, order status tags (`OPEN`, `CLOSED`, `PENDING`), and dynamic position risk-reward calculations to `ManualTrades.tsx`.
+*   **`a625cf8` - Command Palette Keyboard Shortcuts & UX Polish**:
+    *   Implemented global `Ctrl + K` / `Cmd + K` hotkey listeners for `CommandPalette.tsx` spotlight search and added backdrop click-to-dismiss behavior.
+*   **`659ef36` to `9366023` - Landing Page Overhaul & Live Price Simulation**:
+    *   Redesigned `LandingPage.tsx` with Coinbase-inspired soft elevation aesthetics, real-time simulated price feeds, interactive asset catalog filtering (Crypto, Stocks, Forex, Commodities), and inline sparkline visualizations.
+    *   Optimized asset catalog rendering performance using `useMemo`.
+*   **`4d59562`, `317af36` & `521604c` - Derivatives Options Dashboard Modularization & Mobile Dropdowns**:
+    *   Decomposed `DerivativesOptionsDashboard.tsx` into modular sub-tab components (`OptionChainView`, `PayoffDiagramView`, `IVSurfaceView`, `GreeksCalculatorView`).
+    *   Added touch-friendly mobile dropdown selectors for options assets and analytics tabs.
+    *   Exported formal `OptionStrategy` types and updated calculation signatures in `blackScholesEngine.ts`.
+*   **`d79d278` (tag: v1.2.0) - Chart Responsiveness, Data Resiliency & WebSocket Optimizations**:
+    *   Integrated `ResizeObserver` in `TradingViewChart.tsx` for dynamic height re-scaling on viewport changes.
+    *   Improved Binance WebSocket lifecycle management, auto-reconnection fallback handlers, and fallback data generation in `dataFeed.ts`.
+    *   Added periodic background price updates to `PaperTrading.tsx` and optimized component callback hooks (`useCallback`) across trading views.
+    *   Added configurable benchmark toggles to `AdvancedBacktester.tsx`.
+*   **`5de7fe9` & `6c2a8fa` - Code Quality & ESLint Rule Alignment**:
+    *   Purged unused state variables and imports, updated ESLint rules for TypeScript strictness, and aligned code conventions across all services.
 *   **Google Gemini 2.0 Flash AI & Institutional UX Release**:
     *   **Real AI Copilot Integration (`aiCopilotService.ts`, `App.tsx`, `AIMarketIntelligence.tsx`)**: Replaced keyword rules with live Google Gemini 2.0 Flash REST API integration. Injects live portfolio snapshot (positions, unrealized PnL, cash, order history) as system prompt context with 20-turn rolling history. Added secure `localStorage` API key storage in Settings.
     *   **Global Command Palette (`CommandPalette.tsx`)**: Omnipresent keyboard spotlight search (`Ctrl + K` / `Cmd + K`) for instant view jumping, asset selection (`BTC`, `ETH`, `SOL`, `AAPL`, `NVDA`, `GOLD`), and quick trading actions.
@@ -723,7 +754,7 @@ Below is the chronological history of the recent updates and modifications made 
     *   Built `algoExecutionService.ts` and `AlgoOrderManager.tsx` offering **TWAP**, **VWAP**, and **Iceberg** algorithmic execution.
     *   Integrated live **Depth of Market (OrderBookDOM.tsx)** L2 bids/asks visualization, buy/sell wall concentration detection, and order imbalance ratios.
     *   Overhauled responsive mobile layouts and aligned visual color themes across all new components.
-*   **`71d4eed` (HEAD) - GitHub Star Integration & Header CTA**:
+*   **`71d4eed` - GitHub Star Integration & Header CTA**:
     *   Added direct GitHub repository star links to the landing page navbar and main application header.
 *   **`cff68ea` to `984f896` (tag: v1.0.0) - Android Mobile App Packaging & Capacitor Pipeline**:
     *   Configured Capacitor framework integration for native Android deployment.
