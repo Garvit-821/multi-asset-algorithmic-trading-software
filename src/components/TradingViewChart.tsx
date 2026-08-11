@@ -59,17 +59,31 @@ export function TradingViewChart({
   }, [symbol, assetType]);
 
   const removeMlForecastOverlay = useCallback(() => {
-    if (!chartRef.current) return;
+    const chart = chartRef.current;
+    if (!chart) return;
+    
     if (mlTrendSeriesRef.current) {
-      chartRef.current.removeSeries(mlTrendSeriesRef.current);
+      try {
+        chart.removeSeries(mlTrendSeriesRef.current);
+      } catch {
+        // Series already removed or invalid
+      }
       mlTrendSeriesRef.current = null;
     }
     if (mlUpperSeriesRef.current) {
-      chartRef.current.removeSeries(mlUpperSeriesRef.current);
+      try {
+        chart.removeSeries(mlUpperSeriesRef.current);
+      } catch {
+        // Series already removed or invalid
+      }
       mlUpperSeriesRef.current = null;
     }
     if (mlLowerSeriesRef.current) {
-      chartRef.current.removeSeries(mlLowerSeriesRef.current);
+      try {
+        chart.removeSeries(mlLowerSeriesRef.current);
+      } catch {
+        // Series already removed or invalid
+      }
       mlLowerSeriesRef.current = null;
     }
     setMlData(null);
@@ -298,6 +312,11 @@ export function TradingViewChart({
       if (updateInterval) {
         clearInterval(updateInterval);
       }
+      mlTrendSeriesRef.current = null;
+      mlUpperSeriesRef.current = null;
+      mlLowerSeriesRef.current = null;
+      chartRef.current = null;
+      seriesRef.current = null;
       chart.remove();
     };
   }, [symbol, assetType, height, loadChartData, updateChartData]);
