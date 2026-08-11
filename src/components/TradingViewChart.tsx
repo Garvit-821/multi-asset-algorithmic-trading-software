@@ -331,9 +331,18 @@ export function TradingViewChart({
       {showMlForecast && mlData && (
         <div className="absolute top-3 left-3 z-10 flex items-center space-x-2 bg-gray-950/90 border border-blue-500/40 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-md shadow-md">
           <BrainCircuit className="w-4 h-4 text-blue-400 animate-pulse" />
-          <div>
+          <div className="flex items-center space-x-2">
             <span className="font-bold text-blue-400">ML Forecast ({mlData.modelType})</span>
-            <span className="text-gray-400 ml-2 font-mono">+{mlData.horizonBars} bars | {mlData.accuracyConfidencePct}% Confidence</span>
+            <span className="text-gray-400 font-mono">+{mlData.horizonBars} bars | {mlData.accuracyConfidencePct}% Conf.</span>
+            {mlData.trendSignal && (
+              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                mlData.trendSignal.includes('BULLISH') ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                mlData.trendSignal.includes('BEARISH') ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+              }`}>
+                {mlData.trendSignal}
+              </span>
+            )}
           </div>
         </div>
       )}
