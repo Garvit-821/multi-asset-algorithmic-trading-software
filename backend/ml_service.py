@@ -3,6 +3,7 @@ FastAPI Institutional-Grade ML & Time-Series Price Forecasting Microservice
 Phase 2 AI Quantitative Analytics Backend Engine
 """
 
+from _typeshed import _type_checker_internals
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
