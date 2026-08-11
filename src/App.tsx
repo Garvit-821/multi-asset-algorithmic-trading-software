@@ -16,7 +16,6 @@ import { AdvancedBacktester } from './components/AdvancedBacktester';
 import { AIMarketIntelligence } from './components/AIMarketIntelligence';
 import { DerivativesOptionsDashboard } from './components/DerivativesOptionsDashboard';
 import { CommandPalette } from './components/CommandPalette';
-import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
 import { HeaderTickerBar } from './components/HeaderTickerBar';
 import { paperTradingService } from './services/paperTradingService';
 import {
@@ -609,9 +608,6 @@ function App() {
         onNavigate={(v) => setCurrentView(v as View)}
         onSelectAsset={(sym) => setSelectedSymbol(sym)}
       />
-
-      {/* Global Floating AI Copilot Drawer (Bottom Right) */}
-      <FloatingAICopilotDrawer />
 
       {/* Demo Checkout Modal */}
       {checkoutPlanId && (
