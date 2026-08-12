@@ -3,8 +3,19 @@ import { Bot, Sparkles, X, Send, ChevronDown, Minimize2 } from 'lucide-react';
 import { aiCopilotService, CopilotMessage, getGeminiApiKey } from '../services/aiCopilotService';
 import { FormattedAIResponse } from './FormattedAIResponse';
 
-export function FloatingAICopilotDrawer() {
-  const [isOpen, setIsOpen] = useState(false);
+interface FloatingAICopilotDrawerProps {
+  externalIsOpen?: boolean;
+  onCloseExternal?: () => void;
+}
+
+export function FloatingAICopilotDrawer({ externalIsOpen, onCloseExternal }: FloatingAICopilotDrawerProps = {}) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = (val: boolean) => {
+    setInternalIsOpen(val);
+    if (!val && onCloseExternal) onCloseExternal();
+  };
+
   const [isMinimized, setIsMinimized] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);

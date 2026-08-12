@@ -28,7 +28,10 @@ import { CheckoutModal } from './components/payment/CheckoutModal';
 import { PaymentConfirmationModal } from './components/payment/PaymentConfirmationModal';
 import { LockedFeatureGuard } from './components/payment/LockedFeatureGuard';
 import { SettingsView } from './components/SettingsView';
-import { Lock, CreditCard } from 'lucide-react';
+import { ShortcutsHelpModal } from './components/ShortcutsHelpModal';
+import { QuickTradeModal } from './components/QuickTradeModal';
+import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
+import { Lock, CreditCard, Command } from 'lucide-react';
 
 
 import {
@@ -101,6 +104,10 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [selectedSymbol, setSelectedSymbol] = useState<string>('BTC/USDT');
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState<boolean>(false);
+  const [copilotDrawerOpen, setCopilotDrawerOpen] = useState<boolean>(false);
+  const [quickTradeOpen, setQuickTradeOpen] = useState<boolean>(false);
+  const [quickTradeType, setQuickTradeType] = useState<'BUY' | 'SELL'>('BUY');
 
   // Subscription & Payment Workflow State
   const [subscription, setSubscription] = useState<SubscriptionState>(() => subscriptionService.getSubscription());
@@ -109,21 +116,90 @@ function App() {
 
   const showSkeleton = useViewSkeleton(currentView);
 
-  // Global hotkeys for Search Command Palette (Ctrl+K / Cmd+K and Esc)
+  // Global Pro Workstation Keyboard Shortcuts
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA' ||
+          activeElement.tagName === 'SELECT' ||
+          (activeElement as HTMLElement).isContentEditable);
+
+      // Escape key closes open modals/overlays regardless of input focus
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        e.preventDefault();
+        setCommandPaletteOpen(false);
+        setShortcutsModalOpen(false);
+        setCopilotDrawerOpen(false);
+        setQuickTradeOpen(false);
+        setCheckoutPlanId(null);
+        setPaymentReceipt(null);
+        setMobileMenuOpen(false);
+        return;
+      }
+
+      // Ctrl + K / Cmd + K (Spotlight Command Palette)
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K' || e.code === 'KeyK')) {
         e.preventDefault();
         setCommandPaletteOpen((prev) => !prev);
-      } else if ((e.key === 'Escape' || e.key === 'Esc') && commandPaletteOpen) {
+        return;
+      }
+
+      // If user is typing inside an input field, do not trigger single-key or navigation hotkeys
+      if (isInputFocused) return;
+
+      // Shift + ? or ? (Keyboard Shortcuts Cheat Sheet Modal)
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
         e.preventDefault();
-        setCommandPaletteOpen(false);
+        setShortcutsModalOpen((prev) => !prev);
+        return;
+      }
+
+      // Ctrl / Cmd + Combination Hotkeys
+      if (e.metaKey || e.ctrlKey) {
+        if (e.shiftKey) {
+          // Ctrl + Shift + A (Toggle Floating AI Copilot Drawer)
+          if (e.key === 'A' || e.key === 'a' || e.code === 'KeyA') {
+            e.preventDefault();
+            setCopilotDrawerOpen((prev) => !prev);
+            return;
+          }
+          // Ctrl + Shift + B (Quick Buy Order Dialog)
+          if (e.key === 'B' || e.key === 'b' || e.code === 'KeyB') {
+            e.preventDefault();
+            setQuickTradeType('BUY');
+            setQuickTradeOpen(true);
+            return;
+          }
+          // Ctrl + Shift + S (Quick Sell Order Dialog)
+          if (e.key === 'S' || e.key === 's' || e.code === 'KeyS') {
+            e.preventDefault();
+            setQuickTradeType('SELL');
+            setQuickTradeOpen(true);
+            return;
+          }
+        } else {
+          // One-Key Workspace Navigation (Ctrl+1 to Ctrl+5)
+          if (e.key === '1') { e.preventDefault(); setCurrentView('userfeed'); }
+          else if (e.key === '2') { e.preventDefault(); setCurrentView('trading'); }
+          else if (e.key === '3') { e.preventDefault(); setCurrentView('paper'); }
+          else if (e.key === '4') { e.preventDefault(); setCurrentView('dashboard'); }
+          else if (e.key === '5') { e.preventDefault(); setCurrentView('intelligence'); }
+        }
+      }
+
+      // Alt + R (Refresh Live Market Data Stream)
+      if (e.altKey && (e.key === 'r' || e.key === 'R' || e.code === 'KeyR')) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('market_refresh'));
       }
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [commandPaletteOpen]);
+  }, []);
 
 
   const handleResetAccount = () => {
@@ -238,17 +314,28 @@ function App() {
               </button>
             </div>
 
-            {/* Command Palette Trigger Button */}
-            <button
-              onClick={() => setCommandPaletteOpen(true)}
-              className="w-full px-3 py-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 rounded-xl text-slate-600 hover:text-blue-700 font-semibold text-xs transition-all flex items-center justify-between group"
-            >
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-blue-600 group-hover:scale-110 transition-transform" />
-                <span>Search / Commands</span>
-              </div>
-              <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded font-mono shadow-2xs">Ctrl K</kbd>
-            </button>
+            {/* Command Palette & Hotkeys Trigger Buttons */}
+            <div className="flex items-center space-x-1.5">
+              <button
+                onClick={() => setCommandPaletteOpen(true)}
+                className="flex-1 px-3 py-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 rounded-xl text-slate-600 hover:text-blue-700 font-semibold text-xs transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-4 h-4 text-blue-600 group-hover:scale-110 transition-transform" />
+                  <span>Search</span>
+                </div>
+                <kbd className="px-1.5 py-0.5 text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded font-mono shadow-2xs">Ctrl K</kbd>
+              </button>
+
+              <button
+                onClick={() => setShortcutsModalOpen(true)}
+                className="px-2.5 py-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 rounded-xl text-slate-600 hover:text-blue-700 font-semibold text-xs transition-all flex items-center space-x-1"
+                title="Keyboard Shortcuts Cheat Sheet (Shift + ?)"
+              >
+                <Command className="w-4 h-4 text-slate-600" />
+                <kbd className="px-1 py-0.5 text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded font-mono shadow-2xs">?</kbd>
+              </button>
+            </div>
           </div>
 
           <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
@@ -640,6 +727,25 @@ function App() {
           }}
         />
       )}
+      {/* Keyboard Shortcuts Help Modal */}
+      <ShortcutsHelpModal
+        isOpen={shortcutsModalOpen}
+        onClose={() => setShortcutsModalOpen(false)}
+      />
+
+      {/* Quick Trade Market Order Modal */}
+      <QuickTradeModal
+        isOpen={quickTradeOpen}
+        initialType={quickTradeType}
+        initialSymbol={selectedSymbol}
+        onClose={() => setQuickTradeOpen(false)}
+      />
+
+      {/* Global Floating AI Copilot Drawer */}
+      <FloatingAICopilotDrawer
+        externalIsOpen={copilotDrawerOpen}
+        onCloseExternal={() => setCopilotDrawerOpen(false)}
+      />
     </div>
   );
 }
