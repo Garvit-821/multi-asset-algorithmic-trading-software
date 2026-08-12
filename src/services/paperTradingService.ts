@@ -1,3 +1,5 @@
+import { audioHapticsService } from './audioHapticsService';
+
 export interface Position {
   symbol: string;
   assetType: 'crypto' | 'forex' | 'stock' | 'commodity';
@@ -104,6 +106,7 @@ class PaperTradingService {
     });
 
     this.savePortfolio(portfolio);
+    audioHapticsService.playOrderFillSound();
     return { success: true };
   }
 
@@ -160,6 +163,7 @@ class PaperTradingService {
     });
 
     this.savePortfolio(portfolio);
+    audioHapticsService.playOrderFillSound();
     return { success: true };
   }
 

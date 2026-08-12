@@ -25,6 +25,9 @@ import {
   subscriptionService,
 } from '../services/subscriptionService';
 import { getGeminiApiKey, setGeminiApiKey, getGeminiModel, setGeminiModel } from '../services/aiCopilotService';
+import { getTerminalTheme, setTerminalTheme, THEME_OPTIONS, TerminalTheme } from '../services/themeService';
+import { audioHapticsService } from '../services/audioHapticsService';
+import { backupService } from '../services/backupService';
 
 interface SettingsViewProps {
   user: { email?: string; name?: string };
@@ -419,6 +422,101 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <option value="IST">IST (Indian Standard Time)</option>
                   <option value="SGT">SGT (Singapore Time - Asia FX)</option>
                 </select>
+              </div>
+
+              {/* Terminal Theme & Audio Haptics */}
+              <div className="pt-4 border-t border-[#dee1e6] space-y-4">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-gray-500">Terminal Customization & Audio Haptics</h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-extrabold text-[#0a0b0d]">Terminal Theme Palette</label>
+                    <select
+                      value={getTerminalTheme()}
+                      onChange={(e) => {
+                        setTerminalTheme(e.target.value as TerminalTheme);
+                        audioHapticsService.playClickSound();
+                        showToast(`Terminal theme set to ${e.target.value}`);
+                      }}
+                      className="w-full px-4 py-3 bg-white border border-[#dee1e6] rounded-2xl text-xs font-semibold text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    >
+                      {THEME_OPTIONS.map(t => (
+                        <option key={t.id} value={t.id}>{t.name} — {t.description}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-extrabold text-[#0a0b0d]">Web Audio API Synthesized Haptics</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = audioHapticsService.isAudioEnabled();
+                        audioHapticsService.setAudioEnabled(!current);
+                        if (!current) audioHapticsService.playClickSound();
+                        showToast(`Audio feedback ${!current ? 'enabled' : 'disabled'}`);
+                      }}
+                      className={`w-full px-4 py-3 border rounded-2xl text-xs font-bold transition-all text-left flex items-center justify-between ${
+                        audioHapticsService.isAudioEnabled()
+                          ? 'bg-blue-50 border-blue-200 text-blue-800'
+                          : 'bg-gray-50 border-gray-200 text-gray-600'
+                      }`}
+                    >
+                      <span>Synthesized Audio Tones (Fills, Alerts & Copilot)</span>
+                      <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white border border-gray-200 font-extrabold">
+                        {audioHapticsService.isAudioEnabled() ? 'ENABLED' : 'MUTED'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Backup & Portfolio Restore */}
+              <div className="pt-4 border-t border-[#dee1e6] space-y-3">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-gray-500">Data Management & Portfolio Backup</h4>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      backupService.exportStateJSON();
+                      audioHapticsService.playClickSound();
+                      showToast('Full JSON backup downloaded successfully');
+                    }}
+                    className="px-4 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all"
+                  >
+                    📥 Export JSON Snapshot
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      backupService.exportPositionsCSV();
+                      audioHapticsService.playClickSound();
+                    }}
+                    className="px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 rounded-xl text-xs font-bold transition-all"
+                  >
+                    📊 Export Positions CSV
+                  </button>
+
+                  <label className="px-4 py-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center">
+                    📤 Restore from Backup JSON
+                    <input
+                      type="file"
+                      accept=".json"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const res = await backupService.importStateJSON(file);
+                          showToast(res.message);
+                          if (res.success) {
+                            setTimeout(() => window.location.reload(), 1200);
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
 
