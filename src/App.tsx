@@ -182,10 +182,10 @@ function App() {
           }
         } else {
           // One-Key Workspace Navigation (Ctrl+1 to Ctrl+5)
-          if (e.key === '1') { e.preventDefault(); setCurrentView('userfeed'); }
-          else if (e.key === '2') { e.preventDefault(); setCurrentView('trading'); }
-          else if (e.key === '3') { e.preventDefault(); setCurrentView('paper'); }
-          else if (e.key === '4') { e.preventDefault(); setCurrentView('dashboard'); }
+          if (e.key === '1') { e.preventDefault(); setCurrentView('dashboard'); }
+          else if (e.key === '2') { e.preventDefault(); setCurrentView('userfeed'); }
+          else if (e.key === '3') { e.preventDefault(); setCurrentView('trading'); }
+          else if (e.key === '4') { e.preventDefault(); setCurrentView('paper'); }
           else if (e.key === '5') { e.preventDefault(); setCurrentView('intelligence'); }
         }
       }
@@ -212,10 +212,10 @@ function App() {
 
   // Categorized Sidebar Navigation Items
   const coreMenuItems = [
+    { id: 'dashboard' as View, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'userfeed' as View, label: 'Trading Feed', icon: Zap },
     { id: 'trading' as View, label: 'Trading', icon: TrendingUp },
     { id: 'paper' as View, label: 'Paper Trading', icon: Wallet },
-    { id: 'dashboard' as View, label: 'Dashboard', icon: LayoutDashboard },
   ];
 
   const labMenuItems = [
@@ -238,7 +238,7 @@ function App() {
   if (currentView === 'landing') {
     return (
       <LandingPage
-        onLaunch={() => setCurrentView('userfeed')}
+        onLaunch={() => setCurrentView('dashboard')}
         onOpenCheckout={(planId) => setCheckoutPlanId(planId)}
       />
     );
@@ -551,9 +551,11 @@ function App() {
                   )}
                   {currentView === 'dashboard' && (
                     <div className="h-full overflow-y-auto">
-                      <div className="p-3 sm:p-8">
-                        <Dashboard />
-                      </div>
+                      <Dashboard
+                        onNavigate={(v) => setCurrentView(v as View)}
+                        onSelectAsset={(sym) => setSelectedSymbol(sym)}
+                        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+                      />
                     </div>
                   )}
                   {currentView === 'intelligence' && (
