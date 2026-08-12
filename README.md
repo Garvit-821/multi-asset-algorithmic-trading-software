@@ -734,7 +734,7 @@ Below is the chronological history of the recent updates and modifications made 
 *   **`5de7fe9` & `6c2a8fa` - Code Quality & ESLint Rule Alignment**:
     *   Purged unused state variables and imports, updated ESLint rules for TypeScript strictness, and aligned code conventions across all services.
 *   **Google Gemini 2.0 Flash AI & Institutional UX Release**:
-    *   **Real AI Copilot Integration (`aiCopilotService.ts`, `App.tsx`, `AIMarketIntelligence.tsx`)**: Replaced keyword rules with live Google Gemini 2.0 Flash REST API integration. Injects live portfolio snapshot (positions, unrealized PnL, cash, order history) as system prompt context with 20-turn rolling history. Added secure `localStorage` API key storage in Settings.
+    *   **Real AI Copilot Integration (`aiCopilotService.ts`, `App.tsx`, `AIMarketIntelligence.tsx`)**: Replaced keyword rules with live Google Gemini 3.5 / 2.5 Flash REST API integration. Injects live portfolio snapshot (positions, unrealized PnL, cash, order history) as system prompt context with 20-turn rolling history. Added secure `localStorage` API key storage in Settings.
     *   **Global Command Palette (`CommandPalette.tsx`)**: Omnipresent keyboard spotlight search (`Ctrl + K` / `Cmd + K`) for instant view jumping, asset selection (`BTC`, `ETH`, `SOL`, `AAPL`, `NVDA`, `GOLD`), and quick trading actions.
     *   **Floating AI Copilot Drawer (`FloatingAICopilotDrawer.tsx`)**: Persistent bottom-right floating widget allowing traders to query Gemini AI from any screen without losing context.
     *   **Live Header Ticker Bar (`HeaderTickerBar.tsx`)**: Top header tick tape displaying live price quotes, mini sparkline indicators, and one-click asset switching.
@@ -796,7 +796,7 @@ CryptoAgent includes an institutional subscription management and tier-based fea
 The platform enforces tier-based access control (`LockedFeatureGuard.tsx` & `useFeatureGate.ts`) to lock advanced quantitative tools based on active user subscription entitlements:
 - **Free / Standard Tier**: Access to real-time price charts, standard paper trading simulation, basic indicator setups, and manual trade signal feeds.
 - **Pro Tier**: Unlocks institutional TWAP, VWAP, and Iceberg execution algorithms, L2 Depth of Market visualizers, and visual strategy backtesting tools.
-- **Enterprise / VIP Tier**: Unlocks Google Gemini 2.0 Flash AI Copilot, 1,000-run Monte Carlo risk simulations, PyTorch ML price forecasting overlays, and multi-asset Pearson correlation matrices.
+- **Enterprise / VIP Tier**: Unlocks Google Gemini 3.5 / 2.5 Flash AI Copilot, 1,000-run Monte Carlo risk simulations, PyTorch ML price forecasting overlays, and multi-asset Pearson correlation matrices.
 
 ### 2. Payment & Entitlement Integration Workflow
 1. **Tier Upgrade Selection**: Users choose subscription plans via the pricing modal or interactive feature lock upgrade overlays.

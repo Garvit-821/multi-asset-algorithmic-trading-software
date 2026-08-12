@@ -513,7 +513,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                   <div className="lg:col-span-6 space-y-5">
                     <span className="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-xs font-mono font-bold uppercase border border-purple-500/20">
-                      Google Gemini 2.0 API Integration
+                      Google Gemini 3.5 / 2.5 API Integration
                     </span>
                     <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
                       Real-Time AI Market Intelligence & Copilot.
@@ -873,7 +873,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
                 <ul className="space-y-3 text-xs text-slate-200">
                   <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span><strong>Everything in Free</strong>, plus:</span></li>
                   <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Option Greeks Matrix (Δ, Γ, Θ, ν, ρ)</span></li>
-                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Google Gemini 2.0 AI Market Copilot</span></li>
+                  <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Google Gemini 3.5 / 2.5 AI Market Copilot</span></li>
                   <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Historical Backtester & Replay Engine</span></li>
                   <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>No-Code Visual Strategy Builder</span></li>
                   <li className="flex items-center space-x-2.5"><CheckCircle2 className="w-4 h-4 text-[#05b169] shrink-0" /><span>Telegram Signal Notification Bot</span></li>

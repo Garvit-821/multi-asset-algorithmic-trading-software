@@ -25,7 +25,7 @@ import {
   YAxis,
   CartesianGrid
 } from 'recharts';
-import { aiCopilotService, CopilotMessage, getGeminiApiKey } from '../services/aiCopilotService';
+import { aiCopilotService, CopilotMessage, getGeminiApiKey, getGeminiModel } from '../services/aiCopilotService';
 
 import { generateCrossAssetCorrelationMatrix, CorrelationMatrixData } from '../services/correlationService';
 import { runGridSearchOptimization, GridOptimizationSummary } from '../services/gridSearchOptimizer';
@@ -238,7 +238,7 @@ export function AIMarketIntelligence() {
                   <span>Rule-Based Mode Active</span>
                 </div>
                 <p className="text-xs text-amber-900/80 leading-relaxed">
-                  Add your <strong>Google Gemini API key</strong> in <strong>Settings → AI Copilot Configuration</strong> to unlock real-time intelligent analysis powered by Gemini 2.0 Flash.
+                  Add your <strong>Google Gemini API key</strong> in <strong>Settings → AI Copilot Configuration</strong> to unlock real-time intelligent analysis powered by Gemini AI ({getGeminiModel()}).
                 </p>
                 <button
                   onClick={() => { setHasLiveAI(!!getGeminiApiKey()); }}
@@ -251,7 +251,7 @@ export function AIMarketIntelligence() {
               <div className="bg-purple-50/60 border border-purple-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-3">
                 <div className="flex items-center space-x-2 text-purple-700 font-bold text-xs">
                   <Zap className="w-4 h-4 shrink-0" />
-                  <span>Gemini 2.0 Flash Connected</span>
+                  <span>Gemini ({getGeminiModel()}) Connected</span>
                 </div>
                 <p className="text-xs text-purple-900/80 leading-relaxed">
                   Real AI analysis is active. The copilot has full visibility of your live portfolio positions, cash balance, and order history.
@@ -273,7 +273,7 @@ export function AIMarketIntelligence() {
                   {hasLiveAI ? (
                     <span className="text-[10px] text-purple-600 font-bold flex items-center space-x-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse inline-block" />
-                      <span>Powered by Gemini 2.0 Flash</span>
+                      <span>Powered by Gemini ({getGeminiModel()})</span>
                     </span>
                   ) : (
                     <span className="text-[10px] text-green-600 font-bold flex items-center space-x-1">

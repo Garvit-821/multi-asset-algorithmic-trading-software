@@ -16,6 +16,8 @@ export interface CopilotMessage {
 
 // ─── localStorage key ────────────────────────────────────────────────────────
 const API_KEY_STORAGE_KEY = 'stratrade_gemini_api_key';
+const MODEL_STORAGE_KEY = 'stratrade_gemini_model';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 export function getGeminiApiKey(): string {
   return localStorage.getItem(API_KEY_STORAGE_KEY) || '';
@@ -26,6 +28,18 @@ export function setGeminiApiKey(key: string): void {
     localStorage.setItem(API_KEY_STORAGE_KEY, key.trim());
   } else {
     localStorage.removeItem(API_KEY_STORAGE_KEY);
+  }
+}
+
+export function getGeminiModel(): string {
+  return localStorage.getItem(MODEL_STORAGE_KEY) || DEFAULT_MODEL;
+}
+
+export function setGeminiModel(model: string): void {
+  if (model.trim()) {
+    localStorage.setItem(MODEL_STORAGE_KEY, model.trim());
+  } else {
+    localStorage.removeItem(MODEL_STORAGE_KEY);
   }
 }
 
@@ -101,7 +115,8 @@ async function callGeminiAPI(
   const apiKey = getGeminiApiKey();
   if (!apiKey) throw new Error('NO_API_KEY');
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const model = getGeminiModel();
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Build contents array: system + history + new user turn
   const contents = [

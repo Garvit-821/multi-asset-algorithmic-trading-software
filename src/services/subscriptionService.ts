@@ -84,7 +84,7 @@ export const PLANS: Record<PlanId, PlanDetails> = {
     features: [
       'Everything in Free Sandbox',
       'Full Option Greeks Sensitivity Matrix (Δ, Γ, Θ, ν, ρ)',
-      'Google Gemini 2.0 AI Market Intelligence & Copilot',
+      'Google Gemini 3.5 / 2.5 AI Market Intelligence & Copilot',
       'Historical Strategy Backtester & Replay Engine',
       'No-Code Visual Strategy Graph Builder',
       'Social Market Sentiment & Pulse Monitor',

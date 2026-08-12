@@ -24,7 +24,7 @@ import {
   PlanId,
   subscriptionService,
 } from '../services/subscriptionService';
-import { getGeminiApiKey, setGeminiApiKey } from '../services/aiCopilotService';
+import { getGeminiApiKey, setGeminiApiKey, getGeminiModel, setGeminiModel } from '../services/aiCopilotService';
 
 interface SettingsViewProps {
   user: { email?: string; name?: string };
@@ -58,7 +58,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   // AI Integration States
   const [geminiKey, setGeminiKey] = useState(getGeminiApiKey());
   const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
+  const [selectedModel, setSelectedModel] = useState(getGeminiModel());
   const [aiTemperature, setAiTemperature] = useState(0.2);
   const [isTestingAi, setIsTestingAi] = useState(false);
   const [aiTestResult, setAiTestResult] = useState<string | null>(null);
@@ -83,7 +83,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const handleSaveGeminiKey = () => {
     setGeminiApiKey(geminiKey);
-    showToast('Gemini API key updated successfully');
+    setGeminiModel(selectedModel);
+    showToast('Gemini API key & model settings updated successfully');
   };
 
   const handleTestAiConnection = async () => {
@@ -92,7 +93,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     await new Promise((res) => setTimeout(res, 800));
     setIsTestingAi(false);
     if (geminiKey.trim()) {
-      setAiTestResult('Connected • Latency: 42ms • Model: Gemini 2.0 Flash');
+      setAiTestResult(`Connected • Latency: 42ms • Model: ${selectedModel}`);
     } else {
       setAiTestResult('No API Key configured • Running on public demo fallback');
     }
@@ -439,7 +440,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div>
                 <h3 className="text-lg font-extrabold text-[#0a0b0d] flex items-center space-x-2">
                   <BrainCircuit className="w-5 h-5 text-[#0052ff]" />
-                  <span>Google Gemini 2.0 AI Copilot Integration</span>
+                  <span>Google Gemini 3.5 / 2.5 AI Copilot Integration</span>
                 </h3>
                 <p className="text-xs text-[#5b616e] mt-0.5">
                   Configure custom Gemini API credentials for real-time market sentiment synthesis and quantitative prompt processing.
@@ -484,9 +485,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     onChange={(e) => setSelectedModel(e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-[#dee1e6] rounded-2xl text-xs font-semibold text-[#0a0b0d] focus:border-[#0052ff] focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
-                    <option value="gemini-2.0-flash">Google Gemini 2.0 Flash (Sub-second low latency)</option>
-                    <option value="gemini-1.5-pro">Google Gemini 1.5 Pro (Deep quantitative reasoning)</option>
-                    <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite (High throughput)</option>
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Sub-second low latency)</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Next-Gen low latency)</option>
+                    <option value="gemini-3.0-flash">Google Gemini 3.0 Flash (Advanced quantitative intelligence)</option>
+                    <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Deep reasoning & synthesis)</option>
+                    <option value="gemini-1.5-pro">Google Gemini 1.5 Pro (Legacy quantitative reasoning)</option>
                   </select>
                 </div>
 

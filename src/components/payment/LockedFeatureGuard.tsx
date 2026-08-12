@@ -13,7 +13,7 @@ interface LockedFeatureGuardProps {
 const VIEW_FEATURE_DESCRIPTIONS: Record<string, { title: string; subtitle: string; bullets: string[] }> = {
   intelligence: {
     title: 'AI Market Intelligence Hub',
-    subtitle: 'Real-time contextual market analysis and automated strategy synthesis powered by Google Gemini 2.0 API.',
+    subtitle: 'Real-time contextual market analysis and automated strategy synthesis powered by Google Gemini 3.5 / 2.5 API.',
     bullets: [
       'Natural language technical indicator explanation & signal breakdown',
       'Automated momentum, support, and resistance analysis',
