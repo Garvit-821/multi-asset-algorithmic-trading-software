@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Lock, Sparkles, X, ShieldCheck, ArrowRight, Zap, RefreshCw, AlertCircle, Wifi, CheckCircle2, ChevronDown } from 'lucide-react';
 import {
   PlanId,
@@ -35,6 +35,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setActivePlanId(initialPlanId === 'free' ? 'pro' : initialPlanId);
+      setInterval(initialInterval);
+      setErrorMsg(null);
+      setIsProcessing(false);
+    }
+  }, [isOpen, initialPlanId, initialInterval]);
 
   if (!isOpen) return null;
 

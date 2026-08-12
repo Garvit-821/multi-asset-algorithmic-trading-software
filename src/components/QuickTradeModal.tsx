@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
 import { paperTradingService } from '../services/paperTradingService';
 
@@ -20,6 +20,15 @@ export const QuickTradeModal: React.FC<QuickTradeModalProps> = ({
   const [quantity, setQuantity] = useState<string>('0.1');
   const [executed, setExecuted] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setType(initialType);
+      setSymbol(initialSymbol);
+      setExecuted(false);
+      setError('');
+    }
+  }, [isOpen, initialType, initialSymbol]);
 
   if (!isOpen) return null;
 
