@@ -37,8 +37,9 @@
     - [Docker Deployment](#docker-deployment)
     - [Android Mobile App (Capacitor APK)](#android-mobile-app-capacitor-apk)
 12. [Troubleshooting](#troubleshooting)
-13. [Payment Workflow & Feature Gating System](#payment-workflow--feature-gating-system)
-14. [License](#license)
+13. [Pro Terminal Keyboard Shortcuts & AI Copilot System](#pro-terminal-keyboard-shortcuts--ai-copilot-system)
+14. [Payment Workflow & Feature Gating System](#payment-workflow--feature-gating-system)
+15. [License](#license)
 
 ---
 
@@ -698,10 +699,48 @@ bash setup-android.sh
 
 ---
 
+## ⌨️ Pro Terminal Keyboard Shortcuts & AI Copilot System
+
+Stratrade features a desktop-grade global keyboard shortcut engine and an institutional AI Copilot rendering pipeline designed for rapid execution, navigation, and quantitative market auditing.
+
+### 1. Global Keyboard Shortcuts Suite
+Centralized event routing in `App.tsx` handles global keypress events with smart input focus protection (preventing hotkey execution while typing inside text fields or code editors).
+
+| Category | Combination | Function | Implementation Details |
+| :--- | :--- | :--- | :--- |
+| **Global Overlays** | <kbd>Shift</kbd> + <kbd>?</kbd> or <kbd>?</kbd> | **Shortcuts Cheat Sheet** | Displays `ShortcutsHelpModal.tsx` listing all workstation hotkeys categorized into visual `<kbd>` badges. |
+| | <kbd>Esc</kbd> | **Universal Overlay Dismiss** | Unifies state reset for all active modals (`CommandPalette`, `ShortcutsHelpModal`, `QuickTradeModal`, `FloatingAICopilotDrawer`, `CheckoutModal`, `PaymentConfirmationModal`, and mobile drawer menu). |
+| | <kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>Cmd</kbd> + <kbd>K</kbd> | **Spotlight Command Palette** | Opens omnipresent search bar (`CommandPalette.tsx`) for instant asset switching and menu jumps. |
+| **Workspace Navigation** | <kbd>Ctrl</kbd> + <kbd>1</kbd> | **Trading Feed** | Instantly switches active view to `UserDashboard` (Live Trading Feed). |
+| | <kbd>Ctrl</kbd> + <kbd>2</kbd> | **Live Trading Chart** | Instantly switches active view to `MarketDashboard` (TradingView & Orderbook). |
+| | <kbd>Ctrl</kbd> + <kbd>3</kbd> | **Paper Ledger** | Instantly switches active view to `PaperTrading` portfolio manager. |
+| | <kbd>Ctrl</kbd> + <kbd>4</kbd> | **Dashboard** | Instantly switches active view to `Dashboard` (Performance Analytics). |
+| | <kbd>Ctrl</kbd> + <kbd>5</kbd> | **AI Hub** | Instantly switches active view to `AIMarketIntelligence` hub. |
+| **Fast Trade Execution** | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> | **Quick Buy Order** | Opens `QuickTradeModal.tsx` in **BUY** mode with asset pair dropdown and paper trading execution. |
+| | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | **Quick Sell Order** | Opens `QuickTradeModal.tsx` in **SELL** mode with asset pair dropdown and paper trading execution. |
+| **AI & Utilities** | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>A</kbd> | **Toggle AI Drawer** | Toggles persistent `FloatingAICopilotDrawer.tsx` widget from any view. |
+| | <kbd>Alt</kbd> + <kbd>R</kbd> | **Refresh Data Stream** | Dispatches custom `market_refresh` event to update live price tickers and order books. |
+
+### 2. Google Gemini 3.5 / 2.5 AI Model Ecosystem Integration
+- **Dynamic Service Layer (`aiCopilotService.ts`)**: Upgraded from static endpoints to dynamic endpoint generation (`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`).
+- **Target Selection & Persistence**: Supports `gemini-2.5-flash`, `gemini-3.5-flash`, `gemini-3.0-flash`, `gemini-2.5-pro`, and `gemini-1.5-pro`. User model selection is stored persistently in `localStorage` (`stratrade_gemini_model`).
+- **Live System Context Injection**: Injects live portfolio snapshot (cash balance, open positions, average entry prices, win rate, recent order history) into system prompts with 20-turn rolling conversation memory.
+
+### 3. Institutional AI Response Visualizer (`FormattedAIResponse.tsx`)
+- **Automated Markdown Parsing**: Parses headers, bold key-value metrics, code blocks, bullet points, and alert callouts (`Note:`, `Warning:`).
+- **Structured Metric Cards**: Detects quantitative keys (Cash, Win Rate, Asset Exposure, PnL) and dynamically renders styled card containers with financial icons (`DollarSign`, `TrendingUp`, `PieChart`, `CheckCircle2`) and animated progress bars.
+- **Float Truncation & Currency Formatting**: Automatically cleans unrounded floating-point numbers from AI output (e.g. `$12,661.783941` $\rightarrow$ `$12,661.78` and `1.5507009544758485 BTC` $\rightarrow$ `1.5507 BTC`).
+
+---
+
 ## 📜 Project Changelog & Recent Commits
 
 Below is the chronological history of the recent updates and modifications made to the CryptoAgent terminal:
 
+*   **Pro Terminal Keyboard Shortcuts Engine & AI Copilot Upgrade**:
+    *   **Global Keyboard Shortcuts Suite (`App.tsx`, `ShortcutsHelpModal.tsx`, `QuickTradeModal.tsx`)**: Implemented institutional keybinding system (<kbd>Shift + ?</kbd> cheat sheet modal, <kbd>Ctrl + 1..5</kbd> workspace jumps, <kbd>Ctrl + Shift + A</kbd> AI drawer toggle, <kbd>Ctrl + Shift + B/S</kbd> quick market orders, <kbd>Alt + R</kbd> data refresh, and universal <kbd>Esc</kbd> dismiss).
+    *   **Google Gemini 3.5 / 2.5 Ecosystem Integration (`aiCopilotService.ts`, `SettingsView.tsx`)**: Upgraded AI architecture to support dynamic model targets (`gemini-2.5-flash`, `gemini-3.5-flash`, `gemini-3.0-flash`, `gemini-2.5-pro`) with persistent `localStorage` model configuration.
+    *   **Institutional AI Response Renderer (`FormattedAIResponse.tsx`)**: Developed visual component for rendering structured AI outputs, metric cards with financial iconography, float number cleaning, and dynamic allocation share bars.
 *   **`229fa99` (HEAD) - Documentation & Table of Contents Anchor Fixes**:
     *   Fixed README table of contents anchors and standardized list indentation across technical documentation guides.
 *   **`5276a25` - Strict Type Safety & Core Refactoring**:
