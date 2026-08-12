@@ -159,6 +159,11 @@ function App() {
     { id: 'manual' as View, label: 'Manual Trades', icon: LayoutDashboard },
   ];
 
+  // Initialize active terminal theme on mount
+  useEffect(() => {
+    applyTerminalTheme();
+  }, []);
+
   // If the view is the Landing Page, render full width outside the dashboard shell
   if (currentView === 'landing') {
     return (
@@ -168,11 +173,6 @@ function App() {
       />
     );
   }
-
-  // Initialize active terminal theme on mount
-  useEffect(() => {
-    applyTerminalTheme();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col h-screen overflow-hidden">
