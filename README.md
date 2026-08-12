@@ -711,22 +711,30 @@ Centralized event routing in `App.tsx` handles global keypress events with smart
 | **Global Overlays** | <kbd>Shift</kbd> + <kbd>?</kbd> or <kbd>?</kbd> | **Shortcuts Cheat Sheet** | Displays `ShortcutsHelpModal.tsx` listing all workstation hotkeys categorized into visual `<kbd>` badges. |
 | | <kbd>Esc</kbd> | **Universal Overlay Dismiss** | Unifies state reset for all active modals (`CommandPalette`, `ShortcutsHelpModal`, `QuickTradeModal`, `FloatingAICopilotDrawer`, `CheckoutModal`, `PaymentConfirmationModal`, and mobile drawer menu). |
 | | <kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>Cmd</kbd> + <kbd>K</kbd> | **Spotlight Command Palette** | Opens omnipresent search bar (`CommandPalette.tsx`) for instant asset switching and menu jumps. |
-| **Workspace Navigation** | <kbd>Ctrl</kbd> + <kbd>1</kbd> | **Trading Feed** | Instantly switches active view to `UserDashboard` (Live Trading Feed). |
-| | <kbd>Ctrl</kbd> + <kbd>2</kbd> | **Live Trading Chart** | Instantly switches active view to `MarketDashboard` (TradingView & Orderbook). |
-| | <kbd>Ctrl</kbd> + <kbd>3</kbd> | **Paper Ledger** | Instantly switches active view to `PaperTrading` portfolio manager. |
-| | <kbd>Ctrl</kbd> + <kbd>4</kbd> | **Dashboard** | Instantly switches active view to `Dashboard` (Performance Analytics). |
+| **Workspace Navigation** | <kbd>Ctrl</kbd> + <kbd>1</kbd> | **Institutional Dashboard** | Instantly switches active view to `Dashboard` (Home & Institutional Analytics). |
+| | <kbd>Ctrl</kbd> + <kbd>2</kbd> | **Trading Feed** | Instantly switches active view to `UserDashboard` (Live Trading Feed). |
+| | <kbd>Ctrl</kbd> + <kbd>3</kbd> | **Live Trading Chart** | Instantly switches active view to `MarketDashboard` (TradingView & Orderbook). |
+| | <kbd>Ctrl</kbd> + <kbd>4</kbd> | **Paper Ledger** | Instantly switches active view to `PaperTrading` portfolio manager. |
 | | <kbd>Ctrl</kbd> + <kbd>5</kbd> | **AI Hub** | Instantly switches active view to `AIMarketIntelligence` hub. |
 | **Fast Trade Execution** | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> | **Quick Buy Order** | Opens `QuickTradeModal.tsx` in **BUY** mode with asset pair dropdown and paper trading execution. |
-| | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | **Quick Sell Order** | Opens `QuickTradeModal.tsx` in **SELL** mode with asset pair dropdown and paper trading execution. |
+| | <kbd>Ctrl</kbd> + <kbd>5</kbd> | **Quick Sell Order** | Opens `QuickTradeModal.tsx` in **SELL** mode with asset pair dropdown and paper trading execution. |
 | **AI & Utilities** | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>A</kbd> | **Toggle AI Drawer** | Toggles persistent `FloatingAICopilotDrawer.tsx` widget from any view. |
 | | <kbd>Alt</kbd> + <kbd>R</kbd> | **Refresh Data Stream** | Dispatches custom `market_refresh` event to update live price tickers and order books. |
 
-### 2. Google Gemini 3.5 / 2.5 AI Model Ecosystem Integration
+### 2. Institutional Dashboard UI Redesign (`Dashboard.tsx`)
+- **Institutional Analytics Header**: Displays live market monitoring status, quick search bar with `⌘ K` hotkey trigger, notification bell counter, and user profile metadata badge ("Garvit Prakash - Pro Trader").
+- **Top Metric Cards Row**: 4 sleek cards (`Coins Monitored`, `Active Alerts`, `Manual Trades`, `AI Accuracy`) with status tags and custom SVG micro-sparklines.
+- **Top Market Movers Table**: Displays pair metrics, prices, 24h change %, star favorites toggles, and inline trend sparklines.
+- **Recent Activity & 24H Donut Chart**: Combines activity timeline feed with a Recharts Donut (`PieChart`) event breakdown (`128 Total Events`), legend, and smooth activity volume `AreaChart`.
+- **Asset Ticker Bar**: Interactive bottom ticker card slider displaying real-time prices for top crypto and equity assets.
+- **Default Launch Landing Destination**: Directs users to `Dashboard` upon clicking "Launch Terminal" / "Launch Workstation".
+
+### 3. Google Gemini 3.5 / 2.5 AI Model Ecosystem Integration
 - **Dynamic Service Layer (`aiCopilotService.ts`)**: Upgraded from static endpoints to dynamic endpoint generation (`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`).
 - **Target Selection & Persistence**: Supports `gemini-2.5-flash`, `gemini-3.5-flash`, `gemini-3.0-flash`, `gemini-2.5-pro`, and `gemini-1.5-pro`. User model selection is stored persistently in `localStorage` (`stratrade_gemini_model`).
 - **Live System Context Injection**: Injects live portfolio snapshot (cash balance, open positions, average entry prices, win rate, recent order history) into system prompts with 20-turn rolling conversation memory.
 
-### 3. Institutional AI Response Visualizer (`FormattedAIResponse.tsx`)
+### 4. Institutional AI Response Visualizer (`FormattedAIResponse.tsx`)
 - **Automated Markdown Parsing**: Parses headers, bold key-value metrics, code blocks, bullet points, and alert callouts (`Note:`, `Warning:`).
 - **Structured Metric Cards**: Detects quantitative keys (Cash, Win Rate, Asset Exposure, PnL) and dynamically renders styled card containers with financial icons (`DollarSign`, `TrendingUp`, `PieChart`, `CheckCircle2`) and animated progress bars.
 - **Float Truncation & Currency Formatting**: Automatically cleans unrounded floating-point numbers from AI output (e.g. `$12,661.783941` $\rightarrow$ `$12,661.78` and `1.5507009544758485 BTC` $\rightarrow$ `1.5507 BTC`).

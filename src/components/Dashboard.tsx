@@ -279,18 +279,18 @@ export function Dashboard({ onNavigate, onSelectAsset, onOpenCommandPalette }: D
 
   return (
     <div className="space-y-6 p-4 sm:p-8 max-w-7xl mx-auto bg-[#fafbfc] min-h-screen text-[#0a0b0d] font-sans pb-28 md:pb-12">
-      {/* ── Top Header Bar with Search & User Profile ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* ── Top Header Bar with Search & Bell Icon (Profile removed) ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0a0b0d]">Dashboard</h1>
           <p className="text-xs sm:text-sm text-[#5b616e] mt-0.5 font-medium">Real-time trading insights and analytics</p>
         </div>
 
-        <div className="flex items-center space-x-3 sm:space-x-4 self-end md:self-auto">
+        <div className="flex items-center space-x-3 self-end sm:self-auto">
           {/* Search Markets Command Trigger */}
           <button
             onClick={() => onOpenCommandPalette?.()}
-            className="flex items-center space-x-3 px-3.5 py-2 bg-white border border-[#dee1e6] hover:border-blue-500 rounded-2xl shadow-2xs transition-all text-xs text-[#5b616e] hover:text-[#0a0b0d] group min-w-[200px] sm:min-w-[240px]"
+            className="flex items-center space-x-3 px-3.5 py-2 bg-white border border-[#dee1e6] hover:border-blue-500 rounded-2xl shadow-2xs transition-all text-xs text-[#5b616e] hover:text-[#0a0b0d] group min-w-[200px] sm:min-w-[260px]"
           >
             <Search className="w-4 h-4 text-[#7c828a] group-hover:text-[#0052ff] transition-colors" />
             <span className="flex-1 text-left font-medium">Search markets, coins...</span>
@@ -308,31 +308,10 @@ export function Dashboard({ onNavigate, onSelectAsset, onOpenCommandPalette }: D
               </span>
             </button>
           </div>
-
-          {/* User Profile Info Header */}
-          <div className="flex items-center space-x-2.5 pl-1 border-l border-[#dee1e6]">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-xs shrink-0 overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                alt="Garvit Prakash"
-                className="w-full h-full object-cover rounded-full"
-                onError={(e) => {
-                  // Fallback avatar if image fails to load
-                  (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Garvit+Prakash&background=0052ff&color=fff';
-                }}
-              />
-            </div>
-            <div className="hidden sm:block text-left">
-              <div className="text-xs sm:text-sm font-extrabold text-[#0a0b0d] leading-tight">Garvit Prakash</div>
-              <span className="text-[10px] font-extrabold font-mono text-[#0052ff] bg-blue-50 px-2 py-0.5 rounded-full inline-block mt-0.5 border border-blue-100">
-                Pro Trader
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* ── Top Metric Cards Row (4 Cards matching UI design) ── */}
+      {/* ── Top Metric Cards Row (4 Cards) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Monitored Coins */}
         <div className="bg-white border border-[#dee1e6] rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-2xs flex items-center justify-between hover:shadow-md transition-shadow">
@@ -518,7 +497,7 @@ export function Dashboard({ onNavigate, onSelectAsset, onOpenCommandPalette }: D
         </div>
 
         {/* Right Column: Recent Activity + Market Activity 24H */}
-        <div className="lg:col-span-6 bg-white border border-[#dee1e6] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs space-y-5 flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white border border-[#dee1e6] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xs flex flex-col justify-start space-y-4">
           <div className="flex items-center justify-between border-b border-[#dee1e6] pb-3.5">
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-[#0052ff]" />
@@ -532,11 +511,11 @@ export function Dashboard({ onNavigate, onSelectAsset, onOpenCommandPalette }: D
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
             {/* Activity Stream List */}
-            <div className="md:col-span-6 space-y-3.5">
+            <div className="md:col-span-6 space-y-3">
               {activities.map((act) => (
-                <div key={act.id} className="flex items-start space-x-3 text-xs group">
+                <div key={act.id} className="flex items-start space-x-3 text-xs group p-1.5 hover:bg-[#f7f8fa] rounded-xl transition-colors">
                   <div className="mt-0.5 shrink-0">
                     {act.type === 'alert' && (
                       <div className="p-1.5 bg-emerald-50 text-[#05b169] rounded-xl border border-emerald-100">
@@ -580,48 +559,48 @@ export function Dashboard({ onNavigate, onSelectAsset, onOpenCommandPalette }: D
                 </button>
               </div>
 
-              {/* Donut Chart with Center 128 Events Text & Legend */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="w-28 h-28 relative shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={DONUT_DATA}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={30}
-                        outerRadius={44}
-                        paddingAngle={3}
-                        dataKey="value"
-                      >
-                        {DONUT_DATA.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                    <span className="text-base font-extrabold font-mono text-[#0a0b0d] leading-none">128</span>
-                    <span className="text-[8px] font-bold text-[#7c828a] uppercase tracking-wider mt-0.5">Total Events</span>
-                  </div>
-                </div>
-
-                {/* Donut Legend */}
-                <div className="space-y-1 text-[10px] flex-1">
-                  {DONUT_DATA.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between text-[#5b616e]">
-                      <div className="flex items-center space-x-1.5 min-w-0">
-                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="truncate font-medium">{item.name}</span>
-                      </div>
-                      <span className="font-mono font-extrabold text-[#0a0b0d] ml-1">{item.value} ({item.percentage})</span>
-                    </div>
-                  ))}
+              {/* Donut Chart with Center 128 Events Text */}
+              <div className="w-28 h-28 relative mx-auto my-1 shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={DONUT_DATA}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={32}
+                      outerRadius={48}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {DONUT_DATA.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                  <span className="text-base font-extrabold font-mono text-[#0a0b0d] leading-none">128</span>
+                  <span className="text-[8px] font-bold text-[#7c828a] uppercase tracking-wider mt-0.5">Total Events</span>
                 </div>
               </div>
 
+              {/* Clean Donut Legend List */}
+              <div className="space-y-1.5 text-[11px] bg-white p-2.5 rounded-xl border border-[#dee1e6]">
+                {DONUT_DATA.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between text-[#5b616e]">
+                    <div className="flex items-center space-x-1.5 min-w-0">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="truncate font-medium text-[10px]">{item.name}</span>
+                    </div>
+                    <span className="font-mono font-extrabold text-[#0a0b0d] text-[10px] ml-1">
+                      {item.value} <span className="text-[#7c828a] font-normal">({item.percentage})</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+
               {/* Timeline Area Chart below donut */}
-              <div className="h-16 w-full pt-1">
+              <div className="h-14 w-full pt-1">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={ACTIVITY_TIMELINE_DATA}>
                     <defs>
