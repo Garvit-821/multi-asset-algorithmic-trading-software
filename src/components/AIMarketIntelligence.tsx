@@ -26,6 +26,7 @@ import {
   CartesianGrid
 } from 'recharts';
 import { aiCopilotService, CopilotMessage, getGeminiApiKey, getGeminiModel } from '../services/aiCopilotService';
+import { FormattedAIResponse } from './FormattedAIResponse';
 
 import { generateCrossAssetCorrelationMatrix, CorrelationMatrixData } from '../services/correlationService';
 import { runGridSearchOptimization, GridOptimizationSummary } from '../services/gridSearchOptimizer';
@@ -314,9 +315,7 @@ export function AIMarketIntelligence() {
                       </div>
                     </div>
 
-                    <div className="text-xs leading-relaxed whitespace-pre-line font-sans">
-                      {msg.text}
-                    </div>
+                    <FormattedAIResponse content={msg.text} isUser={msg.sender === 'user'} />
 
                     {/* Metadata Visualizer for Exposure */}
                     {msg.metadata?.exposureData && (

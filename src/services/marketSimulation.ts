@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CoinsIcon } from 'lucide-react';
 
 const CRYPTO_PAIRS = [
   'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'XRP/USDT', 'ADA/USDT',
@@ -126,7 +127,7 @@ export class MarketSimulator {
     try {
       // Get all CoinGecko IDs
       const coinIds = CRYPTO_PAIRS.map(pair => COINGECKO_IDS[pair]).filter(Boolean);
-      
+
       // Fetch data from CoinGecko API
       const response = await axios.get(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds.join(',')}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true`,

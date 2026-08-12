@@ -264,18 +264,18 @@ class AICopilotService {
     const techExposure = breakdown.find(b => b.category === 'Equities/Tech')?.percent || 0;
     const cryptoExposure = breakdown.find(b => b.category === 'Crypto')?.percent || 0;
 
-    let responseText = `Here is your portfolio exposure breakdown:\n\n` +
-      `• **Total Portfolio Valuation**: $${totalValuation.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +
-      `• **Available Cash**: $${totalCash.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${cashPct}%)\n` +
-      `• **Tech/Equities Exposure**: ${techExposure}%\n` +
-      `• **Crypto Assets Exposure**: ${cryptoExposure}%\n\n`;
+    let responseText = `### 📊 Portfolio Exposure Breakdown\n\n` +
+      `* **Total Portfolio Valuation**: $${totalValuation.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +
+      `* **Available Cash**: $${totalCash.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${cashPct}%)\n` +
+      `* **Tech/Equities Exposure**: ${techExposure}%\n` +
+      `* **Crypto Assets Exposure**: ${cryptoExposure}%\n\n`;
 
     if (techExposure > 40) {
-      responseText += `⚠️ **High Concentration Risk**: Your portfolio has a high concentration of ${techExposure}% in Tech/Equities. Consider diversifying into defensive assets like Commodities or Gold.`;
+      responseText += `Note: Your portfolio has a high concentration of ${techExposure}% in Tech/Equities. Consider diversifying into defensive assets like Commodities or Gold.`;
     } else if (cryptoExposure > 50) {
-      responseText += `⚠️ **High Volatility Warning**: Over ${cryptoExposure}% of your capital is exposed to Crypto assets. Ensure stop-loss boundaries are enforced.`;
+      responseText += `Note: Over ${cryptoExposure}% of your capital is exposed to Crypto assets. Ensure stop-loss boundaries are enforced.`;
     } else {
-      responseText += `✅ **Balanced Allocation**: Your asset allocation across equities, crypto, and liquid cash reserve is in a healthy risk corridor.`;
+      responseText += `* **Allocation Status**: Balanced allocation across equities, crypto, and liquid cash reserve.`;
     }
 
     return {
@@ -290,19 +290,17 @@ class AICopilotService {
 
   private generateTradeAuditAnalysis(portfolio: Portfolio): CopilotMessage {
     const orders = portfolio.orders;
-    let responseText = `📊 **Trade Performance Audit**:\n\n`;
+    let responseText = `### 📈 Trade Performance Audit\n\n`;
     if (orders.length === 0) {
-      responseText += `Based on recent execution history across standard strategies:\n\n` +
-        `• **Worst Loss**: \`BTC/USDT\` (-$480.50 / -3.2%) — Exited via Stop Loss due to MACD bearish flip.\n` +
-        `• **Best Trade**: \`ETH/USDT\` (+$1,250.00 / +8.4%) — Exited at Take Profit target on EMA crossover.\n` +
-        `• **Overall Win Rate**: **64.5%** across 31 execution cycles.\n\n` +
-        `💡 **Insight**: Your largest losses occurred during high volatility news windows. Consider pausing grid bots during CPI/FOMC releases.`;
+      responseText += `* **Worst Loss**: \`BTC/USDT\` (-$480.50 / -3.2%)\n` +
+        `* **Best Trade**: \`ETH/USDT\` (+$1,250.00 / +8.4%)\n` +
+        `* **Overall Win Rate**: **64.5%** across 31 execution cycles\n\n` +
+        `Note: Your largest losses occurred during high volatility news windows. Consider pausing grid bots during CPI/FOMC releases.`;
     } else {
-      responseText += `Analyzed ${orders.length} order records:\n\n` +
-        `• **Total Orders Executed**: ${orders.length}\n` +
-        `• **Latest Order**: ${orders[0].type} ${orders[0].quantity} units of \`${orders[0].symbol}\` @ $${orders[0].price}\n` +
-        `• **Execution Efficiency**: 98.4% (minimal slippage detected).\n\n` +
-        `💡 **Recommendation**: Tighten stop loss from 3.0% to 2.0% on high beta pairs.`;
+      responseText += `* **Total Orders Executed**: ${orders.length}\n` +
+        `* **Latest Order**: ${orders[0].type} ${orders[0].quantity.toFixed(4)} units of \`${orders[0].symbol}\` @ $${orders[0].price.toFixed(2)}\n` +
+        `* **Execution Efficiency**: 98.4% (minimal slippage detected)\n\n` +
+        `Note: Tighten stop loss from 3.0% to 2.0% on high beta pairs.`;
     }
     return {
       id: `copilot-${Date.now()}`,
@@ -319,10 +317,11 @@ class AICopilotService {
       id: `copilot-${Date.now()}`,
       sender: 'assistant',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      text: `🛡️ **Portfolio Risk & Rebalance Protocol**:\n\n` +
-        `1. **Cross-Asset Correlation Alert**: BTC/USDT and ETH/USDT display a high correlation of **0.88**. Holding max size in both increases downside tail risk.\n` +
-        `2. **Recommended Action**: Reallocate 15% of crypto profits into non-correlated hedges (e.g. GOLD or cash reserve).\n` +
-        `3. **Circuit Breakers**: Enable global daily drawdown kill-switch at -3.5% balance drop.`,
+      text: `### 🛡️ Risk & Rebalance Protocol\n\n` +
+        `* **Correlation Risk**: BTC/USDT & ETH/USDT display a high correlation of **0.88**\n` +
+        `* **Rebalance Target**: Reallocate 15% of crypto profits into Gold or cash reserve\n` +
+        `* **Circuit Breakers**: Enable global daily drawdown kill-switch at -3.5%\n\n` +
+        `Note: Holding max size in highly correlated pairs increases downside tail risk.`,
       category: 'risk',
       metadata: { recommendations: ['Trim crypto exposure by 15% and allocate to Gold/Forex hedges.', 'Set global daily loss threshold at -3.5%.'] }
     };
@@ -333,21 +332,14 @@ class AICopilotService {
       id: `copilot-${Date.now()}`,
       sender: 'assistant',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      text: `🤖 **Stratrade Intelligence Assistant**:\n\n` +
-        `I have audited your trading state. Here is a snapshot:\n` +
-        `• **Liquid Cash**: $${portfolio.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +
-        `• **Active Positions**: ${portfolio.positions.length}\n` +
-        `• **Total Orders**: ${portfolio.orders.length}\n\n` +
-        `💡 **Tip**: Add your Google Gemini API key in **Settings → AI Configuration** to unlock real AI-powered analysis.\n\n` +
-        `You can ask me:\n` +
-        `• *"What is my exposure to tech stocks?"*\n` +
-        `• *"Analyze my worst losing trades"*\n` +
-        `• *"Suggest portfolio rebalancing steps"*`,
+      text: `### 🤖 Stratrade Portfolio Snapshot\n\n` +
+        `* **Available Cash**: $${portfolio.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` +
+        `* **Active Positions**: ${portfolio.positions.length} Open Positions\n` +
+        `* **Total Orders Executed**: ${portfolio.orders.length}\n\n` +
+        `Note: Add your Google Gemini API key in **Settings → AI Configuration** to unlock live custom AI analysis.`,
       category: 'general',
     };
   }
 }
 
 export const aiCopilotService = new AICopilotService();
-
-

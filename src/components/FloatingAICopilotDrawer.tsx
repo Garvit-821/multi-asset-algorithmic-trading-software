@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Sparkles, X, Send, ChevronDown, Minimize2 } from 'lucide-react';
 import { aiCopilotService, CopilotMessage, getGeminiApiKey } from '../services/aiCopilotService';
+import { FormattedAIResponse } from './FormattedAIResponse';
 
 export function FloatingAICopilotDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -161,7 +162,7 @@ export function FloatingAICopilotDrawer() {
                         <span>{m.sender === 'user' ? 'You' : 'Copilot'}</span>
                         <span>{m.timestamp}</span>
                       </div>
-                      <div className="whitespace-pre-line font-sans">{m.text}</div>
+                      <FormattedAIResponse content={m.text} isUser={m.sender === 'user'} />
                     </div>
                   </div>
                 ))}
