@@ -29,7 +29,6 @@ import { PaymentConfirmationModal } from './components/payment/PaymentConfirmati
 import { LockedFeatureGuard } from './components/payment/LockedFeatureGuard';
 import { SettingsView } from './components/SettingsView';
 import { Lock, CreditCard } from 'lucide-react';
-import { applyTerminalTheme } from './services/themeService';
 
 
 import {
@@ -159,11 +158,6 @@ function App() {
     { id: 'manual' as View, label: 'Manual Trades', icon: LayoutDashboard },
   ];
 
-  // Initialize active terminal theme on mount
-  useEffect(() => {
-    applyTerminalTheme();
-  }, []);
-
   // If the view is the Landing Page, render full width outside the dashboard shell
   if (currentView === 'landing') {
     return (
@@ -177,11 +171,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col h-screen overflow-hidden">
       {/* Top Header Ticker Tape Bar */}
-      <HeaderTickerBar
-        onSelectAsset={(sym) => { setSelectedSymbol(sym); setCurrentView('trading'); }}
-        currentView={currentView}
-        onSelectPreset={(viewName) => setCurrentView(viewName as View)}
-      />
+      <HeaderTickerBar onSelectAsset={(sym) => { setSelectedSymbol(sym); setCurrentView('trading'); }} />
 
       {/* Mobile Top Header (hidden on desktop) */}
       <header className="flex md:hidden items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm z-30">

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CoinsIcon } from 'lucide-react';
 
 const CRYPTO_PAIRS = [
   'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'XRP/USDT', 'ADA/USDT',

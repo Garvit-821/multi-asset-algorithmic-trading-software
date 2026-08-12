@@ -220,21 +220,3 @@ select {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ── Terminal Theme Custom Variables ─────────────────────────────────────── */
-.theme-bloomberg {
-  filter: sepia(0.2) hue-rotate(15deg);
-}
-
-.theme-emerald {
-  filter: hue-rotate(85deg) contrast(1.05);
-}
-
-.theme-slate {
-  filter: contrast(1.02);
-}
-
-.theme-obsidian {
-  filter: none;
-}
-
-
