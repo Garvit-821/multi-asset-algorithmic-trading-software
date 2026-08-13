@@ -54,4 +54,3 @@ ORDER BY ordinal_position;
 SELECT 
     current_user as current_db_user,
     session_user as session_user;
-

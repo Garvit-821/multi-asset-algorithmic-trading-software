@@ -22,7 +22,7 @@ It details the internal packaging mechanics, exact configuration files, every er
    - [Issue 1: Missing Android SDK Location (`sdk.dir`)](#issue-1-missing-android-sdk-location-sdkdir)
    - [Issue 2: Unaccepted Android SDK License Agreements](#issue-2-unaccepted-android-sdk-license-agreements)
    - [Issue 3: Read-Only SDK Directory Permissions](#issue-3-read-only-sdk-directory-permissions)
-5. [Automated One-Click Build Script (`setup-android.sh`)](#5-automated-one-click-build-script-setup-androidsh)
+5. [Automated One-Click Build Script (`scripts/setup-android.sh`)](#5-automated-one-click-build-script-scriptssetup-androidsh)
 6. [Master Command Cheat Sheet](#6-master-command-cheat-sheet)
 7. [Locating & Installing the `.apk` on Android Devices](#7-locating--installing-the-apk-on-android-devices)
 
@@ -264,9 +264,9 @@ sudo chown -R $USER:$USER /usr/lib/android-sdk
 
 ---
 
-## 5. Automated One-Click Build Script (`setup-android.sh`)
+## 5. Automated One-Click Build Script (`scripts/setup-android.sh`)
 
-To automate environment detection, license verification, permissions setup, and compilation into a single command, we implemented `setup-android.sh`:
+To automate environment detection, license verification, permissions setup, and compilation into a single command, we implemented `scripts/setup-android.sh`:
 
 ```bash
 #!/bin/bash
@@ -354,7 +354,7 @@ sudo mkdir -p /usr/lib/android-sdk/licenses
 echo -e "89330d722b24741a1578b6f5598d3908744f4e68\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n791244e692b300e653ee1134a772636dfef00a4d\nd56f5187479451eabf01fb78af6dfcb131a6481e" | sudo tee /usr/lib/android-sdk/licenses/android-sdk-license > /dev/null
 
 # 6. Execute one-click automated build
-bash setup-android.sh
+bash scripts/setup-android.sh
 ```
 
 ---

@@ -209,9 +209,9 @@ Initialize the tables and RLS security parameters in your Supabase project datab
 1. Log in to your **Supabase Dashboard**.
 2. Open the **SQL Editor** tab.
 3. Paste and run the contents of the local sql migration scripts in this exact order:
-   - `create_price_alerts_table.sql` (Creates alerts schema, states, and chat configurations)
+   - `supabase/scripts/create_price_alerts_table.sql` (Creates alerts schema, states, and chat configurations)
    - `supabase/migrations/20251027051145_create_crypto_trading_tables.sql` (Generates cache tables and backtest stores)
-   - `fix_rls_issues.sql` (Applies row-level policies mapping permissions to user identifiers)
+   - `supabase/scripts/fix_rls_issues.sql` (Applies row-level policies mapping permissions to user identifiers)
 
 ### 5. Start the Development Server
 
@@ -644,12 +644,12 @@ docker run -p 8080:80 \
 
 The platform is fully configured for native Android compilation using **Ionic Capacitor**. 
 
-> 📖 **Complete Step-by-Step Build Record & Error Logs**: See **[`ANDROID_BUILD_GUIDE.md`](./ANDROID_BUILD_GUIDE.md)** for a deep dive into every command, configuration, and resolution for Gradle SDK licenses & permission fixes.
+> 📖 **Complete Step-by-Step Build Record & Error Logs**: See **[`ANDROID_BUILD_GUIDE.md`](./docs/ANDROID_BUILD_GUIDE.md)** for a deep dive into every command, configuration, and resolution for Gradle SDK licenses & permission fixes.
 
 #### Quick One-Click Build Script
 Run the automated build script:
 ```bash
-bash setup-android.sh
+bash scripts/setup-android.sh
 ```
 
 #### Manual Build Commands

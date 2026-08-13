@@ -63,4 +63,3 @@ SELECT
     'price_alerts table created successfully!' as status,
     COUNT(*) as row_count
 FROM public.price_alerts;
-
