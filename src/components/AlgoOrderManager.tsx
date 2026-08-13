@@ -34,10 +34,10 @@ export function AlgoOrderManager({ symbol, currentPrice }: AlgoOrderManagerProps
     return unsubscribe;
   }, [selectedOrderForLogs]);
 
-  const handleLaunchOrder = () => {
+  const handleLaunchOrder = async () => {
     if (totalQuantity <= 0) return;
 
-    const newOrder = algoExecutionService.createAlgoOrder({
+    const newOrder = await algoExecutionService.createAlgoOrder({
       strategyType: activeStrategy,
       symbol,
       side,

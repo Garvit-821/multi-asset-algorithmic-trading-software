@@ -1,7 +1,9 @@
 // Institutional Algorithmic Order Execution Engine (TWAP, VWAP, Iceberg)
+// Refactored for Database Persistence & Server Execution Tracking
 
 import { exchangeConnector, ExchangeId } from './exchangeConnector';
 import { paperTradingService } from './paperTradingService';
+import { supabase } from '../lib/supabase';
 
 export type AlgoStrategyType = 'TWAP' | 'VWAP' | 'ICEBERG';
 
@@ -45,6 +47,62 @@ class AlgoExecutionService {
   private activeOrders: Map<string, AlgoOrderConfig> = new Map();
   private listeners: Set<Listener> = new Set();
 
+  constructor() {
+    this.syncFromDatabase();
+  }
+
+  public async syncFromDatabase() {
+    try {
+      const { data: dbOrders, error } = await supabase
+        .from('algo_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !dbOrders) return;
+
+      for (const order of dbOrders) {
+        const { data: slices } = await supabase
+          .from('algo_order_slices')
+          .select('*')
+          .eq('algo_order_id', order.id)
+          .order('slice_index', { ascending: true });
+
+        const mappedSlices: SliceLog[] = (slices || []).map((s: { id: string; slice_index: number; executed_at: string; quantity: number; price: number; status: 'FILLED' | 'REJECTED'; exchange_order_id?: string }) => ({
+          id: s.id,
+          sliceIndex: s.slice_index,
+          timestamp: new Date(s.executed_at).toLocaleTimeString(),
+          quantity: Number(s.quantity),
+          price: Number(s.price),
+          status: s.status,
+          orderId: s.exchange_order_id,
+        }));
+
+        const config: AlgoOrderConfig = {
+          id: order.id,
+          strategyType: order.strategy_type,
+          symbol: order.symbol,
+          side: order.side,
+          totalQuantity: Number(order.total_quantity),
+          filledQuantity: Number(order.filled_quantity || 0),
+          exchangeId: order.exchange_id as ExchangeId,
+          status: order.status as AlgoOrderStatus,
+          createdAt: order.created_at,
+          durationMinutes: order.duration_minutes,
+          sliceIntervalSeconds: order.slice_interval_seconds,
+          randomizeVariancePercent: order.randomize_variance_percent,
+          displayQuantity: order.display_quantity,
+          limitPrice: order.limit_price,
+          sliceLogs: mappedSlices,
+        };
+
+        this.activeOrders.set(order.id, config);
+      }
+      this.notify();
+    } catch (_err) {
+      console.warn('[AlgoExecutionService] Database sync fallback');
+    }
+  }
+
   public subscribe(listener: Listener) {
     this.listeners.add(listener);
     listener(this.getOrders());
@@ -63,7 +121,7 @@ class AlgoExecutionService {
   }
 
   // Create & Register a new Algorithmic Order
-  public createAlgoOrder(params: Omit<AlgoOrderConfig, 'id' | 'filledQuantity' | 'status' | 'createdAt' | 'sliceLogs'>): AlgoOrderConfig {
+  public async createAlgoOrder(params: Omit<AlgoOrderConfig, 'id' | 'filledQuantity' | 'status' | 'createdAt' | 'sliceLogs'>): Promise<AlgoOrderConfig> {
     const id = `ALGO-${params.strategyType}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const newOrder: AlgoOrderConfig = {
       ...params,
@@ -76,6 +134,32 @@ class AlgoExecutionService {
 
     this.activeOrders.set(id, newOrder);
     this.notify();
+
+    // Persist to Supabase Database
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      if (userRes?.user?.id) {
+        await supabase.from('algo_orders').insert({
+          id,
+          user_id: userRes.user.id,
+          strategy_type: params.strategyType,
+          symbol: params.symbol,
+          side: params.side,
+          total_quantity: params.totalQuantity,
+          filled_quantity: 0,
+          exchange_id: params.exchangeId,
+          status: 'PENDING',
+          duration_minutes: params.durationMinutes,
+          slice_interval_seconds: params.sliceIntervalSeconds,
+          randomize_variance_percent: params.randomizeVariancePercent,
+          display_quantity: params.displayQuantity,
+          limit_price: params.limitPrice,
+        });
+      }
+    } catch (_err) {
+      console.warn('[AlgoExecutionService] Database insert fallback');
+    }
+
     return newOrder;
   }
 
@@ -85,6 +169,7 @@ class AlgoExecutionService {
     if (!order || order.status === 'COMPLETED' || order.status === 'CANCELLED') return;
 
     order.status = 'RUNNING';
+    this.updateOrderStatusDb(orderId, 'RUNNING');
     this.notify();
 
     if (order.strategyType === 'TWAP') {
@@ -106,6 +191,7 @@ class AlgoExecutionService {
       order.timerId = undefined;
     }
     order.status = 'PAUSED';
+    this.updateOrderStatusDb(orderId, 'PAUSED');
     this.notify();
   }
 
@@ -119,7 +205,18 @@ class AlgoExecutionService {
       order.timerId = undefined;
     }
     order.status = 'CANCELLED';
+    this.updateOrderStatusDb(orderId, 'CANCELLED');
     this.notify();
+  }
+
+  private async updateOrderStatusDb(orderId: string, status: AlgoOrderStatus, filledQty?: number) {
+    try {
+      const updatePayload: Record<string, unknown> = { status, updated_at: new Date().toISOString() };
+      if (filledQty !== undefined) updatePayload.filled_quantity = filledQty;
+      await supabase.from('algo_orders').update(updatePayload).eq('id', orderId);
+    } catch (_err) {
+      // Ignore fallback
+    }
   }
 
   // TWAP Execution Strategy Runner
@@ -138,11 +235,11 @@ class AlgoExecutionService {
       if (remainingQty <= 0.000001 || sliceIndex >= totalSlices) {
         order.status = 'COMPLETED';
         if (order.timerId) clearInterval(order.timerId);
+        this.updateOrderStatusDb(order.id, 'COMPLETED', order.filledQuantity);
         this.notify();
         return;
       }
 
-      // Calculate slice quantity with variance
       let currentSliceQty = baseSliceQty;
       if (order.randomizeVariancePercent && order.randomizeVariancePercent > 0) {
         const variance = (Math.random() * 2 - 1) * (order.randomizeVariancePercent / 100);
@@ -151,12 +248,12 @@ class AlgoExecutionService {
 
       currentSliceQty = Math.min(currentSliceQty, remainingQty);
 
-      // Execute slice via connector or paper engine
       const executionResult = await this.executeSliceTrade(order, currentSliceQty);
 
       sliceIndex++;
       order.filledQuantity = Number((order.filledQuantity + currentSliceQty).toFixed(4));
-      order.sliceLogs.push({
+      
+      const sliceLogItem: SliceLog = {
         id: `SLICE-${Date.now()}-${sliceIndex}`,
         sliceIndex,
         timestamp: new Date().toLocaleTimeString(),
@@ -164,7 +261,12 @@ class AlgoExecutionService {
         price: executionResult.price,
         status: 'FILLED',
         orderId: executionResult.orderId,
-      });
+      };
+
+      order.sliceLogs.push(sliceLogItem);
+
+      this.recordSliceDb(order.id, sliceLogItem);
+      this.updateOrderStatusDb(order.id, order.filledQuantity >= order.totalQuantity ? 'COMPLETED' : 'RUNNING', order.filledQuantity);
 
       if (order.filledQuantity >= order.totalQuantity) {
         order.status = 'COMPLETED';
@@ -174,17 +276,13 @@ class AlgoExecutionService {
       this.notify();
     };
 
-    // Execute first slice immediately
     executeSlice();
-
-    // Schedule remaining slices
     order.timerId = setInterval(executeSlice, intervalSec * 1000);
   }
 
-  // VWAP Execution Strategy Runner (Volume Profile Weighted)
+  // VWAP Execution Strategy Runner
   private runVWAP(order: AlgoOrderConfig) {
     const intervalSec = order.sliceIntervalSeconds || 10;
-    // Volume curve profile weights for intraday slices (U-shaped distribution)
     const volumeProfile = [0.25, 0.15, 0.10, 0.08, 0.07, 0.10, 0.25];
     const totalSlices = volumeProfile.length;
     let sliceIndex = order.sliceLogs.length;
@@ -196,6 +294,7 @@ class AlgoExecutionService {
       if (remainingQty <= 0.000001 || sliceIndex >= totalSlices) {
         order.status = 'COMPLETED';
         if (order.timerId) clearInterval(order.timerId);
+        this.updateOrderStatusDb(order.id, 'COMPLETED', order.filledQuantity);
         this.notify();
         return;
       }
@@ -208,7 +307,7 @@ class AlgoExecutionService {
 
       sliceIndex++;
       order.filledQuantity = Number((order.filledQuantity + currentSliceQty).toFixed(4));
-      order.sliceLogs.push({
+      const sliceLogItem: SliceLog = {
         id: `VWAP-${Date.now()}-${sliceIndex}`,
         sliceIndex,
         timestamp: new Date().toLocaleTimeString(),
@@ -216,7 +315,11 @@ class AlgoExecutionService {
         price: executionResult.price,
         status: 'FILLED',
         orderId: executionResult.orderId,
-      });
+      };
+
+      order.sliceLogs.push(sliceLogItem);
+      this.recordSliceDb(order.id, sliceLogItem);
+      this.updateOrderStatusDb(order.id, order.filledQuantity >= order.totalQuantity ? 'COMPLETED' : 'RUNNING', order.filledQuantity);
 
       if (order.filledQuantity >= order.totalQuantity) {
         order.status = 'COMPLETED';
@@ -243,18 +346,17 @@ class AlgoExecutionService {
       if (remainingQty <= 0.000001) {
         order.status = 'COMPLETED';
         if (order.timerId) clearInterval(order.timerId);
+        this.updateOrderStatusDb(order.id, 'COMPLETED', order.filledQuantity);
         this.notify();
         return;
       }
 
-      // Only show displayQty to market
       const currentSliceQty = Math.min(displayQty, remainingQty);
-
       const executionResult = await this.executeSliceTrade(order, currentSliceQty);
 
       sliceIndex++;
       order.filledQuantity = Number((order.filledQuantity + currentSliceQty).toFixed(4));
-      order.sliceLogs.push({
+      const sliceLogItem: SliceLog = {
         id: `ICEBERG-${Date.now()}-${sliceIndex}`,
         sliceIndex,
         timestamp: new Date().toLocaleTimeString(),
@@ -262,7 +364,11 @@ class AlgoExecutionService {
         price: executionResult.price,
         status: 'FILLED',
         orderId: executionResult.orderId,
-      });
+      };
+
+      order.sliceLogs.push(sliceLogItem);
+      this.recordSliceDb(order.id, sliceLogItem);
+      this.updateOrderStatusDb(order.id, order.filledQuantity >= order.totalQuantity ? 'COMPLETED' : 'RUNNING', order.filledQuantity);
 
       if (order.filledQuantity >= order.totalQuantity) {
         order.status = 'COMPLETED';
@@ -276,30 +382,48 @@ class AlgoExecutionService {
     order.timerId = setInterval(executeSlice, intervalSec * 1000);
   }
 
+  private async recordSliceDb(algoOrderId: string, slice: SliceLog) {
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      if (userRes?.user?.id) {
+        await supabase.from('algo_order_slices').insert({
+          algo_order_id: algoOrderId,
+          user_id: userRes.user.id,
+          slice_index: slice.sliceIndex,
+          quantity: slice.quantity,
+          price: slice.price,
+          status: slice.status,
+          exchange_order_id: slice.orderId,
+          client_order_id: slice.id,
+        });
+      }
+    } catch (_err) {
+      // Fallback
+    }
+  }
+
   // Helper method to execute a single slice trade
   private async executeSliceTrade(order: AlgoOrderConfig, sliceQty: number): Promise<{ price: number; orderId: string }> {
-    // Check if live connectors have active credentials, else use paper service
-    const creds = exchangeConnector.getCredentials()[order.exchangeId];
+    const res = await exchangeConnector.executeOrder({
+      exchangeId: order.exchangeId,
+      symbol: order.symbol,
+      side: order.side,
+      orderType: 'MARKET',
+      quantity: sliceQty,
+    });
 
-    if (creds && creds.apiKey) {
-      const res = await exchangeConnector.executeOrder({
-        exchangeId: order.exchangeId,
-        symbol: order.symbol,
-        side: order.side,
-        orderType: 'MARKET',
-        quantity: sliceQty,
-      });
-      return { price: res.price, orderId: res.orderId || `SLICE-${Date.now()}` };
-    } else {
-      // Paper Trading fallback execution
-      const currentPrice = order.limitPrice || 50000;
-      if (order.side === 'BUY') {
-        paperTradingService.buyAsset(order.symbol, 'crypto', sliceQty, currentPrice);
-      } else {
-        paperTradingService.sellAsset(order.symbol, 'crypto', sliceQty, currentPrice);
-      }
-      return { price: currentPrice, orderId: `PAPER-SLICE-${Date.now()}` };
+    if (res.success && res.orderId && !res.orderId.startsWith('SIM-')) {
+      return { price: res.price, orderId: res.orderId };
     }
+
+    // Paper Trading fallback execution
+    const currentPrice = order.limitPrice || 50000;
+    if (order.side === 'BUY') {
+      paperTradingService.buyAsset(order.symbol, 'crypto', sliceQty, currentPrice);
+    } else {
+      paperTradingService.sellAsset(order.symbol, 'crypto', sliceQty, currentPrice);
+    }
+    return { price: currentPrice, orderId: `PAPER-SLICE-${Date.now()}` };
   }
 }
 

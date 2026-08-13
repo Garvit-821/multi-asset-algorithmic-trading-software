@@ -207,7 +207,7 @@ function App() {
     paperTradingService.resetPortfolio();
   };
 
-  const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string; app_metadata?: { role?: string }; user_metadata?: { role?: string } } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string; app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> } | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
