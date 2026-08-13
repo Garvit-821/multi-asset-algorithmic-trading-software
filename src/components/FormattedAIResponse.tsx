@@ -151,7 +151,7 @@ export const FormattedAIResponse: React.FC<FormattedAIResponseProps> = ({
     }
 
     // Check for metric bullet points (e.g. * **Available Cash**: $12,661.78)
-    const metricBulletMatch = trimmed.match(/^[\*\-]\s+\*\*([^\*:]+)\*\*:\s*(.+)$/);
+    const metricBulletMatch = trimmed.match(/^[*-]\s+\*\*([^*:]+)\*\*:\s*(.+)$/);
     if (metricBulletMatch) {
       const [, label, val] = metricBulletMatch;
       currentMetricsList.push({ label, value: val, rawLine });
@@ -200,7 +200,7 @@ export const FormattedAIResponse: React.FC<FormattedAIResponseProps> = ({
 // Helper function to render bold, code, inline metrics cleanly
 function renderInlineFormattedText(text: string): React.ReactNode {
   // Split text by markdown bold pattern **bold** and inline code `code`
-  const parts = text.split(/(\*\*[^\*]+\*\*|`[^`]+`)/g);
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
 
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {

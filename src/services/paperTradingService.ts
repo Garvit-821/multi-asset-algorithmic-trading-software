@@ -138,9 +138,9 @@ class PaperTradingService {
     const revenue = quantity * price;
     portfolio.cash += revenue;
 
-    // Deduct quantity
-    const remainingQty = pos.quantity - quantity;
-    if (remainingQty <= 0) {
+    // Deduct quantity with floating point tolerance
+    const remainingQty = Number((pos.quantity - quantity).toFixed(8));
+    if (remainingQty <= 0.00000001) {
       portfolio.positions.splice(existingPositionIdx, 1);
     } else {
       portfolio.positions[existingPositionIdx] = {
