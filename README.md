@@ -1,5 +1,8 @@
 # Stratrade - Multi-Asset Algorithmic Trading Platform 
 
+![Lines of Code](https://img.shields.io/badge/Lines_of_Code-21%2C341_LOC-0052ff?style=for-the-badge&logo=typescript&logoColor=white)
+![Frontend LOC](https://img.shields.io/badge/Frontend_src-19%2C762_LOC-0052ff?style=for-the-badge&logo=react&logoColor=white)
+
 **Stratrade** is a comprehensive, institutional-grade multi-asset algorithmic trading, paper simulation, real-world exchange execution, and risk analysis terminal. Designed for quantitative traders and administrators, it supports live crypto price charting via sub-second WebSockets, client-side strategy backtesting, Depth of Market (DOM L2) liquidity visualization, institutional execution algorithms (TWAP, VWAP, Iceberg), and real-time conditional alert notifications dispatched directly to Telegram.
 
 > [!TIP]
@@ -8,6 +11,7 @@
 > 🚀 **Live Production Access**:
 > - **Primary (Vercel)**: [stratrade.vercel.app](https://stratrade.vercel.app)
 > - **Backup/Alternative (Netlify)**: [stratrade.netlify.app](https://stratrade.netlify.app) *(use if the Vercel primary deployment is down)*
+> - 📊 **Code Base Statistics**: **21,341 Lines of Code** (19,762 lines in `src/`, 36,432 total repository lines)
 
 ---
 
@@ -141,6 +145,7 @@ This section provides a detailed technical breakdown of the newly added institut
 
 ## Tech Stack
 
+- **Codebase Size / Lines of Code**: **21,341 lines** of active source code (19,762 lines TypeScript/React in `src/`, 36,432 total repository lines)
 - **Language**: TypeScript 5.0+ (100% strict type safety)
 - **Frontend Core**: React 18+ initialized via Vite
 - **Security & Encryption**: Web Crypto API (256-bit AES-GCM & PBKDF2 Key Derivation)
