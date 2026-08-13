@@ -1,18 +1,13 @@
 /**
- * Telegram Bot Service for sending alerts
+ * Telegram Bot Service for sending alerts via secure Supabase Edge Function
  * 
- * To use this service, you need:
- * 1. Create a Telegram Bot via @BotFather
- * 2. Get your bot token
- * 3. Get your chat ID from @userinfobot
- * 4. Store these in environment variables or Supabase secrets
- * 
- * For production, this should be implemented as a backend API endpoint
- * to keep your bot token secure.
+ * Security Note:
+ * Bot tokens are server-side secrets (TELEGRAM_BOT_TOKEN) stored in Supabase Edge Function
+ * secrets or backend environment variables. The client application NEVER holds or exposes
+ * the raw bot token in browser JavaScript bundles.
  */
 
-const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || '';
-const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
+import { supabase } from '../lib/supabase';
 
 export interface TelegramAlert {
   symbol: string;
@@ -25,41 +20,38 @@ export interface TelegramAlert {
 }
 
 /**
- * Send an alert to Telegram
- * Note: This is a client-side implementation for demo purposes.
- * In production, this should be a server-side API call.
+ * Send an alert to Telegram via server-side Edge Function
  */
 export async function sendTelegramAlert(
   chatId: string,
   alert: TelegramAlert
 ): Promise<boolean> {
-  if (!TELEGRAM_BOT_TOKEN) {
-    console.warn('Telegram bot token not configured');
+  if (!chatId) {
+    console.warn('Telegram chat ID not configured');
     return false;
   }
 
   const message = formatAlertMessage(alert);
 
   try {
-    const response = await fetch(`${TELEGRAM_API_URL}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const { data, error } = await supabase.functions.invoke('send-telegram-alert', {
+      body: {
+        chatId,
+        message,
       },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'Markdown',
-      }),
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Telegram API error:', error);
+    if (error) {
+      console.error('Failed to send Telegram alert via backend Edge Function:', error.message || error);
       return false;
     }
 
-    return true;
+    if (data?.error) {
+      console.error('Telegram API error from backend:', data.error);
+      return false;
+    }
+
+    return data?.success === true;
   } catch (error) {
     console.error('Failed to send Telegram alert:', error);
     return false;
@@ -94,23 +86,25 @@ function formatAlertMessage(alert: TelegramAlert): string {
 }
 
 /**
- * Verify Telegram bot token and chat ID
+ * Verify Telegram bot server-side configuration status
  */
-export async function verifyTelegramConfig(): Promise<boolean> {
-  if (!TELEGRAM_BOT_TOKEN) {
-    return false;
-  }
+export async function verifyTelegramConfig(chatId?: string): Promise<boolean> {
+  if (!chatId) return false;
 
   try {
-    const response = await fetch(`${TELEGRAM_API_URL}/getMe`);
-    if (!response.ok) {
+    const { data, error } = await supabase.functions.invoke('send-telegram-alert', {
+      body: {
+        chatId,
+        message: '🔔 *Stratrade Connection Test*\n\nTelegram alert dispatch successfully verified!',
+      },
+    });
+
+    if (error || data?.error) {
       return false;
     }
 
-    const data = await response.json();
-    return data.ok === true;
+    return data?.success === true;
   } catch {
     return false;
   }
 }
-

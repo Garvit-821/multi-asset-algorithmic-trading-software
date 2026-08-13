@@ -200,7 +200,7 @@ Open the `.env` file and fill in your Supabase connection credentials and Telegr
 ```env
 VITE_SUPABASE_URL=https://your-supabase-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_TELEGRAM_BOT_TOKEN=1234567890:ABCdefGhIJKlmNoPQRsTUVwxyZ...
+TELEGRAM_BOT_TOKEN=1234567890:ABCdefGhIJKlmNoPQRsTUVwxyZ...
 ```
 
 ### 4. Database Migration Setup
@@ -222,9 +222,6 @@ npm run dev
 ```
 
 The terminal will run locally at [http://localhost:5173](http://localhost:5173). 
-
-> [!NOTE]
-> To access administrator dashboards, enter the system as `crypto@crypto.com`.
 
 ---
 
@@ -570,11 +567,11 @@ $$\text{Index} = \min\left(100, \max\left(0, \text{round}\left( (S_{\text{avg}} 
 
 The application requires specific environment configurations. Below is the detailed reference:
 
-| Variable | Required | Description | Default | How to Obtain |
+| Variable | Required | Type | Description | How to Obtain |
 |---|---|---|---|---|
-| `VITE_SUPABASE_URL` | **Yes** | The base gateway endpoint URL of your Supabase project. | - | Found under Project Settings > API in your Supabase dashboard. |
-| `VITE_SUPABASE_ANON_KEY` | **Yes** | The public API gateway token key. | - | Found under Project Settings > API in your Supabase dashboard. |
-| `VITE_TELEGRAM_BOT_TOKEN` | **Yes** | The authorization token for the Telegram Bot. | - | Send a message to `@BotFather` on Telegram to create a bot. |
+| `VITE_SUPABASE_URL` | **Yes** | Public Client | The base gateway endpoint URL of your Supabase project. | Found under Project Settings > API in Supabase dashboard. |
+| `VITE_SUPABASE_ANON_KEY` | **Yes** | Public Client | The public API gateway token key. | Found under Project Settings > API in Supabase dashboard. |
+| `TELEGRAM_BOT_TOKEN` | **Yes** | Server Secret | Server-side authorization token for Telegram Bot Edge Function. | Send a message to `@BotFather` on Telegram to create a bot. |
 
 ---
 
@@ -620,7 +617,7 @@ Since Vite compiles the application into static HTML, CSS, and JS files (`dist/`
 1. **Deploying on Vercel**:
    - Install the Vercel CLI: `npm install -g vercel`.
    - Run `vercel` in the project root.
-   - Configure the environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_TELEGRAM_BOT_TOKEN`) inside the Vercel project dashboard.
+   - Configure the environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) in your frontend host and set `TELEGRAM_BOT_TOKEN` in your Supabase Edge Function Secrets.
 2. **Deploying on Netlify**:
    - Link your GitHub repository to Netlify.
    - Set the Build Command to `npm run build`.
@@ -639,7 +636,7 @@ docker build -t cryptoagent-terminal:latest .
 docker run -p 8080:80 \
   -e VITE_SUPABASE_URL=https://your-project.supabase.co \
   -e VITE_SUPABASE_ANON_KEY=your_key \
-  -e VITE_TELEGRAM_BOT_TOKEN=your_token \
+  -e TELEGRAM_BOT_TOKEN=your_token \
   -d cryptoagent-terminal:latest
 ```
 

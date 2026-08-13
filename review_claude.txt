@@ -93,3 +93,9 @@ What I'd need to go deeper
 
 For a genuine line-level pass rather than a documentation-level one, I'd want: exchangeConnector.ts and cryptoSecurity.ts (to confirm where signing actually happens), wherever AlgoOrderManager.tsx/algoExecutionService.ts persist state, alertMonitor.ts (confirm it's not just a client-side interval), the real RLS policies (fix_rls_issues.sql plus current state), the Stripe webhook handler, wherever the crypto@crypto.com check lives, and FormattedAIResponse.tsx (confirm it's not doing raw HTML injection from AI output). Also useful to know: is Phase 1 live with real user funds right now or still pre-launch, who's your target user base/jurisdiction, and what's team size — those three change how I'd sequence this list more than anything else.
 
+
+
+Execution & Key Architecture (P0 Financial/Security): Design and refactor exchangeConnector & algoExecutionService to handle key storage and order execution on the server side.
+Financial Precision & Testing: Implement decimal.js rounding for order sizes and write unit tests for trading math and slicing algorithms.
+
+Authentication, Admin Access & RLS (P0 Security): Fix admin bypass (e.g., crypto@crypto.com), implement real role claims, verify RLS policies and column scoping for user_id.

@@ -389,23 +389,34 @@ function itemVal(val: unknown): number | string {
 class MockSupabaseClient {
   auth = {
     async getSession() {
-      return { data: { session: { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } } } };
+      const storedUser = localStorage.getItem('stratrade_mock_user');
+      const user = storedUser ? JSON.parse(storedUser) : { email: 'trader@stratrade.io', id: 'sandbox-user-id' };
+      return { data: { session: { user } } };
     },
     async getUser() {
-      return { data: { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } } };
+      const storedUser = localStorage.getItem('stratrade_mock_user');
+      const user = storedUser ? JSON.parse(storedUser) : { email: 'trader@stratrade.io', id: 'sandbox-user-id' };
+      return { data: { user } };
     },
     onAuthStateChange(callback: (event: string, session: { user: { email: string; id: string } } | null) => void) {
-      callback('SIGNED_IN', { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } });
+      const storedUser = localStorage.getItem('stratrade_mock_user');
+      const user = storedUser ? JSON.parse(storedUser) : { email: 'trader@stratrade.io', id: 'sandbox-user-id' };
+      callback('SIGNED_IN', { user });
       return { data: { subscription: { unsubscribe: () => {} } } };
     },
     async signOut() {
+      localStorage.removeItem('stratrade_mock_user');
       return { error: null };
     },
-    async signInWithPassword() {
-      return { data: { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } }, error: null };
+    async signInWithPassword({ email }: { email?: string } = {}) {
+      const user = { email: email || 'trader@stratrade.io', id: 'sandbox-user-id' };
+      localStorage.setItem('stratrade_mock_user', JSON.stringify(user));
+      return { data: { user }, error: null };
     },
-    async signUp() {
-      return { data: { user: { email: 'crypto@crypto.com', id: 'mock-admin-id' } }, error: null };
+    async signUp({ email }: { email?: string } = {}) {
+      const user = { email: email || 'trader@stratrade.io', id: 'sandbox-user-id' };
+      localStorage.setItem('stratrade_mock_user', JSON.stringify(user));
+      return { data: { user }, error: null };
     }
   };
 

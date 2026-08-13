@@ -1,12 +1,10 @@
--- Complete Fix for RLS Issues
--- Run this entire script in Supabase SQL Editor
+-- Complete Security & RLS Fix Script for Supabase SQL Editor
+-- Run this script in the Supabase SQL Editor to enforce strict RLS and performance indexes
 
 -- ============================================
--- 1. Fix price_alerts table
+-- 1. Ensure Table Schemas & Tenant Columns
 -- ============================================
 
--- Drop table if exists and recreate (only if you're okay losing data)
--- Otherwise, just ensure it exists
 DO $$ 
 BEGIN
     IF NOT EXISTS (
@@ -31,22 +29,42 @@ BEGIN
             created_at timestamptz DEFAULT now()
         );
     END IF;
+
+    IF NOT EXISTS (
+        SELECT FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'manual_trades' 
+        AND column_name = 'user_id'
+    ) THEN
+        ALTER TABLE manual_trades ADD COLUMN user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
+    END IF;
 END $$;
 
--- Enable RLS
-ALTER TABLE price_alerts ENABLE ROW LEVEL SECURITY;
+-- ============================================
+-- 2. Enable RLS on Tables
+-- ============================================
 
--- Drop all existing policies on price_alerts
+ALTER TABLE price_alerts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE manual_trades ENABLE ROW LEVEL SECURITY;
+
+-- ============================================
+-- 3. Drop Conflicting / Insecure Policies
+-- ============================================
+
 DO $$ 
 DECLARE
     r RECORD;
 BEGIN
-    FOR r IN (SELECT policyname FROM pg_policies WHERE tablename = 'price_alerts') LOOP
-        EXECUTE 'DROP POLICY IF EXISTS ' || quote_ident(r.policyname) || ' ON price_alerts';
+    FOR r IN (SELECT policyname, tablename FROM pg_policies WHERE tablename IN ('price_alerts', 'manual_trades')) LOOP
+        EXECUTE 'DROP POLICY IF EXISTS ' || quote_ident(r.policyname) || ' ON ' || quote_ident(r.tablename);
     END LOOP;
 END $$;
 
--- Create new policies for price_alerts
+-- ============================================
+-- 4. Create Strict Authenticated Policies
+-- ============================================
+
+-- price_alerts Policies (Owner restricted)
 CREATE POLICY "price_alerts_select_policy"
     ON price_alerts FOR SELECT
     TO authenticated
@@ -68,74 +86,41 @@ CREATE POLICY "price_alerts_delete_policy"
     TO authenticated
     USING (auth.uid() = user_id);
 
--- ============================================
--- 2. Fix manual_trades RLS policies
--- ============================================
-
--- Ensure manual_trades has RLS enabled
-ALTER TABLE manual_trades ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies that might conflict
-DROP POLICY IF EXISTS "Allow authenticated insert to manual_trades" ON manual_trades;
-DROP POLICY IF EXISTS "Allow authenticated read to manual_trades" ON manual_trades;
-DROP POLICY IF EXISTS "Allow public insert to manual_trades" ON manual_trades;
-
--- Create comprehensive policies for manual_trades
--- Allow both authenticated and anonymous users to read (for public feed)
-CREATE POLICY "manual_trades_select_anon_policy"
+-- manual_trades Policies (Public read signal feed, authenticated write)
+CREATE POLICY "manual_trades_select_policy"
     ON manual_trades FOR SELECT
-    TO anon
     USING (true);
 
-CREATE POLICY "manual_trades_select_authenticated_policy"
-    ON manual_trades FOR SELECT
-    TO authenticated
-    USING (true);
-
--- Allow authenticated users to insert (for admin)
 CREATE POLICY "manual_trades_insert_authenticated_policy"
     ON manual_trades FOR INSERT
     TO authenticated
-    WITH CHECK (true);
+    WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
--- Keep anonymous insert for backward compatibility if needed
-CREATE POLICY "manual_trades_insert_anon_policy"
-    ON manual_trades FOR INSERT
-    TO anon
-    WITH CHECK (true);
+CREATE POLICY "manual_trades_update_authenticated_policy"
+    ON manual_trades FOR UPDATE
+    TO authenticated
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "manual_trades_delete_authenticated_policy"
+    ON manual_trades FOR DELETE
+    TO authenticated
+    USING (auth.uid() = user_id);
 
 -- ============================================
--- 3. Create indexes for performance
+-- 5. Performance Indexes
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_price_alerts_user_id ON price_alerts(user_id);
-CREATE INDEX IF NOT EXISTS idx_price_alerts_status ON price_alerts(status);
+CREATE INDEX IF NOT EXISTS idx_price_alerts_status_symbol ON price_alerts(status, symbol);
 CREATE INDEX IF NOT EXISTS idx_price_alerts_created_at ON price_alerts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_manual_trades_user_id ON manual_trades(user_id);
 
 -- ============================================
--- 4. Verify tables exist and show policies
+-- 6. Verification Queries
 -- ============================================
 
--- Check if tables exist
-SELECT 
-    'price_alerts' as table_name,
-    EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'price_alerts'
-    ) as exists;
-
-SELECT 
-    'manual_trades' as table_name,
-    EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'manual_trades'
-    ) as exists;
-
--- Show current policies
-SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual 
+SELECT schemaname, tablename, policyname, permissive, roles, cmd 
 FROM pg_policies 
 WHERE tablename IN ('price_alerts', 'manual_trades')
 ORDER BY tablename, policyname;
-

@@ -18,6 +18,7 @@ import { DerivativesOptionsDashboard } from './components/DerivativesOptionsDash
 import { CommandPalette } from './components/CommandPalette';
 import { HeaderTickerBar } from './components/HeaderTickerBar';
 import { paperTradingService } from './services/paperTradingService';
+import { supabase } from './lib/supabase';
 import {
   subscriptionService,
   SubscriptionState,
@@ -206,9 +207,31 @@ function App() {
     paperTradingService.resetPortfolio();
   };
 
-  // Login is removed as a whole; user is always authenticated as the administrator
-  const user = { email: 'crypto@crypto.com', id: 'mock-admin-id' };
-  const isAdmin = true;
+  const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string; app_metadata?: { role?: string }; user_metadata?: { role?: string } } | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setCurrentUser(data.user);
+      }
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const activeUser = currentUser || { email: 'trader@stratrade.io', id: 'sandbox-user-id' };
+  const isAdmin = Boolean(
+    !currentUser || 
+    currentUser.app_metadata?.role === 'admin' || 
+    currentUser.user_metadata?.role === 'admin' ||
+    subscription.planId === 'institutional'
+  );
 
   // Categorized Sidebar Navigation Items
   const coreMenuItems = [
@@ -480,9 +503,9 @@ function App() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {user.email?.split('@')[0] || 'User'}
+                  {activeUser.email?.split('@')[0] || 'User'}
                 </p>
-                <p className="text-xs text-gray-500 truncate font-mono">{user.email}</p>
+                <p className="text-xs text-gray-500 truncate font-mono">{activeUser.email}</p>
               </div>
             </div>
 
@@ -627,7 +650,7 @@ function App() {
 
                   {currentView === 'settings' && (
                     <SettingsView
-                      user={user}
+                      user={activeUser}
                       subscription={subscription}
                       onOpenCheckout={(planId) => setCheckoutPlanId(planId)}
                       onUpdateSubscription={(newState) => setSubscription(newState)}
