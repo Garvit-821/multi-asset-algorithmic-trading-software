@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   LayoutDashboard,
@@ -15,7 +15,8 @@ import {
   Command,
   X,
   Layers,
-  Repeat
+  Repeat,
+  BookOpen
 } from 'lucide-react';
 
 export interface CommandItem {
@@ -33,9 +34,10 @@ interface CommandPaletteProps {
   onToggle?: () => void;
   onNavigate: (view: string) => void;
   onSelectAsset?: (symbol: string) => void;
+  onOpenGuide?: () => void;
 }
 
-export function CommandPalette({ isOpen, onClose, onToggle, onNavigate, onSelectAsset }: CommandPaletteProps) {
+export function CommandPalette({ isOpen, onClose, onToggle, onNavigate, onSelectAsset, onOpenGuide }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,6 +74,9 @@ export function CommandPalette({ isOpen, onClose, onToggle, onNavigate, onSelect
   if (!isOpen) return null;
 
   const commands: CommandItem[] = [
+    // Quick Actions & Guide
+    ...(onOpenGuide ? [{ id: 'action-guide', title: 'User Guide & Platform Manual', subtitle: 'Detailed feature walkthrough and documentation', category: 'Quick Actions' as const, icon: BookOpen, action: () => { onOpenGuide(); onClose(); } }] : []),
+
     // Navigation
     { id: 'nav-dash', title: 'Market Overview Dashboard', subtitle: 'Live tickers, charts & order book', category: 'Navigation', icon: LayoutDashboard, action: () => { onNavigate('trading'); onClose(); } },
     { id: 'nav-backtest', title: 'High-Fidelity Backtester', subtitle: 'Slippage, latency & Monte Carlo risk engine', category: 'Navigation', icon: History, action: () => { onNavigate('backtest'); onClose(); } },

@@ -9,7 +9,6 @@ import {
   BarChart2,
   Sparkles,
   ShieldCheck,
-  Key,
   Bell,
   Layers,
   Calculator,

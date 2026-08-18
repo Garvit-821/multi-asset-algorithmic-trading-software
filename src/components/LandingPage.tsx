@@ -178,13 +178,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
               <Compass className="w-4 h-4 text-[#0052ff]" />
               <span>Terminal Tour</span>
             </a>
-            <button
-              onClick={() => setIsGuideOpen(true)}
-              className="hover:text-[#0052ff] transition-colors flex items-center space-x-1 font-bold text-[#0052ff]"
-            >
-              <BookOpen className="w-4 h-4 text-[#0052ff]" />
-              <span>User Guide</span>
-            </button>
             <a href="#features" className="hover:text-[#0052ff] transition-colors">Quant Suite</a>
             <a href="#explore" className="hover:text-[#0052ff] transition-colors">Asset Catalog</a>
             <a href="#pricing" className="hover:text-[#0052ff] transition-colors font-bold text-[#0052ff]">Pricing Plans</a>
@@ -1150,6 +1143,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
               <Github className="w-4 h-4 mr-1.5 text-[#0a0b0d]" />
               <span>GitHub Repository</span>
             </a>
+            <button
+              onClick={() => setIsGuideOpen(true)}
+              className="flex items-center text-[#0052ff] hover:underline font-bold"
+            >
+              <BookOpen className="w-4 h-4 mr-1 text-[#0052ff]" />
+              <span>User Manual & Guide</span>
+            </button>
             <span className="flex items-center"><Globe className="w-4 h-4 mr-1 text-[#7c828a]" /> Web Workstation</span>
             <span className="flex items-center"><Smartphone className="w-4 h-4 mr-1 text-[#7c828a]" /> Mobile Sandbox</span>
           </div>

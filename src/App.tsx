@@ -32,6 +32,7 @@ import { SettingsView } from './components/SettingsView';
 import { ShortcutsHelpModal } from './components/ShortcutsHelpModal';
 import { QuickTradeModal } from './components/QuickTradeModal';
 import { FloatingAICopilotDrawer } from './components/FloatingAICopilotDrawer';
+import { UserGuideModal } from './components/UserGuideModal';
 import { Lock, CreditCard, Command } from 'lucide-react';
 
 
@@ -109,6 +110,7 @@ function App() {
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState<boolean>(false);
   const [quickTradeOpen, setQuickTradeOpen] = useState<boolean>(false);
   const [quickTradeType, setQuickTradeType] = useState<'BUY' | 'SELL'>('BUY');
+  const [guideModalOpen, setGuideModalOpen] = useState<boolean>(false);
 
   // Subscription & Payment Workflow State
   const [subscription, setSubscription] = useState<SubscriptionState>(() => subscriptionService.getSubscription());
@@ -716,6 +718,14 @@ function App() {
         onToggle={() => setCommandPaletteOpen((prev) => !prev)}
         onNavigate={(v) => setCurrentView(v as View)}
         onSelectAsset={(sym) => setSelectedSymbol(sym)}
+        onOpenGuide={() => setGuideModalOpen(true)}
+      />
+
+      {/* User Guide & Platform Manual Modal */}
+      <UserGuideModal
+        isOpen={guideModalOpen}
+        onClose={() => setGuideModalOpen(false)}
+        onLaunchPlatform={() => setCurrentView('trading')}
       />
 
       {/* Demo Checkout Modal */}
