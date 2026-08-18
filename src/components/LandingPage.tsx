@@ -40,6 +40,8 @@ import {
 } from '../services/subscriptionService';
 import { CheckoutModal } from './payment/CheckoutModal';
 import { PaymentConfirmationModal } from './payment/PaymentConfirmationModal';
+import { UserGuideModal } from './UserGuideModal';
+import { BookOpen } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunch: () => void;
@@ -55,6 +57,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
   const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategory>('all');
   const [liveSimValue, setLiveSimValue] = useState<number>(64520.40);
   const [isAnnualBilling, setIsAnnualBilling] = useState<boolean>(true);
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
 
   // Modal checkout state local to LandingPage (if onOpenCheckout not handled externally)
   const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId | null>(null);
@@ -175,6 +178,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
               <Compass className="w-4 h-4 text-[#0052ff]" />
               <span>Terminal Tour</span>
             </a>
+            <button
+              onClick={() => setIsGuideOpen(true)}
+              className="hover:text-[#0052ff] transition-colors flex items-center space-x-1 font-bold text-[#0052ff]"
+            >
+              <BookOpen className="w-4 h-4 text-[#0052ff]" />
+              <span>User Guide</span>
+            </button>
             <a href="#features" className="hover:text-[#0052ff] transition-colors">Quant Suite</a>
             <a href="#explore" className="hover:text-[#0052ff] transition-colors">Asset Catalog</a>
             <a href="#pricing" className="hover:text-[#0052ff] transition-colors font-bold text-[#0052ff]">Pricing Plans</a>
@@ -1174,6 +1184,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch, onOpenChecko
           }}
         />
       )}
+
+      <UserGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        onLaunchPlatform={onLaunch}
+      />
 
     </div>
   );
